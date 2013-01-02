@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Utils;
+using Editor;
 
 
-namespace Logic
+namespace Monocle
 {
     class Program
     {
