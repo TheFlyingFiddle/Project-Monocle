@@ -42,8 +42,7 @@
   <ItemGroup>
     <Compile Include="FSM\FSM.cs" />
     <Compile Include="FSM\State.cs" />
-    <Compile Include="FSM\StateActions\StateAction.cs" />
-    <Compile Include="FSM\VariableCollection.cs" />
+    <Compile Include="FSM\StateAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

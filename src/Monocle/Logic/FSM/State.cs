@@ -65,7 +65,7 @@ namespace Logic
 
         public IEnumerable<IStateAction> Actions
         {
-            get { return this.actions.AsEnumerable<IStateAction>(); }
+            get { return this.actions; }
         }
 
         /// <summary>
@@ -146,6 +146,37 @@ namespace Logic
         public object Clone()
         {
             return new State(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+                return true;
+            else if (obj is State)
+            {
+                State s = obj as State;
+                if (s.actions.Length == this.actions.Length && s.Name == this.Name)
+                {
+                    if (transitions.Count == s.transitions.Count)
+                    {
+                        for (int i = 0; i < s.actions.Length; i++)
+                        {
+                            if (!actions[i].Equals(s.actions[i]))
+                                return false;
+                        }
+
+                        foreach (var transition in transitions)
+                        {
+                            if (!s.transitions.ContainsKey(transition.Key) || s.transitions[transition.Key] != transition.Value)
+                                return false;
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

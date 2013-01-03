@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Logic_Test
+namespace EntityFramework
 {
-    public class Class1
+    [Serializable]
+    class ComponentMissingException : Exception
     {
+
     }
 }

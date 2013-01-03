@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Logic
+namespace Utils
 {
-    public interface IVariableCollection : IEnumerable<KeyValuePair<string, object>>
+    public interface IVariableCollection : IEnumerable<KeyValuePair<string, object>>, ICloneable
     {
         T GetVariable<T>(string name);
         void SetVariable<T>(string name, T value);
+        bool TryGetVariable<T>(string name, out T variable);
+        int Count { get; }
     }
 
     /// <summary>
@@ -18,6 +20,12 @@ namespace Logic
     public class VariableCollection : IVariableCollection
     {
         private readonly Dictionary<string, object> variables;
+
+
+        public int Count
+        {
+            get { throw new NotImplementedException(); }
+        }
 
         public VariableCollection(Dictionary<string, object> variables)
         {
@@ -29,6 +37,9 @@ namespace Logic
             this.variables = new Dictionary<string, object>();
             foreach (var keyvalue in collection)
             {
+                if (keyvalue.Value == null)
+                    throw new ArgumentNullException("A value in the collection is null!");
+
                 this.variables.Add(keyvalue.Key, keyvalue.Value);
             }
         }
@@ -52,7 +63,31 @@ namespace Logic
 
             throw new ArgumentException("A variable named " + name + " does not exist.");
         }
-        
+
+        /// <summary>
+        /// Tries to get a variable.
+        /// </summary>
+        /// <typeparam name="T">The type of the variable</typeparam>
+        /// <param name="name">Name of the variable</param>
+        /// <param name="variable">Variable to store the variable.</param>
+        /// <returns>The variable.</returns>
+        public bool TryGetVariable<T>(string name, out T variable)
+        {
+            object obj;
+            if (this.variables.TryGetValue(name, out obj))
+            {
+                if (obj is T)
+                {
+                    variable = (T)obj;
+                    return true;
+                }
+            }
+
+            variable = default(T);
+            return false;
+        }
+
+
         /// <summary>
         /// Sets a variable.
         /// </summary>
@@ -71,7 +106,10 @@ namespace Logic
                     throw new ArgumentNullException("value");
 
                 if (obj.GetType() == typeof(T))
+                {
                     this.variables[name] = value;
+                    return;
+                }
                 else
                     throw new InvalidCastException(string.Format("Changing the type of variable {0} from {1} to {2} is not legal.", name, obj.GetType(), typeof(T)));
             }
@@ -92,5 +130,10 @@ namespace Logic
         }
 
         #endregion
+
+        public object Clone()
+        {
+            return new VariableCollection(this);
+        }
     }
 }

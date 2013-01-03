@@ -94,7 +94,7 @@ namespace Logic
         /// Copy Constructor.
         /// </summary>
         /// <param name="fSM"></param>
-        public FSM(FSM fSM)
+        private FSM(FSM fSM)
             : this(fSM.variables, fSM.states.Select((s) => (IndexedState)s.Clone()).ToArray(), fSM.startIndex)
         {
         }
@@ -190,6 +190,34 @@ namespace Logic
         public object Clone()
         {
             return new FSM(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+                return true;
+            else if (obj is FSM)
+            {
+                var fsm = obj as FSM;
+                if (this.startIndex == fsm.startIndex)
+                {
+                    if (fsm.states.Length == this.states.Length)
+                    {
+                        for (int i = 0; i < fsm.states.Length; i++)
+                        {
+                            if (states[i].Equals(fsm.states[i]))
+                                return false;
+                        }
+
+                        if (this.variables.Count != fsm.variables.Count)
+                            return false;
+
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

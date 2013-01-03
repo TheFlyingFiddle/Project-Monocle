@@ -7,8 +7,9 @@ using Logic;
 using System.Reflection;
 using System.Linq.Expressions;
 using Utils;
+using EntityFramework;
 
-namespace Logic_Performance
+namespace Performance
 {
     class MessagePerformance
     {
@@ -18,23 +19,30 @@ namespace Logic_Performance
         public void Run(long time, long tries)
         {
             MessageSender.CacheAssemblieMessages(typeof(MessA).Assembly);
-            long dC = 0, mC = 0;
+            MessA messa = new MessA();
+            ScriptMethod<string> del = new ScriptMethod<string>("Method1");
+            del.TrackInstance(messa);
+
+
+            long dC = 0, mC = 0, sM = 0;
             for (int i = 0; i < tries; i++)
             {
                 dC += Take_Time(time, (num, m) => m.Method1("h"));
                 mC += Take_Time(time, (num, m) => MessageSender.SendMessage(m, "Method1", "h", MessageOptions.DontRequireReceiver));
+                sM += Take_Time(time, (num, m) => del.Method.Invoke("h"));
             }
 
-            Console.WriteLine("Direct_Call mean: " + ((decimal)dC / (decimal)TRIES));
-            Console.WriteLine("Message_Call mean: " + ((decimal)mC / (decimal)TRIES));
+            Console.WriteLine("Direct_Call mean: " + ((decimal)dC / (decimal)tries));
+            Console.WriteLine("Message_Call mean: " + ((decimal)mC / (decimal)tries));
+            Console.WriteLine("ScripMethod_Call mean: " + ((decimal)sM / (decimal)tries));
             Console.WriteLine("The ratio of calls is: " + ((decimal)mC / (decimal)dC));
         }
 
 
-        public long Take_Time(long time, Action<int,MessA> testFuncion)
+        public long Take_Time(long time, Action<int, Mess> testFuncion)
         {
             var watch = new Stopwatch();
-            MessA mess = new MessA();
+            Mess mess = new MessA();
             watch.Start();
             for (long i = 0; i < time; i++)
             {
@@ -47,7 +55,12 @@ namespace Logic_Performance
         }
     }
 
-    class MessA : IReceiver
+    interface Mess
+    {
+        void Method1(string value);
+    }
+
+    class MessA : IReceiver, Mess
     {
         [Message]
         public void Method1(string value) { }
