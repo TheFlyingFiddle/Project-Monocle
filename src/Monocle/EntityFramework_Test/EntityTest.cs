@@ -5,272 +5,276 @@ using System.Text;
 using NUnit.Framework;
 using EntityFramework;
 using Moq;
+using Game;
+using Utils;
 
 namespace EntityFramework_Test
 {
     [TestFixture]
     public class EntityTest
     {
+        IEntityCollection entityCollection;
+        Entity entity;
 
-        [Test]
-        public void CanGetName()
+        [SetUp]
+        public void Setup()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
+            entityCollection = new EntityCollection();
+            entity = (Entity)entityCollection.AddEntity();
+        }
 
-            Assert.AreEqual("Hello", entity.Name);
+        [TearDown]
+        public void TearDown()
+        {
+            entity.Destroy();
+            MonocleObject.LifeTimeManager.DestroyObjectsFlaggedForDestruction();
         }
 
         [Test]
-        public void HasTagWorks()
+        public void CanSetAndGetName()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            entity.AddTag("Tag1");
-            entity.AddTag("Tag2");
-
-            Assert.IsTrue(entity.HasTag("Tag1"));
-            Assert.IsTrue(entity.HasTag("Tag2"));
-            Assert.IsFalse(entity.HasTag("Tag3"));
+            entity.Name = "Daniel";
+            Assert.AreEqual("Daniel", entity.Name);
         }
 
         [Test]
-        public void GetComponentRetrivesComponent()
+        public void CanAddAndRemoveTags()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fake = entity.AddComponent<FakeComp>();
-
-            Assert.AreSame(fake, entity.GetComponent<Component>());
-        }
-
-        [Test]
-        public void GetComponentCanRetriveComponentFromInterface()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fakeComp = entity.AddComponent<FakeComp>();
+            Assert.IsFalse(entity.HasTag("Player"));
             
-            Assert.AreSame(fakeComp, entity.GetComponent<IFake>());       
-        }
-
-        [Test]
-        public void TryGetComponentRetrivesComponent()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fake = entity.AddComponent<FakeComp>();
-
-            Component result;
-            entity.TryGetComponent<Component>(out result);
-
-            Assert.AreSame(fake, result);
-        }
-
-
-        [Test]
-        public void TryGetComponentFailsIfThereIsNoComponentToRetrive()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            Component result;
-            Assert.IsFalse(entity.TryGetComponent<Component>(out result));
-            Assert.IsNull(result);
-        }
-
-        [Test]
-        public void AddComponentDoesAddAComponent()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            Assert.Throws<ComponentMissingException>(() => entity.GetComponent<Component>());
-
-            var fakeComp = entity.AddComponent<FakeComp>();
-            Assert.AreSame(fakeComp, entity.GetComponent<Component>());
-        }
-
-        [Test]
-        public void AddComponentNotifiesEntityCollection()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fakeComp = entity.AddComponent<FakeComp>();
-
-            mock.Verify((m) => m.AddedComponent(fakeComp), Times.Once());
-        }
-
-        [Test]
-        public void DeleteComponentRemovesComponent()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fakeComp = entity.AddComponent<FakeComp>();
-            Assert.AreSame(fakeComp, entity.GetComponent<Component>());
-            entity.DestroyComponent(fakeComp);
-            Assert.Throws<ComponentMissingException>(() => entity.GetComponent<Component>());
-        }
-
-        [Test]
-        public void DeleteComponentNotifiesEntityCollection()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            var fakeComp = entity.AddComponent<FakeComp>();
-            entity.DestroyComponent(fakeComp);
-
-            mock.Verify((m) => m.RemovedComponent(fakeComp), Times.Once());
-        }
-
-        [Test]
-        public void AddVarAddsAVariable()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            var expected = "test";
-            entity.AddVar("string_var", expected);
-            entity.AddVar("int_var", 2);
-
-            Assert.AreSame(expected, entity.GetVar<string>("string_var"));
-            Assert.AreEqual(2, entity.GetVar<int>("int_var"));
-        }
-
-        [Test]
-        public void CannotAddSameVariableTwice()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            entity.AddVar("string_var", "test");
+            entity.AddTag("Player");
+            Assert.IsTrue(entity.HasTag("Player"));
             
+            entity.RemoveTag("Player");
+            Assert.IsFalse(entity.HasTag("Player"));          
+        }
+
+        [Test]
+        public void CanAddComponent()
+        {
+            var comp = entity.AddComponent<FakeComp>();
+            Assert.NotNull(comp);
+        }
+
+        [Test]
+        public void CanAddMutipleComponentsOfSameType()
+        {
+            var comp = entity.AddComponent<FakeComp>();
+            var comp1 = entity.AddComponent<FakeComp>();
             
-            Assert.Throws<ArgumentException>(() => entity.AddVar("string_var", "test2"));
+            Assert.NotNull(comp1);
+            Assert.AreNotSame(comp, comp1);
         }
 
         [Test]
-        public void RemoveVarRemovesAVariable()
+        public void CanGetComponent()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            entity.AddVar("string_var", "test");
-
-            Assert.IsTrue(entity.RemoveVar("string_var"));
-            Assert.Throws<ArgumentException>(() => entity.GetVar<string>("string_var"));
-        }
-
-
-
-        [Test]
-        public void GetVarRetrivesVariable()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-          
-            var expected = "test";
-            entity.AddVar("string_var",expected);
-            entity.AddVar("int_var", 2);
-
-            Assert.AreSame(expected, entity.GetVar<string>("string_var"));
-            Assert.AreEqual(2, entity.GetVar<int>("int_var"));
+            var comp = entity.AddComponent<FakeComp>();
+            Assert.AreSame(comp, entity.GetComponent<FakeComp>());
         }
 
         [Test]
-        public void ExcpetionsAreThrownIfGetVarUsesInvalidArguments()
+        public void CanGetComponentThroughInterface()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            entity.AddVar("int_var", 2);
-
-            Assert.Throws<InvalidCastException>(() => entity.GetVar<string>("int_var"));
-            Assert.Throws<ArgumentException>(() => entity.GetVar<string>("string_var"));
-        }
-
-
-        [Test]
-        public void TryGetVarRetrivesVariable()
-        {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            var expected = "test";
-            entity.AddVar("string_var", expected);
-            entity.AddVar("int_var", 2);
-
-            int resultInt;
-            string resultString;
-
-            entity.TryGetVar<int>("int_var", out resultInt);
-            entity.TryGetVar<string>("string_var", out resultString);
-
-            Assert.AreEqual(2, resultInt);
-            Assert.AreEqual(expected, resultString);
+            var comp = entity.AddComponent<FakeComp>();
+            Assert.AreSame(comp, entity.GetComponent<IFake>());
         }
 
         [Test]
-        public void TryGetComponentFailsIfThereIsNoVariableToRetriveOrInvalidVariableType()
+        public void GetComponentThrowsExceptionIfItFails()
         {
-             
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            entity.AddVar("int_var", 2);
-             
-            string result;
-
-            Assert.IsFalse(entity.TryGetVar<string>("string_var", out result));
-            Assert.IsNull(result);
-            Assert.IsFalse(entity.TryGetVar<string>("int_var", out result));
-            Assert.IsNull(result);
+            Assert.Throws<ComponentMissingException>(() => entity.GetComponent<FakeComp>());
         }
 
         [Test]
-        public void SetVarActuallySetsAVariable()
+        public void CanGetComponents()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            entity.AddVar("int_var", 2);
+            entity.AddComponent<FakeComp>();
+            entity.AddComponent<FakeComp>();
 
-            entity.SetVar<int>("int_var", 10);
-            Assert.AreEqual(10, entity.GetVar<int>("int_var"));
+            var components = entity.GetComponents<FakeComp>().GetEnumerator();
+
+            components.MoveNext();
+            var fake1 = components.Current;
+            components.MoveNext();
+
+            Assert.AreNotSame(fake1, components.Current);
         }
 
         [Test]
-        public void SetVarThrowsExceptionIfInvalidParameters()
+        public void GetComponetsOnlyReturnsComponentsOfTheSpecifiedType()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-            entity.AddVar("int_var", 2);
+            entity.AddComponent<FakeComp>();
+            entity.AddComponent<FakeComp>();
+            entity.AddComponent<FakeComp1>();
 
-            Assert.Throws<InvalidCastException>(() => entity.SetVar<string>("int_var", "Hej"));
-            Assert.Throws<ArgumentException>(() => entity.SetVar<string>("string_var", "Hej"));
+            foreach (var component in entity.GetComponents<FakeComp>())
+            {
+                Assert.IsInstanceOf<FakeComp>(component);
+            }
         }
 
         [Test]
-        public void AddTagAddsATag()
+        public void CanTryGetComponent()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            Assert.IsFalse(entity.HasTag("tag1"));
-            entity.AddTag("tag1");
-            Assert.IsTrue(entity.HasTag("tag1"));
+            var comp = entity.AddComponent<FakeComp>();
+            FakeComp result;
+            if (entity.TryGetComponent<FakeComp>(out result))
+                Assert.AreSame(comp, result);
+            else
+                Assert.Fail();
         }
 
         [Test]
-        public void RemoveTagRemovesATag()
+        public void TryGetComponentFailsIfComponentNotFound()
         {
-            var mock = new Mock<InternalEntityCollection>();
-            var entity = new Entity("Hello", mock.Object);
-
-            entity.AddTag("tag1");
-            entity.AddTag("tag1");
-            Assert.IsTrue(entity.HasTag("tag1"));
-            entity.RemoveTag("tag1");
-            Assert.IsFalse(entity.HasTag("tag1"));
+            FakeComp result;
+            if (entity.TryGetComponent<FakeComp>(out result))
+                Assert.Fail();
         }
 
+        [Test]
+        public void RemoveComponentActuallyRemovesAComponent()
+        {
+            var comp = entity.AddComponent<FakeComp>();
+            entity.RemoveComponent(comp);
+
+            Assert.Throws<ComponentMissingException>(() => entity.GetComponent<FakeComp>());
+
+            //Cleanup;
+            comp.Destroy();
+        }
+
+        [Test]
+        public void CanAddVariable()
+        {
+            Variable<string> var = entity.AddVar<string>("Test", "Foo");
+            Assert.NotNull(var);
+        }
+
+        [Test]
+        public void CantAddDuplicateVariable()
+        {
+            entity.AddVar<string>("Test", "Foo");
+            Assert.Throws<ArgumentException>(() => entity.AddVar<string>("Test", "Bur"));
+        }
+
+        [Test]
+        public void CanGetVariable()
+        {
+            Variable<string> var = entity.AddVar<string>("Test", "Foo");
+            Assert.AreSame(var, entity.GetVar<string>("Test"));
+        }
+        
+
+        [Test]
+        public void GetVarThrowsExceptionOnInvalidType()
+        {
+            Variable<string> var = entity.AddVar<string>("Test", "Foo");
+
+            Assert.Throws<InvalidCastException>(() => entity.GetVar<int>("Test"));
+        }
+
+        [Test]
+        public void GetVarThrowsExceptionOnNonExitingVariable()
+        {
+            Assert.Throws<ArgumentException>(() => entity.GetVar<string>("Test"));
+        }
+
+        [Test]
+        public void TryGetVarCanGetAVariable()
+        {
+            Variable<string> var = entity.AddVar<string>("Test", "Foo");
+            Variable<string> result;
+            if (entity.TryGetVar<string>(var.Name, out result))
+                Assert.AreSame(var, result);
+            else
+                Assert.Fail();
+        }
+
+        [Test]
+        public void TryGetVarCantGetInvalidVariable()
+        {
+            entity.AddVar<string>("Test","Foo");
+
+            Variable<string> stringVar;
+            Variable<int> intVar;
+
+            if (entity.TryGetVar<int>("Test", out intVar) ||
+                entity.TryGetVar<string>("Foo", out stringVar))
+                Assert.Fail();
+        }
+
+        [Test]
+        public void CanRemoveVariable()
+        {
+            entity.AddVar<string>("Test", "Foo");
+            entity.RemoveVar("Test");
+
+            Assert.Throws<ArgumentException>(() => entity.GetVar<string>("Test")); 
+        }
+
+        [Test]
+        public void CanClone()
+        {
+            var clone = (Entity)entity.Clone();
+
+            //Note No entity or MonocleObject for that matter are EVER equal.
+            //So this is a very hard thing to test. IDK how to do it without going through alot 
+            //Of anoing trouble.
+            Assert.NotNull(clone);
+
+            //Cleanup.
+            clone.Destroy();
+        }
+
+        [Test]
+        public void CanParent()
+        {
+            var entity1 = entityCollection.AddEntity();
+            entity.Parent = entity1;
+            Assert.AreSame(entity.Parent, entity1);
+        }
+
+        [Test]
+        public void UnParentingRemovesTheEntityFromTheParentsChildren()
+        {
+            var entity1 = entityCollection.AddEntity();
+            entity.Parent = entity1;
+
+            entity.Parent = null;
+
+            Assert.IsFalse(entity1.Children.Contains(entity));
+        }
+
+        [Test]
+        public void ParentingAddsEntityAsAChildToTheParent()
+        {
+            var entity1 = entityCollection.AddEntity();
+            entity.Parent = entity1;
+            Assert.IsTrue(entity1.Children.Contains(entity));
+        }
+
+        [Test]
+        public void CanDestroy()
+        {
+            entity.Destroy();
+            MonocleObject.LifeTimeManager.DestroyObjectsFlaggedForDestruction();
+
+            Assert.IsTrue(entity == null);
+        }
+
+        [Test]
+        public void DestroyAlsoDestroysAllChildren()
+        {
+            var entity1 = entityCollection.AddEntity();
+            entity.Parent = entity1;
+
+            entity1.Destroy();
+            MonocleObject.LifeTimeManager.DestroyObjectsFlaggedForDestruction();
+
+            Assert.IsTrue(entity == null);
+        }
     }
 
     interface IFake { }
@@ -280,6 +284,14 @@ namespace EntityFramework_Test
         protected override Component Clone()
         {
             return new FakeComp();
+        }
+    }
+
+    class FakeComp1 : Component
+    {
+        protected override Component Clone()
+        {
+            return new FakeComp1();
         }
     }
 }

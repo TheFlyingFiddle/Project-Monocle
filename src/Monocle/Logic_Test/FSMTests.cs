@@ -18,7 +18,7 @@ namespace Logic_Test
             var mock = new Mock<IndexedState>();
             mock.Setup((m) => m.Clone()).Returns(mock.Object);
 
-            var fsm = new FSM(new VariableCollection(new Dictionary<string, object>()), new IndexedState[] { mock.Object }, 0);
+            var fsm = new FSM(new VariableCollection(), new IndexedState[] { mock.Object }, 0);
 
             fsm.Start();
 
@@ -36,7 +36,7 @@ namespace Logic_Test
             mock1.Setup((m) => m.Clone()).Returns(mock1.Object);
             mock1.Setup((m) => m.GetTransition("goto0")).Returns(0);
 
-            var fsm = new FSM(new VariableCollection(new Dictionary<string, object>()), new IndexedState[] { mock.Object , mock1.Object}, 0);
+            var fsm = new FSM(new VariableCollection(), new IndexedState[] { mock.Object , mock1.Object}, 0);
 
 
             fsm.SendEvent("goto1");
@@ -56,7 +56,10 @@ namespace Logic_Test
             var mock = new Mock<IndexedState>();
             mock.Setup((m) => m.Clone()).Returns(mock.Object);
 
-            var variableCollection = new VariableCollection(new Dictionary<string, object>() { { "test", 2 }, { "ets", "hello" } });
+            var variableCollection = new VariableCollection();
+            variableCollection.AddVariable("test", 2);
+            variableCollection.AddVariable("test2", "Hello");
+
             var fsm = new FSM(variableCollection, new IndexedState[] { mock.Object }, 0);
 
             Assert.AreEqual(2, fsm.GetVariable<int>("test"));
@@ -70,14 +73,17 @@ namespace Logic_Test
             var mock = new Mock<IndexedState>();
             mock.Setup((m) => m.Clone()).Returns(mock.Object);
 
-            var variableCollection = new VariableCollection(new Dictionary<string, object>() { { "test", 2 }, { "ets", "hello" } });
+            var variableCollection = new VariableCollection();
+            Variable<int> var1 = variableCollection.AddVariable("test", 2);
+            Variable<string> var2 = variableCollection.AddVariable("test2", "Hello");
+
             var fsm = new FSM(variableCollection, new IndexedState[] { mock.Object }, 0);
 
-            fsm.SetVariable<int>("test", 10);
-            Assert.AreEqual(10, fsm.GetVariable<int>("test"));
+            var1.Data = 10;
+            Assert.AreEqual(10, fsm.GetVariable<int>("test").Data);
 
-            fsm.SetVariable<string>("ets", "dance");
-            Assert.AreEqual("dance", fsm.GetVariable<string>("ets"));
+            var2.Data = "dance";
+            Assert.AreEqual("dance", fsm.GetVariable<string>("ets").Data);
         }
 
 
@@ -85,7 +91,7 @@ namespace Logic_Test
         public void SendMessageCalledOnActiveState()
         {
             var mock = new Mock<IndexedState>();
-            var fsm = new FSM(new VariableCollection(new Dictionary<string, object>()), new IndexedState[] { mock.Object }, 0);
+            var fsm = new FSM(new VariableCollection(), new IndexedState[] { mock.Object }, 0);
 
             fsm.Start();
             fsm.SendMessage("Hello");
@@ -99,7 +105,7 @@ namespace Logic_Test
             var mock = new Mock<IndexedState>();
             mock.Setup((m) => m.Clone()).Returns(mock.Object);
 
-            var fsm = new FSM(new VariableCollection(new Dictionary<string, object>()), new IndexedState[] { mock.Object }, 0);
+            var fsm = new FSM(new VariableCollection(), new IndexedState[] { mock.Object }, 0);
 
             fsm.Start();
             mock.Verify((s) => s.Enter(), Times.Once());

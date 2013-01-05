@@ -17,10 +17,5 @@ namespace EntityFramework
         {
             throw new NotImplementedException();
         }
-
-        internal IMutableVariableCollection CloneVariables()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

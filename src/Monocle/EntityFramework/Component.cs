@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Game;
+using Utils;
 
 namespace EntityFramework
 {
-    
-    public abstract class Component 
+    public abstract class Component : Game.MonocleObject
     {
+        private Entity owner;
         public IEntity Owner
         {
-            get;
-            internal set;
+            get { return this.owner; }
+            internal set { this.owner = (Entity)value; }
         }
 
-        public Component Copy(IEntity owner)
+        internal Component Copy(IEntity owner)
         {
             var clone = this.Clone();
             clone.Owner = owner;
@@ -22,20 +24,21 @@ namespace EntityFramework
         }
 
         protected abstract Component Clone();
-    }
 
-    public class UpdatableComponent : Component
-    {
-     
-        public void Update()
+        public void SendMessage(string messageName, object param, MessageOptions options)
         {
-            Console.WriteLine("Updating...");
+            MessageSender.SendMessage(this, messageName, param, options);
         }
 
-        protected override Component Clone()
+        internal new void DestroyImediate()
         {
-            return new UpdatableComponent();
+            base.DestroyImediate();
+        }
+
+        protected override void DestroySelf()
+        {
+            this.owner.RemoveComponent(this);
+            this.owner = null;
         }
     }
-
 }

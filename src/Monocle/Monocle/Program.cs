@@ -13,15 +13,6 @@ namespace Monocle
     {
         public static void Main(string[] args)
         {
-            MessageSender.CacheAssemblieMessages(typeof(Program).Assembly);
-            
-            var fsm = new FSMEditor().BuildFSM();
-            fsm.Start();
-
-            while (true)
-            {
-                fsm.SendMessage("HandleCommand", Console.ReadLine());
-            }
         }
     }
 }

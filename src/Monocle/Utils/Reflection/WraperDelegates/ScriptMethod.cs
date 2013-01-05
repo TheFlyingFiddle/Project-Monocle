@@ -6,8 +6,16 @@ using System.Reflection;
 
 namespace EntityFramework
 {
+    /// <summary>
+    /// A class used to wrap instance methods of the <see cref="Action"/> type.
+    /// </summary>
+    /// <remarks>This class is very usefull if you want to call a specific method 
+    ///  but you either don't know the type or now if the method exists at all.</remarks>
+    ///  <example>
+    /// <remarks>For optimisation purpuses the Method Delegate is public.</remarks>
     public class ScriptMethod
     {
+        //Name of the method to wrap.
         private readonly string methodName;
         private readonly Dictionary<object, Action> instances;
 

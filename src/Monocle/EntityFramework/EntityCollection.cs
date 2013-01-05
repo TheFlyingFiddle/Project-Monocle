@@ -2,107 +2,80 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Utils;
 
 namespace EntityFramework
 {
-    public interface IEntityCollection
+    interface IEntityCollection : IEnumerable<IEntity> 
     {
-        IEntity CreateEntity(string name);
-        IEntity CreateEntity(Prefab prefab, string name = "");
-        IEntity CloneEntity(IEntity entity);
-        void DestroyEntity(IEntity entity);
-        void ReamovedDestroyedEntities();
+        IEntity AddEntity();
+        IEntity Find(Predicate<IEntity> match);
 
         event Action<IEntity> EntityCreated;
         event Action<IEntity> EntityDestroyed;
-        event Action<Component> ComponentAdded;
-        event Action<Component> ComponentRemoved;
+        event Action<Component> ComponentCreated;
+        event Action<Component> ComponentDestroyed;
     }
 
-    public interface InternalEntityCollection : IEntityCollection
-    {
-        void AddedComponent(Component component);
-        void RemovedComponent(Component component);
-    }
 
-    class EntityCollection : InternalEntityCollection
+    class EntityCollection : IEntityCollection
     {
+        private readonly List<IEntity> entities;
+
         public event Action<IEntity> EntityCreated;
         public event Action<IEntity> EntityDestroyed;
-        public event Action<Component> ComponentAdded;
-        public event Action<Component> ComponentRemoved;
+        public event Action<Component> ComponentCreated;
+        public event Action<Component> ComponentDestroyed;
 
-        private readonly IEntityCreator creator;
-        private readonly List<IEntity> entities;
-        private readonly List<IEntity> toRemove;
-
-        public EntityCollection(IEntityCreator creator)
+        public EntityCollection()
         {
-            this.creator = creator;
             this.entities = new List<IEntity>();
-            this.toRemove = new List<IEntity>();
+        }
+      
+        internal void OnComponentAdded(Component component)
+        {
+            if (this.ComponentCreated != null)
+                this.ComponentCreated(component);
         }
 
-        public IEntity CreateEntity(string name)
+        internal void OnComponentRemoved(Component component)
         {
-            var entity = creator.CreateEntity(name, this);
-            this.AddEntity(entity);
-            return entity;
+            if (this.ComponentDestroyed != null)
+                this.ComponentDestroyed(component);
         }
 
-        public IEntity CreateEntity(Prefab prefab, string name = "")
+        internal void Remove(Entity entity)
         {
-            var entity = creator.CreateEntity(prefab, this, name);
-            this.AddEntity(entity);
-            return entity;
-        }
-
-        public IEntity CloneEntity(IEntity entity)
-        {
-            var clone = creator.CopyEntity(entity, this);
-            this.AddEntity(clone);
-            return clone;
-        }
-
-        public void DestroyEntity(IEntity entity)
-        {
-            this.toRemove.Add(entity);
-        }
-
-        private void AddEntity(IEntity entity)
-        {
-            this.entities.Add(entity);
-            if (this.EntityCreated != null)
-                this.EntityCreated(entity);
-        }
-
-        private void RemoveEntity(IEntity entity)
-        {
-            this.entities.Remove(entity);
             if (this.EntityDestroyed != null)
                 this.EntityDestroyed(entity);
+
+            this.entities.Remove(entity);
         }
 
-        public void AddedComponent(Component component)
+        public IEntity AddEntity()
         {
-            if (this.ComponentAdded != null)
-                this.ComponentAdded(component);
+            var entity = new Entity(this, new VariableCollection());
+            if (this.EntityCreated != null)
+                this.EntityCreated(entity);
+
+            this.entities.Add(entity);
+            return entity;
         }
 
-        public void RemovedComponent(Component component)
+        public IEntity Find(Predicate<IEntity> match)
         {
-            if (this.ComponentRemoved != null)
-                this.ComponentRemoved(component);
+            return this.entities.Find(match);
         }
 
-        public void ReamovedDestroyedEntities()
-        {
-            foreach (var entity in this.toRemove)
-            {
-                this.RemoveEntity(entity);
-            }
 
-            this.toRemove.Clear();
+        public IEnumerator<IEntity> GetEnumerator()
+        {
+            return this.entities.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

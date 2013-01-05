@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1051A5AB-E417-4900-839C-06FE9AB4D7C9}</ProjectGuid>
+    <ProjectGuid>{84CBBC64-7140-46E3-950E-6177349B3ED2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Editor</RootNamespace>
-    <AssemblyName>Editor</AssemblyName>
+    <RootNamespace>Scripting</RootNamespace>
+    <AssemblyName>Scripting</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,7 +30,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSScriptLibrary">
+      <HintPath>..\..\..\..\..\..\Desktop\cs-script\Lib\Bin\NET 4.0\CSScriptLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,21 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TileEditor\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Logic\Logic.csproj">
-      <Project>{C1EDFD58-1781-4AFE-A640-6DD719F13843}</Project>
-      <Name>Logic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Utils\Utils.csproj">
-      <Project>{AF421291-A1E3-40CE-9D83-D3D0ECA1F932}</Project>
-      <Name>Utils</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

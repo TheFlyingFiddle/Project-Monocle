@@ -20,16 +20,16 @@ namespace Performance
         {
             MessageSender.CacheAssemblieMessages(typeof(MessA).Assembly);
             MessA messa = new MessA();
-            ScriptMethod<string> del = new ScriptMethod<string>("Method1");
+            ScriptMethod del = new ScriptMethod("Method2");
             del.TrackInstance(messa);
 
 
             long dC = 0, mC = 0, sM = 0;
             for (int i = 0; i < tries; i++)
             {
-                dC += Take_Time(time, (num, m) => m.Method1("h"));
-                mC += Take_Time(time, (num, m) => MessageSender.SendMessage(m, "Method1", "h", MessageOptions.DontRequireReceiver));
-                sM += Take_Time(time, (num, m) => del.Method.Invoke("h"));
+                dC += Take_Time(time, (num, m) => m.Method2());
+                mC += Take_Time(time, (num, m) => MessageSender.SendMessage(m, "Method2", null, MessageOptions.DontRequireReceiver));
+                sM += Take_Time(time, (num, m) => del.Method.Invoke());
             }
 
             Console.WriteLine("Direct_Call mean: " + ((decimal)dC / (decimal)tries));
@@ -58,6 +58,7 @@ namespace Performance
     interface Mess
     {
         void Method1(string value);
+        void Method2();
     }
 
     class MessA : IReceiver, Mess

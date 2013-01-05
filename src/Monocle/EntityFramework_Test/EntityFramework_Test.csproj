@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SkipPostSharp</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentTest.cs" />
+    <Compile Include="EntityCollectionTest.cs" />
     <Compile Include="EntityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,6 +53,14 @@
     <ProjectReference Include="..\EntityFramework\EntityFramework.csproj">
       <Project>{8F20FA84-BD1E-4CF6-98CD-5FA107DF1C87}</Project>
       <Name>EntityFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Game\Game.csproj">
+      <Project>{651CE533-F619-4355-B239-8FCDABA30D1E}</Project>
+      <Name>Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{AF421291-A1E3-40CE-9D83-D3D0ECA1F932}</Project>
+      <Name>Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,17 +11,7 @@ namespace EntityFramework
     }
 
     public class EntitySystem : IEntitySystem
-    {
-
-        public void TrackEntityCollection(IEntityCollection collection)
-        {
-            collection.ComponentAdded += ComponentAdded;
-            collection.ComponentRemoved += ComponentRemoved;
-            collection.EntityCreated += EntityCreated;
-            collection.EntityDestroyed += EntityDestroyed;
-        }
-
-
+    {     
         protected virtual void EntityCreated(IEntity entity) { }
         protected virtual void EntityDestroyed(IEntity entity) { }
         protected virtual void ComponentAdded(Component component) {  }

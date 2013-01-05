@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
+using PostSharp.Aspects;
+using PostSharp.Extensibility;
+using Game;
 
 namespace EntityFramework
 {
@@ -10,18 +12,30 @@ namespace EntityFramework
     {
         public static void Main(string[] args)
         {
-            var entityCollection = new EntityCollection(new EntityCreator());
-            var system = new UpdateSystem();
-            system.TrackEntityCollection(entityCollection);
+        }
+    }
 
-            var entity = entityCollection.CreateEntity("John");
-            entity.AddComponent<UpdatableComponent>();
+    [Serializable]
+    [MulticastAttributeUsage(MulticastTargets.Method, TargetMemberAttributes =  MulticastAttributes.Instance)]
+    public class NullCheckAspect : OnMethodBoundaryAspect
+    {
+        public override void OnEntry(MethodExecutionArgs args)
+        {
+            base.OnEntry(args);
 
-            while (true)
-            {
-                Thread.Sleep(1000);
-                system.Update();
-            }          
+            MonocleObject moObj = args.Instance as MonocleObject;
+            if (moObj == null)
+                throw new NullReferenceException("e");
+        }
+
+
+
+        public override bool CompileTimeValidate(System.Reflection.MethodBase method)
+        {
+            if (!typeof(MonocleObject).IsAssignableFrom(method.DeclaringType))
+                return false;
+
+            return base.CompileTimeValidate(method);
         }
     }
 }

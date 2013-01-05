@@ -47,20 +47,9 @@ namespace Logic
         /// <returns>A variable value.</returns>
         /// <exception cref="InvalidCastException">Thrown if the type T is not the correct type for this variable.</exception>
         /// <exception cref="ArgumentException">Thrown if the variable does not exist.</exception>
-        T GetVariable<T>(string variableID);
+        Variable<T> GetVariable<T>(string variableID);
 
 
-
-        /// <summary>
-        /// Sets a variable.
-        /// </summary>
-        /// <typeparam name="T">The type of the variable.</typeparam>
-        /// <param name="name">The name of the variable.</param>
-        /// <param name="value">The new value of the variable.</param>
-        /// <exception cref="ArgumentNullException">Thrown if value is null.</exception>
-        /// <exception cref="InvalidCastException">Thrown if the type of the value is incorrect.</exception>
-        /// <exception cref="ArgumentException">Thrown if the variable does not exsist.</exception>
-        void SetVariable<T>(string variableID, T value);
     }
 
     /// <summary>
@@ -68,7 +57,7 @@ namespace Logic
     /// </summary>
     public class FSM : IFSM
     {
-        private readonly VariableCollection variables;
+        private readonly IVariableCollection variables;
         private readonly IndexedState[] states;
         private int activeIndex;
         private readonly int startIndex;
@@ -82,7 +71,7 @@ namespace Logic
         /// <param name="activeIndex">The startingID of the fsm.</param>
         public FSM(IVariableCollection variables, IndexedState[] states, int activeIndex)
         {
-            this.variables = new VariableCollection(variables);
+            this.variables = (IVariableCollection)variables.Clone();
             this.states = states;
             this.startIndex = activeIndex;
             this.activeIndex = activeIndex;
@@ -164,24 +153,11 @@ namespace Logic
         /// <returns>A variable value.</returns>
         /// <exception cref="InvalidCastException">Thrown if the type T is not the correct type for this variable.</exception>
         /// <exception cref="ArgumentException">Thrown if the variable does not exist.</exception>
-        public T GetVariable<T>(string variableID)
+        public Variable<T> GetVariable<T>(string variableID)
         {
             return this.variables.GetVariable<T>(variableID);
         }
 
-        /// <summary>
-        /// Sets a variable.
-        /// </summary>
-        /// <typeparam name="T">The type of the variable.</typeparam>
-        /// <param name="name">The name of the variable.</param>
-        /// <param name="value">The new value of the variable.</param>
-        /// <exception cref="ArgumentNullException">Thrown if value is null.</exception>
-        /// <exception cref="InvalidCastException">Thrown if the type of the value is incorrect.</exception>
-        /// <exception cref="ArgumentException">Thrown if the variable does not exsist.</exception>
-        public void SetVariable<T>(string variableID, T value)
-        {
-            this.variables.SetVariable<T>(variableID, value);
-        }
 
         /// <summary>
         /// Clones the FSM (DEEP)
