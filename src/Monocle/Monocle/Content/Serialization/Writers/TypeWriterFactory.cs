@@ -22,7 +22,7 @@ namespace Monocle.Content.Serialization
         {
             foreach (var type in toRegister.GetTypes())
             {
-                if (type.IsDefined(typeof(ContentWriterAttribute), false))
+                if (type.IsDefined(typeof(TypeWriterAttribute), false))
                     this.RegisterTypeWriter((ITypeWriter)Activator.CreateInstance(type));
                 else if (type.IsDefined(typeof(GenericTypeWriterAttribute), false))
                     this.RegisterGenericTypeWriter(type);
@@ -95,6 +95,7 @@ namespace Monocle.Content.Serialization
 
         public void RegisterGenericTypeWriter(Type genericTypeWriterType)
         {
+
             if (!typeof(ITypeWriter).IsAssignableFrom(genericTypeWriterType))
                 throw new ArgumentException("Not a type writer!");
             if (!genericTypeWriterType.IsGenericType)

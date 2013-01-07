@@ -32,7 +32,7 @@ namespace Monocle.Content.Serialization
     { }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ContentWriterAttribute : Attribute
+    public class TypeWriterAttribute : Attribute
     { }
 
     [AttributeUsage(AttributeTargets.Class)]

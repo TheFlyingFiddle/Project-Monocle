@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Moq;
 using Monocle.Logic;
 using Monocle.Content.Serialization;
+using System.IO;
+using Monocle.Utils;
 
 namespace Logic_Test
 {
@@ -120,6 +122,21 @@ namespace Logic_Test
         public void CanSerializeAndDeserializeFSM()
         {
             fsm.AddState("Test");
+            var state = fsm.AddState("Foo");
+
+            state.AddTransition("BAR", "Test");
+
+            var stream = new MemoryStream();
+
+            var wfactory = new TypeWriterFactory();
+            var rfactory = new TypeReaderFactory();
+
+            AssetWriter.WriteAsset(stream, fsm, wfactory);
+
+            stream.Position = 0;
+            var result = AssetReader.ReadAsset<FSMComponent>(stream, rfactory);
+
+
         }
     }
 }

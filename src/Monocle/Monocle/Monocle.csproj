@@ -80,6 +80,8 @@
     <Compile Include="Core\MonocleLifeTimeManager.cs" />
     <Compile Include="Core\MonocleObject.cs" />
     <Compile Include="Logic\Components\FSMComponent.cs" />
+    <Compile Include="Logic\Components\FSMComponentReader.cs" />
+    <Compile Include="Logic\Components\FSMComponentWriter.cs" />
     <Compile Include="Logic\FSM\FSM.cs" />
     <Compile Include="Logic\FSM\State.cs" />
     <Compile Include="Logic\FSM\StateAction.cs" />

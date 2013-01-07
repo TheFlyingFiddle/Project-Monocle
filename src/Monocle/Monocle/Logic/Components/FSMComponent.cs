@@ -8,28 +8,36 @@ using Monocle.Core;
 
 namespace Monocle.Logic
 {
-    class FSMComponent : Behaviour, IFSM
+    public sealed class FSMComponent : Behaviour, IFSM
     {
-        public class State : IState
+        public sealed class State : IState
         {
             private FSMComponent fsm;
             private List<IStateAction> actions;
             private Dictionary<string, string> transitions;
             private string name;
+
+            internal State(string name, List<IStateAction> actions, Dictionary<string, string> transitions)
+            {
+                this.name = name;
+                this.actions = actions;
+                this.transitions = transitions;
+            }
+
             
-            internal State(State state, FSMComponent fsm)
+            private State(State state, FSMComponent fsm)
             {
                 this.name = state.Name;
                 this.fsm = fsm;
-                this.actions = state.actions.Select((x) => (IStateAction)x.Clone()).ToList();
+                this.actions = CloneActions(state);
                 this.transitions = new Dictionary<string, string>(state.transitions);
             }
 
-            internal State(State state, string newName)
+            private State(State state, string newName)
             {
                 this.name = newName;
                 this.fsm = state.fsm;
-                this.actions = state.actions.Select((x) => (IStateAction)x.Clone()).ToList();
+                this.actions = CloneActions(state);
                 this.transitions = new Dictionary<string, string>(state.transitions);
             }
 
@@ -39,6 +47,18 @@ namespace Monocle.Logic
                 this.fsm = fsm;
                 this.actions = new List<IStateAction>();
                 this.transitions = new Dictionary<string, string>();
+            }
+
+
+            private List<IStateAction> CloneActions(State state)
+            {
+                return state.actions.Select<IStateAction, IStateAction>(
+                    (x) => 
+                    {
+                        var clone = (IStateAction)x.Clone();
+                        clone.FSM = state.fsm;
+                        return clone;
+                    }).ToList();
             }
 
             public string Name
@@ -54,6 +74,16 @@ namespace Monocle.Logic
             {
                 this.fsm.RenameState(this.name, name);
                 this.name = name;
+            }
+
+            public FSMComponent FSM
+            {
+                get { return fsm; }
+                set
+                {
+                    this.fsm = value;
+                    this.actions.ForEach((x) => x.FSM = fsm);
+                }
             }
             
             internal string GetTransition(string _event)
@@ -77,6 +107,11 @@ namespace Monocle.Logic
             public IEnumerable<IStateAction> Actions
             {
                 get { return actions; }
+            }
+
+            public IEnumerable<KeyValuePair<string, string>> Transitions
+            {
+                get { return this.transitions; }
             }
 
             public T AddAction<T>() where T : IStateAction,  new()
@@ -151,7 +186,7 @@ namespace Monocle.Logic
                 toChange.ForEach(x => transitions[x] = newName);
             }
         }
-
+       
         private readonly IVariableCollection variables;
         private readonly Dictionary<string, State> states;
         private string startState;
@@ -162,13 +197,20 @@ namespace Monocle.Logic
             this.variables = new VariableCollection();
             this.states = new Dictionary<string, State>();
         }
-
+        
         public FSMComponent(FSMComponent fSMComponent)
         {
             this.startState = fSMComponent.startState;
             this.variables = (IVariableCollection)fSMComponent.variables.Clone();
             this.states = CloneStates(fSMComponent.states);
+        }
 
+        internal FSMComponent(Dictionary<string, State> states, IVariableCollection variables, string startState)
+        {
+            this.variables = variables;
+            this.startState = startState;
+            this.states = states;
+            this.states.Values.ForEach(x => x.FSM = this);
         }
 
         private Dictionary<string, State> CloneStates(Dictionary<string, State> dictionary)
@@ -285,12 +327,30 @@ namespace Monocle.Logic
             return this.variables.HasVariable(name);
         }
 
-        public void SetStartState(string stateID)
+        private void SetStartState(string stateID)
         {
             if (!this.states.ContainsKey(stateID))
                 throw new ArgumentException(string.Format("Cannot set the startstate to {0} siince it dosn't exsist.", stateID));
 
             this.startState = stateID;
+        }
+        
+        public string StartState
+        {
+            get { return this.startState; }
+            set { this.SetStartState(value); }
+        }
+
+        public int StateCount { get { return this.states.Count; } }
+
+        public IVariableCollection Variables
+        {
+            get { return this.variables; }
+        }
+
+        public IEnumerable<State> States
+        {
+            get { return this.states.Values; }
         }
     }
 }

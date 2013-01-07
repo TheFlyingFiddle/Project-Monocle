@@ -6,7 +6,7 @@ using Monocle.Content.Serialization;
 
 namespace Monocle.Utils.Variables
 {
-    [ContentWriter]
+    [TypeWriter]
     class VariableCollectionWriter : TypeWriter<VariableCollection>
     {
         public override void WriteType(VariableCollection toWrite, IWriter writer)
