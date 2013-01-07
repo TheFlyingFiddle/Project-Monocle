@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Content.Serialization;
+using Monocle.Content.Serialization;
 
 namespace Content_Test.Serialization
 {
@@ -30,18 +30,12 @@ namespace Content_Test.Serialization
         private ITypeWriterFactory CreateTypeWriterFactory()
         {
             var factory = new TypeWriterFactory();
-            factory.RegisterGenericTypeWriter(typeof(ListWriter<>));
-            factory.RegisterGenericTypeWriter(typeof(SetWriter<>));
-            factory.RegisterGenericTypeWriter(typeof(DictionaryWriter<,>));
             return factory;
         }
 
         private ITypeReaderFactory CreateTypeReaderFactory()
         {
             var factory = new TypeReaderFactory();
-            factory.RegisterGenericTypeReader(typeof(ListReader<>));
-            factory.RegisterGenericTypeReader(typeof(SetReader<>));
-            factory.RegisterGenericTypeReader(typeof(DictionaryReader<,>));
             return factory;
         }
 

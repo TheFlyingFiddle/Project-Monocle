@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Moq;
-using Content.Serialization;
+using Monocle.Content.Serialization;
 
 namespace Content_Test.Serialization
 {

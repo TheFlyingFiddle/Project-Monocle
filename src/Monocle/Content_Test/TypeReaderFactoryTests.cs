@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Moq;
-using Content.Serialization;
+using Monocle.Content.Serialization;
 
 namespace Content_Test.Serialization
 {
@@ -23,7 +23,7 @@ namespace Content_Test.Serialization
         public void CanRegisterValidTypeReader()
         {
             var mockedReader = new Mock<ITypeReader>();
-            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(string));
+            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeReader(mockedReader.Object);
         }
 
@@ -40,7 +40,7 @@ namespace Content_Test.Serialization
         public void CantRegisterDuplicateTypeReader()
         {
             var mockedReader = new Mock<ITypeReader>();
-            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(string));
+            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeReader(mockedReader.Object);
 
             Assert.Throws<ArgumentException>(
@@ -51,9 +51,9 @@ namespace Content_Test.Serialization
         public void CantRegisterMultipleTypeReadersForSameType()
         {
             var mockedReader0 = new Mock<ITypeReader>();
-            mockedReader0.Setup(tr => tr.GetRedableType()).Returns(typeof(string));
+            mockedReader0.Setup(tr => tr.GetRedableType()).Returns(typeof(FakeType));
             var mockedReader1 = new Mock<ITypeReader>();
-            mockedReader1.Setup(tr => tr.GetRedableType()).Returns(typeof(string));
+            mockedReader1.Setup(tr => tr.GetRedableType()).Returns(typeof(FakeType));
 
             this.provider.RegisterTypeReader(mockedReader0.Object);
 
@@ -65,11 +65,11 @@ namespace Content_Test.Serialization
         public void CanGetRegisteredTypeReader()
         {
             var mockedReader = new Mock<ITypeReader>();
-            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(string));
+            mockedReader.Setup(tr => tr.GetRedableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeReader(mockedReader.Object);
 
-            Assert.AreSame(mockedReader.Object, this.provider.GetTypeReader<string>());
-            Assert.AreSame(mockedReader.Object, this.provider.GetTypeReader(typeof(string)));
+            Assert.AreSame(mockedReader.Object, this.provider.GetTypeReader<FakeType>());
+            Assert.AreSame(mockedReader.Object, this.provider.GetTypeReader(typeof(FakeType)));
         }
 
         [Test]
@@ -90,5 +90,8 @@ namespace Content_Test.Serialization
         {
             Assert.Throws<RankException>(() => this.provider.GetTypeReader(typeof(int[, ,])));
         }
+
+        private class FakeType { }
     }
+
 }

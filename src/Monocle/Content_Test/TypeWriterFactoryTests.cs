@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Moq;
-using Content.Serialization;
+using Monocle.Content.Serialization;
 
 namespace Content_Test.Serialization
 {
@@ -23,7 +23,7 @@ namespace Content_Test.Serialization
         public void CanRegisterValidTypeWriter()
         {
             var mockedReader = new Mock<ITypeWriter>();
-            mockedReader.Setup(tr => tr.GetWritableType()).Returns(typeof(string));
+            mockedReader.Setup(tr => tr.GetWritableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeWriter(mockedReader.Object);
         }
 
@@ -40,7 +40,7 @@ namespace Content_Test.Serialization
         public void CantRegisterDuplicateTypeWriter()
         {
             var mockedReader = new Mock<ITypeWriter>();
-            mockedReader.Setup(tr => tr.GetWritableType()).Returns(typeof(string));
+            mockedReader.Setup(tr => tr.GetWritableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeWriter(mockedReader.Object);
 
             Assert.Throws<ArgumentException>(
@@ -51,9 +51,9 @@ namespace Content_Test.Serialization
         public void CantRegisterMultipleTypeWritersForSameType()
         {
             var mockedWriter0 = new Mock<ITypeWriter>();
-            mockedWriter0.Setup(tr => tr.GetWritableType()).Returns(typeof(string));
+            mockedWriter0.Setup(tr => tr.GetWritableType()).Returns(typeof(FakeType));
             var mockedWriter1 = new Mock<ITypeWriter<string>>();
-            mockedWriter1.Setup(tr => tr.GetWritableType()).Returns(typeof(string));
+            mockedWriter1.Setup(tr => tr.GetWritableType()).Returns(typeof(FakeType));
 
             this.provider.RegisterTypeWriter(mockedWriter0.Object);
 
@@ -64,11 +64,11 @@ namespace Content_Test.Serialization
         public void CanGetRegisteredTypeWriter()
         {
             var mockedWriter = new Mock<ITypeWriter>();
-            mockedWriter.Setup(tr => tr.GetWritableType()).Returns(typeof(string));
+            mockedWriter.Setup(tr => tr.GetWritableType()).Returns(typeof(FakeType));
             this.provider.RegisterTypeWriter(mockedWriter.Object);
 
-            Assert.AreSame(mockedWriter.Object, this.provider.GetTypeWriter<string>());
-            Assert.AreSame(mockedWriter.Object, this.provider.GetTypeWriter(typeof(string)));
+            Assert.AreSame(mockedWriter.Object, this.provider.GetTypeWriter<FakeType>());
+            Assert.AreSame(mockedWriter.Object, this.provider.GetTypeWriter(typeof(FakeType)));
         }
 
         [Test]
@@ -89,5 +89,7 @@ namespace Content_Test.Serialization
         {
             Assert.Throws<RankException>(() => this.provider.GetTypeWriter(typeof(int[, ,])));
         }
+
+        private class FakeType { }
     }
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using EntityFramework;
 using Moq;
-using Game;
-using Utils;
+using Monocle.EntityFramework;
+using Monocle.Game;
+using Monocle.Utils;
 
 namespace EntityFramework_Test
 {

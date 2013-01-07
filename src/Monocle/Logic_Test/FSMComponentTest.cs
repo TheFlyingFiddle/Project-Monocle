@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Logic;
 using Moq;
+using Monocle.Logic;
+using Monocle.Content.Serialization;
 
 namespace Logic_Test
 {
@@ -113,6 +114,25 @@ namespace Logic_Test
             fsm.SendEvent("FINISHED");
             fsm.SendEvent("OPEN");
             fsm.SendEvent("FINISHED");
+        }
+
+        [Test]
+        public void CanSerializeAndDeserializeFSM()
+        {
+            fsm.AddState("Test");
+            
+            var memStream = new System.IO.MemoryStream();
+
+            var writer = new BinaryWriter(memStream, new TypeWriterFactory());
+            var reader = new BinaryReader(memStream, new TypeReaderFactory());
+
+            writer.Write(fsm);
+
+            memStream.Position = 0;
+
+            var fsmDeserialized = reader.Read<FSMComponent>();
+
+    
         }
     }
 }

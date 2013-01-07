@@ -58,9 +58,9 @@
     <Compile Include="TypeWriterFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content\Content.csproj">
-      <Project>{B4EEBEB5-FC6B-4CFE-96BA-8634BE4EC9E8}</Project>
-      <Name>Content</Name>
+    <ProjectReference Include="..\Monocle\Monocle.csproj">
+      <Project>{8FDB7A50-44CB-4BD2-B4D8-7C1170C774B6}</Project>
+      <Name>Monocle</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

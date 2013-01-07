@@ -43,22 +43,71 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\Attributes.cs" />
+    <Compile Include="Content\Serialization\Collections\ArrayReader.cs" />
+    <Compile Include="Content\Serialization\Collections\ArrayWriter.cs" />
+    <Compile Include="Content\Serialization\Collections\DictionaryReader.cs" />
+    <Compile Include="Content\Serialization\Collections\DictionaryWriter.cs" />
+    <Compile Include="Content\Serialization\Collections\ListReader.cs" />
+    <Compile Include="Content\Serialization\Collections\ListWriter.cs" />
+    <Compile Include="Content\Serialization\Collections\SetReader.cs" />
+    <Compile Include="Content\Serialization\Collections\SetWriter.cs" />
+    <Compile Include="Content\Serialization\Collections\VariableReader.cs" />
+    <Compile Include="Content\Serialization\PrimitiveReaders.cs" />
+    <Compile Include="Content\Serialization\PrimitiveWriters.cs" />
+    <Compile Include="Content\Serialization\Readers\BinaryReader.cs" />
+    <Compile Include="Content\Serialization\Readers\EnumTypeReader.cs" />
+    <Compile Include="Content\Serialization\Readers\IReader.cs" />
+    <Compile Include="Content\Serialization\Readers\ITypeReader.cs" />
+    <Compile Include="Content\Serialization\Readers\ITypeReaderFactory.cs" />
+    <Compile Include="Content\Serialization\Readers\ReflectionTypeReader.cs" />
+    <Compile Include="Content\Serialization\Readers\TypeReader.cs" />
+    <Compile Include="Content\Serialization\Readers\TypeReaderFactory.cs" />
+    <Compile Include="Content\Serialization\Writers\BinaryWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\EnumTypeWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\ITypeWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\ITypeWriterFactory.cs" />
+    <Compile Include="Content\Serialization\Writers\IWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\ReflectionTypeWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\TypeWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\TypeWriterFactory.cs" />
+    <Compile Include="EntityFramework\Behaviour.cs" />
+    <Compile Include="EntityFramework\Component.cs" />
+    <Compile Include="EntityFramework\ComponentMissingException.cs" />
+    <Compile Include="EntityFramework\Entity.cs" />
+    <Compile Include="EntityFramework\EntityCollection.cs" />
+    <Compile Include="EntityFramework\IEntity.cs" />
+    <Compile Include="EntityFramework\IEntitySystem.cs" />
+    <Compile Include="Game\MonocleLifeTimeManager.cs" />
+    <Compile Include="Game\MonocleObject.cs" />
+    <Compile Include="Logic\Components\FSMComponent.cs" />
+    <Compile Include="Logic\FSM\FSM.cs" />
+    <Compile Include="Logic\FSM\State.cs" />
+    <Compile Include="Logic\FSM\StateAction.cs" />
+    <Compile Include="MessagePerformance.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ExtensionMethods.cs" />
+    <Compile Include="Utils\InvalidTypeException.cs" />
+    <Compile Include="Utils\Math\MathHelper.cs" />
+    <Compile Include="Utils\Math\Vector2.cs" />
+    <Compile Include="Utils\Reflection\Messages\IReceiver.cs" />
+    <Compile Include="Utils\Reflection\Messages\MessageAttribute.cs" />
+    <Compile Include="Utils\Reflection\Messages\MessageException.cs" />
+    <Compile Include="Utils\Reflection\Messages\MessageSender.cs" />
+    <Compile Include="Utils\Reflection\WraperDelegates\ScriptMethod.cs" />
+    <Compile Include="Utils\Time\Clock.cs" />
+    <Compile Include="Utils\Time\GameLoop.cs" />
+    <Compile Include="Utils\Time\Sleeper.cs" />
+    <Compile Include="Utils\Time\Time.cs" />
+    <Compile Include="Utils\Variables\Variable.cs" />
+    <Compile Include="Utils\Variables\VariableCollection.cs" />
+    <Compile Include="Utils\Variables\VariablesReader.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Editor\Editor.csproj">
-      <Project>{1051A5AB-E417-4900-839C-06FE9AB4D7C9}</Project>
-      <Name>Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Logic\Logic.csproj">
-      <Project>{C1EDFD58-1781-4AFE-A640-6DD719F13843}</Project>
-      <Name>Logic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Utils\Utils.csproj">
-      <Project>{AF421291-A1E3-40CE-9D83-D3D0ECA1F932}</Project>
-      <Name>Utils</Name>
-    </ProjectReference>
+    <Folder Include="GUI\" />
+    <Folder Include="Video\" />
+    <Folder Include="Windowing\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

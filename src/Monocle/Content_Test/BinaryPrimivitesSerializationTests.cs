@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 
 using MemoryStream = System.IO.MemoryStream;
-using Content.Serialization;
+using Monocle.Content.Serialization;
 
 namespace Content_Test.Serialization
 {

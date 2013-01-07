@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using EntityFramework;
 using Moq;
-using Game;
+using Monocle.EntityFramework;
+using Monocle.Game;
 
 namespace EntityFramework_Test
 {

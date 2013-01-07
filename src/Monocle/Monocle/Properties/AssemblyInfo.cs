@@ -14,6 +14,23 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
+[assembly: InternalsVisibleTo("Animation_Test")]
+[assembly: InternalsVisibleTo("Audio_Test")]
+[assembly: InternalsVisibleTo("Collision_Test")]
+[assembly: InternalsVisibleTo("Content_Test")]
+[assembly: InternalsVisibleTo("Editor_Test")]
+[assembly: InternalsVisibleTo("EditorGUI_Test")]
+[assembly: InternalsVisibleTo("EntityFramework_Test")]
+[assembly: InternalsVisibleTo("Game_Test")]
+[assembly: InternalsVisibleTo("Graphics_Test")]
+[assembly: InternalsVisibleTo("GUI_Test")]
+[assembly: InternalsVisibleTo("Logic_Test")]
+[assembly: InternalsVisibleTo("Math_Test")]
+[assembly: InternalsVisibleTo("Network_Test")]
+[assembly: InternalsVisibleTo("Utils_Test")]
+[assembly: InternalsVisibleTo("Video_Test")]
+
+
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
