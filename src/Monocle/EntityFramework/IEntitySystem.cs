@@ -6,43 +6,55 @@ using System.Reflection;
 
 namespace EntityFramework
 {
-    public interface IEntitySystem
+    public interface IEntitySystem 
     {
-    }
+        void TrackEntityCollection(IEntityCollection collection);
+        void UnTrackEntityCollection(IEntityCollection collection);
+        void SetUp();
+        void TearDown();
+        
+        void Exceute();
 
-    public class EntitySystem : IEntitySystem
-    {     
+        int Order { get; }
+    }
+    
+    public abstract class EntitySystem : IEntitySystem
+    {
+        public int Order
+        {
+            get;
+            set;
+        }
+
+        public EntitySystem(int order) : base() 
+        {
+            this.Order = order; 
+        }
+
+
+        public void TrackEntityCollection(IEntityCollection toTrack)
+        {
+            toTrack.EntityCreated += EntityCreated;
+            toTrack.EntityDestroyed += EntityCreated;
+            toTrack.ComponentCreated += ComponentCreated;
+            toTrack.ComponentDestroyed += ComponentDestroyed;
+        }
+
+        public void UnTrackEntityCollection(IEntityCollection toTrack)
+        {
+            toTrack.EntityCreated -= EntityCreated;
+            toTrack.EntityDestroyed -= EntityCreated;
+            toTrack.ComponentCreated -= ComponentCreated;
+            toTrack.ComponentDestroyed -= ComponentDestroyed;
+        }
+
+        public abstract void SetUp();
+        public abstract void TearDown();
+        public abstract void Exceute();
+
         protected virtual void EntityCreated(IEntity entity) { }
         protected virtual void EntityDestroyed(IEntity entity) { }
-        protected virtual void ComponentAdded(Component component) {  }
-        protected virtual void ComponentRemoved(Component component) { }
-    }
-
-
-    public class UpdateSystem : EntitySystem
-    {
-        private ScriptMethod update;
-
-        public UpdateSystem() 
-        {
-            update = new ScriptMethod("update");
-        }
-
-        public void Update()
-        {
-            if (update.Method != null)
-                update.Method.Invoke();
-
-        }
-
-        protected override void ComponentAdded(Component component)
-        {
-            update.TrackInstance(component);
-        }
-
-        protected override void ComponentRemoved(Component component)
-        {
-            update.UnTrackInstance(component);
-        }
+        protected virtual void ComponentCreated(Component component) {  }
+        protected virtual void ComponentDestroyed(Component component) { }
     }
 }

@@ -27,6 +27,8 @@ namespace EntityFramework
             this.children = CloneChildren(other);
         }
 
+
+
         internal Entity(EntityCollection owner, IVariableCollection variables)
         {
             this.name = string.Empty;
@@ -161,10 +163,11 @@ namespace EntityFramework
             return comp;
         }
 
-        internal void RemoveComponent(Component component)
+        public void RemoveComponent(Component component)
         {
-            this.components.Remove(component);
-            this.owner.OnComponentRemoved(component);
+            var result = this.components.Remove(component);
+            if(result)
+               this.owner.OnComponentRemoved(component);
         }
 
         public Variable<T> GetVar<T>(string name)

@@ -11,7 +11,7 @@ namespace Logic
     /// uses events to transition between states. It provides
     /// access to a local collection of variables.
     /// </summary>
-    public interface IFSM : ICloneable
+    public interface IFSM
     {
         /// <summary>
         /// Starts the fsm. Entering the first state. 
@@ -50,150 +50,29 @@ namespace Logic
         Variable<T> GetVariable<T>(string variableID);
 
 
-    }
-
-    /// <summary>
-    /// Integer ID implementation of IFSM.
-    /// </summary>
-    public class FSM : IFSM
-    {
-        private readonly IVariableCollection variables;
-        private readonly IndexedState[] states;
-        private int activeIndex;
-        private readonly int startIndex;
-
         /// <summary>
-        /// Creates a FSM.
-        /// </summary>
-        /// <remarks>The constructor does not clone states.</remarks>
-        /// <param name="variables">The variables of the fsm.</param>
-        /// <param name="states">The states in the fsm.</param>
-        /// <param name="activeIndex">The startingID of the fsm.</param>
-        public FSM(IVariableCollection variables, IndexedState[] states, int activeIndex)
-        {
-            this.variables = (IVariableCollection)variables.Clone();
-            this.states = states;
-            this.startIndex = activeIndex;
-            this.activeIndex = activeIndex;
-
-            this.SetupActions();
-        }
-
-        /// <summary>
-        /// Copy Constructor.
-        /// </summary>
-        /// <param name="fSM"></param>
-        private FSM(FSM fSM)
-            : this(fSM.variables, fSM.states.Select((s) => (IndexedState)s.Clone()).ToArray(), fSM.startIndex)
-        {
-        }
-
-        /// <summary>
-        /// Hook in the actions. 
-        /// </summary>
-        private void SetupActions()
-        {
-            foreach (var state in this.states)
-            {
-                foreach (var action in state.Actions)
-                {
-                    action.FSM = this;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Start the state machine. Enter the start state.
-        /// </summary>
-        public void Start()
-        {
-            states[activeIndex].Enter();
-        }
-
-        /// <summary>
-        /// Send an event to this FSM.
-        /// </summary>
-        /// <param name="_event">The event to send.</param>
-        public void SendEvent(string _event)
-        {
-            var id = states[activeIndex].GetTransition(_event);
-            if (id == -1)
-                return;
-
-            Transition(id);
-        }
-
-
-        /// <summary>
-        /// Send a message to the FSM. That is propagated to its states.
-        /// </summary>
-        /// <param name="messageName">The name of the message.</param>
-        /// <param name="param">The parameter the message takes or null if the message lacks a parameter.</param>
-        /// <param name="opt">See MessageOptions.</param>
-        /// <exception cref="MessageException">Throw if something is wrong with the message and opt = MessageOptions.RequireReceiver</exception>
-        public void SendMessage(string messageID, 
-                                object param = null, 
-                                MessageOptions opt = MessageOptions.DontRequireReceiver)
-        {
-            states[activeIndex].SendMessage(messageID, param, opt);
-        }
-
-        private void Transition(int stateID)
-        {
-            states[activeIndex].Exit();
-            this.activeIndex = stateID;
-            states[stateID].Enter();
-        }
-
-        /// <summary>
-        /// Gets a variable out of the FSM.
+        /// Adds a variable to the FSM.
         /// </summary>
         /// <typeparam name="T">The type of the variable.</typeparam>
-        /// <param name="name">The name of the variable</param>
-        /// <returns>A variable value.</returns>
-        /// <exception cref="InvalidCastException">Thrown if the type T is not the correct type for this variable.</exception>
-        /// <exception cref="ArgumentException">Thrown if the variable does not exist.</exception>
-        public Variable<T> GetVariable<T>(string variableID)
-        {
-            return this.variables.GetVariable<T>(variableID);
-        }
+        /// <param name="variableID">The id of the variable.</param>
+        /// <param name="value">The value of the variable. (Cannot be null)</param>
+        /// <returns>The newly created variable.</returns>
+        Variable<T> AddVariable<T>(string variableID, T value);
 
 
         /// <summary>
-        /// Clones the FSM (DEEP)
+        /// Removes a variable from the FSM.
         /// </summary>
-        /// <returns>A FSM clone.</returns>
-        public object Clone()
-        {
-            return new FSM(this);
-        }
+        /// <param name="variableID">The variable to remove.</param>
+        /// <returns>True if a variable was removed.</returns>
+        bool RemoveVariable(string variableID);
 
-        public override bool Equals(object obj)
-        {
-            if (obj == this)
-                return true;
-            else if (obj is FSM)
-            {
-                var fsm = obj as FSM;
-                if (this.startIndex == fsm.startIndex)
-                {
-                    if (fsm.states.Length == this.states.Length)
-                    {
-                        for (int i = 0; i < fsm.states.Length; i++)
-                        {
-                            if (states[i].Equals(fsm.states[i]))
-                                return false;
-                        }
+        /// <summary>
+        /// Checks if the FSM contains a specific variiable.
+        /// </summary>
+        /// <param name="name">The name of the variable.</param>
+        /// <returns>True if the fsm contains the variable.</returns>
+        bool HasVariable(string name);
 
-                        if (this.variables.Count != fsm.variables.Count)
-                            return false;
-
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return false;
-        }
     }
 }

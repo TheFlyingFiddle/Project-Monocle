@@ -45,11 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FSMTests.cs" />
+    <Compile Include="FSMComponentTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EntityFramework\EntityFramework.csproj">
+      <Project>{8F20FA84-BD1E-4CF6-98CD-5FA107DF1C87}</Project>
+      <Name>EntityFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Game\Game.csproj">
+      <Project>{651CE533-F619-4355-B239-8FCDABA30D1E}</Project>
+      <Name>Game</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logic\Logic.csproj">
       <Project>{C1EDFD58-1781-4AFE-A640-6DD719F13843}</Project>
       <Name>Logic</Name>
@@ -58,9 +65,6 @@
       <Project>{AF421291-A1E3-40CE-9D83-D3D0ECA1F932}</Project>
       <Name>Utils</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

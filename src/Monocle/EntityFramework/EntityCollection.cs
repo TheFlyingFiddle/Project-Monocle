@@ -6,7 +6,7 @@ using Utils;
 
 namespace EntityFramework
 {
-    interface IEntityCollection : IEnumerable<IEntity> 
+    public interface IEntityCollection : IEnumerable<IEntity> 
     {
         IEntity AddEntity();
         IEntity Find(Predicate<IEntity> match);
@@ -16,7 +16,6 @@ namespace EntityFramework
         event Action<Component> ComponentCreated;
         event Action<Component> ComponentDestroyed;
     }
-
 
     class EntityCollection : IEntityCollection
     {
@@ -66,7 +65,6 @@ namespace EntityFramework
         {
             return this.entities.Find(match);
         }
-
 
         public IEnumerator<IEntity> GetEnumerator()
         {

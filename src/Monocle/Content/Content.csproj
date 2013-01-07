@@ -40,8 +40,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Attributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Seri\Collections\ArrayReader.cs" />
+    <Compile Include="Seri\Collections\ArrayWriter.cs" />
+    <Compile Include="Seri\Collections\DictionaryReader.cs" />
+    <Compile Include="Seri\Collections\DictionaryWriter.cs" />
+    <Compile Include="Seri\Collections\ListReader.cs" />
+    <Compile Include="Seri\Collections\ListWriter.cs" />
+    <Compile Include="Seri\Collections\SetReader.cs" />
+    <Compile Include="Seri\Collections\SetWriter.cs" />
+    <Compile Include="Seri\PrimitiveReaders.cs" />
+    <Compile Include="Seri\PrimitiveWriters.cs" />
+    <Compile Include="Seri\Readers\BinaryReader.cs" />
+    <Compile Include="Seri\Readers\EnumTypeReader.cs" />
+    <Compile Include="Seri\Readers\IReader.cs" />
+    <Compile Include="Seri\Readers\ITypeReader.cs" />
+    <Compile Include="Seri\Readers\ITypeReaderFactory.cs" />
+    <Compile Include="Seri\Readers\ReflectionTypeReader.cs" />
+    <Compile Include="Seri\Readers\TypeReader.cs" />
+    <Compile Include="Seri\Readers\TypeReaderFactory.cs" />
+    <Compile Include="Seri\Writers\BinaryWriter.cs" />
+    <Compile Include="Seri\Writers\EnumTypeWriter.cs" />
+    <Compile Include="Seri\Writers\ITypeWriter.cs" />
+    <Compile Include="Seri\Writers\ITypeWriterFactory.cs" />
+    <Compile Include="Seri\Writers\IWriter.cs" />
+    <Compile Include="Seri\Writers\ReflectionTypeWriter.cs" />
+    <Compile Include="Seri\Writers\TypeWriter.cs" />
+    <Compile Include="Seri\Writers\TypeWriterFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{AF421291-A1E3-40CE-9D83-D3D0ECA1F932}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

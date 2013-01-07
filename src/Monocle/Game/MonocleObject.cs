@@ -31,6 +31,12 @@ namespace Game
             LifeTimeManager.InitializeObject(this);
         }
 
+        ~MonocleObject()
+        {
+            if(this.instanceID != -1)
+                this.DestroyImediate();
+        }
+
         public static bool operator ==(MonocleObject first, MonocleObject second) 
         {
             if (object.ReferenceEquals(first, second))
@@ -78,7 +84,6 @@ namespace Game
         {
             LifeTimeManager.DestroyObject(this);
         }
-
         
         internal protected abstract void DestroySelf();
     }

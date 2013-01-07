@@ -68,6 +68,12 @@ namespace EntityFramework
         bool TryGetComponent<T>(out T component);
 
         /// <summary>
+        /// Removes a component from the entity.
+        /// </summary>
+        /// <param name="component">The component to remove.</param>
+        void RemoveComponent(Component component);
+
+        /// <summary>
         /// Creates a component and adds it to the entity.
         /// </summary>
         /// <typeparam name="T">The type of component.</typeparam>

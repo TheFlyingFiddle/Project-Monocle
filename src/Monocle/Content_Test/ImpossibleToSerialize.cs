@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Editor
+namespace Content_Test.Serialization
 {
-    public class Class1
+    class HasNonSerializableMembers
     {
+        int[, ,] array;
     }
 }
