@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Monocle.EntityFramework
+namespace Monocle.Core
 {
     public abstract class Behaviour : Component
     {

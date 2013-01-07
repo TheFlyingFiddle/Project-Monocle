@@ -5,7 +5,7 @@ using System.Text;
 using Monocle.Utils;
 using Monocle.Game;
 
-namespace Monocle.EntityFramework
+namespace Monocle.Core
 {
     public abstract class Component : MonocleObject
     {

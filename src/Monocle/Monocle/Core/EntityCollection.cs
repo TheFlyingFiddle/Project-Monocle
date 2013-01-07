@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Monocle.Utils;
 
-namespace Monocle.EntityFramework
+namespace Monocle.Core
 {
     public interface IEntityCollection : IEnumerable<IEntity> 
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using System.Collections;
-using Monocle.EntityFramework;
+using Monocle.Core;
 
 namespace EntityFramework_Test
 {

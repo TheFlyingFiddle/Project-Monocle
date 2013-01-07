@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Moq;
-using Monocle.EntityFramework;
 using Monocle.Game;
+using Monocle.Core;
 
 namespace EntityFramework_Test
 {

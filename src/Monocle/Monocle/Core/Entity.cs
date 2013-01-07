@@ -5,7 +5,7 @@ using System.Text;
 using Monocle.Game;
 using Monocle.Utils;
 
-namespace Monocle.EntityFramework
+namespace Monocle.Core
 {
     class Entity : MonocleObject, IEntity
     {
