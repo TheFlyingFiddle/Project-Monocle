@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Utils
 {
-    public interface IVariableCollection : IEnumerable<KeyValuePair<string, ICloneable>>, ICloneable
+    public interface IVariableCollection : IEnumerable<IVariable>, ICloneable
     {
         Variable<T> GetVariable<T>(string name);
         Variable<T> AddVariable<T>(string name, T value);
@@ -22,26 +22,31 @@ namespace Monocle.Utils
     /// <remarks>A variable is a value that has an associated string.</remarks>
     public class VariableCollection : IVariableCollection
     {
-        private readonly Dictionary<string, ICloneable> variables;
+        private readonly Dictionary<string, IVariable> variables;
 
         public VariableCollection()
         {
-            this.variables = new Dictionary<string, ICloneable>();
+            this.variables = new Dictionary<string, IVariable>();
+        }
+
+        internal VariableCollection(IEnumerable<IVariable> variables)
+        {
+            this.variables = new Dictionary<string, IVariable>();
+            variables.ForEach(x => this.variables.Add(x.Name, x));
         }
 
         private VariableCollection(VariableCollection other)
         {
-            variables = new Dictionary<string, ICloneable>();
+            variables = new Dictionary<string, IVariable>();
             foreach (var variable in other.variables)
             {
-                variables.Add(variable.Key, (ICloneable)variable.Value.Clone());
+                variables.Add(variable.Key, (IVariable)variable.Value.Clone());
             }
         }
-
-
+        
         public Variable<T> GetVariable<T>(string name)
         {
-            ICloneable obj;
+            IVariable obj;
             if (this.variables.TryGetValue(name, out obj))
             {
                 Variable<T> var = obj as Variable<T>;
@@ -64,7 +69,7 @@ namespace Monocle.Utils
 
         public bool TryGetVariable<T>(string name, out Variable<T> variable)
         {
-            ICloneable obj;
+            IVariable obj;
             if (this.variables.TryGetValue(name, out obj))
             {
                 variable = obj as Variable<T>;
@@ -101,9 +106,9 @@ namespace Monocle.Utils
             return this.variables.Remove(name);
         }
 
-        public IEnumerator<KeyValuePair<string, ICloneable>> GetEnumerator()
+        public IEnumerator<IVariable> GetEnumerator()
         {
-            return this.variables.GetEnumerator();
+            return this.variables.Values.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

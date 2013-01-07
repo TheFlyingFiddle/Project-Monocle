@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-    [GenericContentReader]
+    [GenericTypeReader]
     public class ListReader<T> : TypeReader<List<T>>
     {
         public override List<T> Read(IReader reader)

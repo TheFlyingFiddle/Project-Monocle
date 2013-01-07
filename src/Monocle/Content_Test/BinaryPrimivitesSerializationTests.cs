@@ -12,8 +12,7 @@ namespace Content_Test.Serialization
     [TestFixture]
     public class BinaryPrimivitesSerializationTests
     {
-        protected BinaryWriter writer;
-        protected BinaryReader reader;
+        protected MemoryStream stream;
         private Mock<ITypeReaderFactory> readerProviderMock;
         private Mock<ITypeWriterFactory> writerProviderMock;
         
@@ -23,19 +22,20 @@ namespace Content_Test.Serialization
             this.readerProviderMock = new Mock<ITypeReaderFactory>();
             this.writerProviderMock = new Mock<ITypeWriterFactory>();
 
-            MemoryStream stream = new MemoryStream();
-
-            reader = new BinaryReader(stream, readerProviderMock.Object);
-            writer = new BinaryWriter(stream, writerProviderMock.Object);
+            stream = new MemoryStream();
         }
 
                 
         [Test]
         public void CanSerializeBytes([Random(0, byte.MaxValue, 5)] int val)
         {
-            this.writer.Write((byte)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadByte();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(byte))).Returns(new UnsignedByteWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(byte))).Returns(new UnsignedByteReader());
+
+
+            AssetWriter.WriteAsset(this.stream, (byte)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<byte>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((byte)val, result);
         }
@@ -43,9 +43,12 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeSignedBytes([Random(sbyte.MinValue, sbyte.MaxValue, 5)] int val)
         {
-            this.writer.Write((sbyte)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadSByte();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(sbyte))).Returns(new SignedByteWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(sbyte))).Returns(new SignedByteReader());
+
+            AssetWriter.WriteAsset(this.stream, (sbyte)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<sbyte>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((sbyte)val, result);
         }
@@ -53,9 +56,13 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeSignedShorts([Random(short.MinValue, short.MaxValue, 5)] int val)
         {
-            this.writer.Write((short)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadInt16();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(short))).Returns(new Int16Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(short))).Returns(new Int16Reader());
+
+
+            AssetWriter.WriteAsset(this.stream, (short)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<short>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((short)val, result);
         }
@@ -63,9 +70,13 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeUnsignedShorts([Random(ushort.MinValue, ushort.MaxValue, 5)] int val)
         {
-            this.writer.Write((ushort)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadUInt16();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(ushort))).Returns(new UInt16Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(ushort))).Returns(new UInt16Reader());
+
+
+            AssetWriter.WriteAsset(this.stream, (ushort)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<ushort>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((ushort)val, result);
         }
@@ -73,19 +84,27 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeSignedIntegers([Random(int.MinValue, int.MaxValue, 5)] int val)
         {
-            this.writer.Write(val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadInt32();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(int))).Returns(new Int32Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(int))).Returns(new Int32Reader());
 
-            Assert.AreEqual(val, result);
+
+            AssetWriter.WriteAsset(this.stream, (int)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<int>(stream, this.readerProviderMock.Object);
+
+            Assert.AreEqual((int)val, result);
         }
 
         [Test]
-        public void CanSerializeUnsignedSignedIntegers([Random(uint.MinValue, uint.MaxValue, 5)] double val)
+        public void CanSerializeUnsignedIntegers([Random(uint.MinValue, uint.MaxValue, 5)] double val)
         {
-            this.writer.Write((uint)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadUInt32();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(uint))).Returns(new UInt32Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(uint))).Returns(new UInt32Reader());
+
+
+            AssetWriter.WriteAsset(this.stream, (uint)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<uint>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((uint)val, result);
         }
@@ -93,9 +112,13 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeSignedLongs([Random(long.MinValue, long.MaxValue, 5)] double val)
         {
-            this.writer.Write((long)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadInt64();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(long))).Returns(new Int64Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(long))).Returns(new Int64Reader());
+
+
+            AssetWriter.WriteAsset(this.stream, (long)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<long>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((long)val, result);
         }
@@ -103,9 +126,13 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeUnsignedLongs([Random(ulong.MinValue, ulong.MaxValue, 5)] double val)
         {
-            this.writer.Write((ulong)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadUInt64();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(ulong))).Returns(new UInt64Writer());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(ulong))).Returns(new UInt64Reader());
+
+
+            AssetWriter.WriteAsset(this.stream, (ulong)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<ulong>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((ulong)val, result);
         }
@@ -113,9 +140,12 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeCharacters([Random(char.MinValue, char.MaxValue, 5)] int val)
         {
-            this.writer.Write((char)val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadChar();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(char))).Returns(new CharacterWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(char))).Returns(new CharacterReader());
+
+            AssetWriter.WriteAsset(this.stream, (char)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<char>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((char)val, result);
         }
@@ -123,17 +153,21 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeBooleans()
         {
-            this.writer.Write(true);
-            this.writer.Stream.Position = 0;
-            bool result = this.reader.ReadBool();
+
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(bool))).Returns(new BooleanWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(bool))).Returns(new BooleanReader());
+
+
+            AssetWriter.WriteAsset(this.stream, true, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<bool>(stream, this.readerProviderMock.Object);
 
             Assert.IsTrue(result);
 
-            this.writer.Stream.Position = 0;
-
-            this.writer.Write(false);
-            this.writer.Stream.Position = 0;
-            result = this.reader.ReadBool();
+            this.stream.Position = 0;
+            AssetWriter.WriteAsset(this.stream, false, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            result = AssetReader.ReadAsset<bool>(stream, this.readerProviderMock.Object);
 
             Assert.IsTrue(!result);
         }
@@ -141,9 +175,14 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeFloats([Random(float.MinValue, float.MaxValue, 5)] double val)
         {
-            this.writer.Write((float)val);
-            this.writer.Stream.Position = 0;
-            float result = this.reader.ReadFloat();
+
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(float))).Returns(new FloatWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(float))).Returns(new FloatReader());
+
+
+            AssetWriter.WriteAsset(this.stream, (float)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<float>(stream, this.readerProviderMock.Object);
 
             Assert.AreEqual((float)val, result);
         }
@@ -151,74 +190,16 @@ namespace Content_Test.Serialization
         [Test]
         public void CanSerializeDoubles([Random(double.MinValue, double.MaxValue, 5)] double val)
         {
-            this.writer.Write(val);
-            this.writer.Stream.Position = 0;
-            var result = this.reader.ReadDouble();
+            this.writerProviderMock.Setup((w) => w.GetTypeWriter(typeof(double))).Returns(new DoubleWriter());
+            this.readerProviderMock.Setup((w) => w.GetTypeReader(typeof(double))).Returns(new DoubleReader());
 
-            Assert.AreEqual(val, result);
+
+            AssetWriter.WriteAsset(this.stream, (double)val, this.writerProviderMock.Object);
+            this.stream.Position = 0;
+            var result = AssetReader.ReadAsset<double>(stream, this.readerProviderMock.Object);
+
+            Assert.AreEqual((double)val, result);
         }
-
-        [Test]
-        public void ExceptionOnNullWriteValue()
-        {
-            Assert.Throws<ArgumentNullException>(() => this.writer.Write((object)null));
-        }
-
-        [Test]
-        public void TypeWriterProviderUsedInWrite()
-        {
-            writerProviderMock.Setup(tp => tp.GetTypeWriter(typeof(TimeSpan))).Returns(new Mock<ITypeWriter>().Object);
-            this.writer.Write(TimeSpan.Zero);
-            writerProviderMock.Verify(tp => tp.GetTypeWriter(typeof(TimeSpan)));
-        }
-
-        [Test]
-        public void TypeReaderProvidedUsedInRead()
-        {
-            var readerMock = new Mock<ITypeReader>();
-
-            readerProviderMock.Setup(tp => tp.GetTypeReader(typeof(TimeSpan))).Returns(readerMock.Object);
-            readerMock.Setup(rm => rm.ReadType(It.IsAny<IReader>())).Returns(default(TimeSpan));
-            this.reader.Read<TimeSpan>();
-            readerProviderMock.Verify(tp => tp.GetTypeReader(typeof(TimeSpan)));
-        }
-
-        [Test]
-        public void ExceptionOnNullStreamInWriterCtor()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BinaryWriter(null, new Mock<ITypeWriterFactory>().Object));
-        }
-
-        [Test]
-        public void ExceptionOnNullTypeWriterProviderInWriterCtor()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BinaryWriter(new MemoryStream(), null));
-        }
-
-        [Test]
-        public void ExceptionOnNullStreamInReaderCtor()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BinaryReader(null, new Mock<ITypeReaderFactory>().Object));
-        }
-
-        [Test]
-        public void ExceptionOnNullTypeReaderProviderInReaderCtor()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BinaryReader(new MemoryStream(), null));
-        }
-
-        [Test]
-        public void ExceptionWhenUnableToWriteASpecificType()
-        {
-            writerProviderMock.Setup(tp => tp.GetTypeWriter(typeof(TimeSpan))).Throws<NotSupportedException>();
-            Assert.Throws<NotSupportedException>(() => this.writer.Write(TimeSpan.FromDays(123)));
-        }
-
-        [Test]
-        public void ExceptionWhenUnableToReadASpecificType()
-        {
-            readerProviderMock.Setup(tp => tp.GetTypeReader(typeof(TimeSpan))).Throws<NotSupportedException>();
-            Assert.Throws<NotSupportedException>(() => this.reader.Read<TimeSpan>());
-        }
+        
     }
 }

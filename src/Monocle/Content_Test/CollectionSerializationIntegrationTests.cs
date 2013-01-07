@@ -15,14 +15,9 @@ namespace Content_Test.Serialization
         {
             var stream = new System.IO.MemoryStream();
 
-            var reader = new BinaryReader(stream, CreateTypeReaderFactory());
-            var writer = new BinaryWriter(stream, CreateTypeWriterFactory());
-
-            writer.Write(value);
-
+            AssetWriter.WriteAsset(stream, value, CreateTypeWriterFactory());
             stream.Position = 0;
-
-            object result = reader.Read(value.GetType());
+            object result = AssetReader.ReadAsset<object>(stream, CreateTypeReaderFactory());
 
             Assert.AreEqual(value, result);
         }
@@ -43,11 +38,13 @@ namespace Content_Test.Serialization
         {
             return new List<object> 
             {
+                new int[] { 1, 2, 3, 4, 5 },
                 new List<int>() { 1,2,3,4,5},
                 new List<List<List<int>>>() { new List<List<int>>() { new List<int>() { 2,3,4,1,5 } } }, 
                 new List<SimplePrimitiveClass> { new SimplePrimitiveClass(), new SimplePrimitiveClass() },
                 new Dictionary<int,float>() { {1 ,4f}, {4,0.45f} },
-                new HashSet<long>() { 123, 12412, 1245, 13931, 181, 914818 }
+                new HashSet<long>() { 123, 12412, 1245, 13931, 181, 914818 },
+                new Dictionary<string, ICloneable> { { "Hello", new SimplePrimitiveClass()}, {"Man", new SimpleGenericClass<int>(1) } }  
             };
         }
 

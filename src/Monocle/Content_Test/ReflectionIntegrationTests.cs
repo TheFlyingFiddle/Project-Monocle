@@ -15,14 +15,9 @@ namespace Content_Test.Serialization
         {
             var stream = new System.IO.MemoryStream();
 
-            var reader = new BinaryReader(stream, new TypeReaderFactory());
-            var writer = new BinaryWriter(stream, new TypeWriterFactory());
-
-            writer.Write(value);
-
+            AssetWriter.WriteAsset(stream, value, new TypeWriterFactory());
             stream.Position = 0;
-
-            object result = reader.Read(value.GetType());
+            object result = AssetReader.ReadAsset<object>(stream, new TypeReaderFactory());
 
             Assert.AreEqual(value, result);
         }

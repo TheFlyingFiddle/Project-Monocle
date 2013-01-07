@@ -100,6 +100,5 @@ namespace Monocle.Content.Serialization
         /// </summary>
         /// <param name="toWrite">String to serialize.</param>
         void Write(string toWrite);
-
     }
 }

@@ -5,14 +5,21 @@ using System.Text;
 
 namespace Monocle.Utils
 {
-    public abstract class Variable<T> : ICloneable
+    public interface IVariable : ICloneable
     {
-        public T Data;
-        public readonly string Name;
+        object Value { get; set; }
+        string Name { get; }
+    }
+
+    public abstract class Variable<T> : IVariable
+    {
+        public T Value;
+        public string Name { get; private set; }
+
 
         protected Variable(T data, string name)
         {
-            this.Data = data;
+            this.Value = data;
             this.Name = name;
         }
 
@@ -27,7 +34,12 @@ namespace Monocle.Utils
             else
                 throw new InvalidTypeException(string.Format("The type {0} cannot be used as a variable!", typeof(T)));
         }
-    
+
+        object IVariable.Value
+        {
+            get { return Value; }
+            set { this.Value = (T)value; }
+        }
     }
 
     class StructVariable<T> : Variable<T>
@@ -37,7 +49,7 @@ namespace Monocle.Utils
 
         public override object Clone()
         {
-            return new StructVariable<T>(this.Data, this.Name);
+            return new StructVariable<T>(this.Value, this.Name);
         }
     }
 
@@ -48,7 +60,7 @@ namespace Monocle.Utils
 
         public override object Clone()
         {
-            return new ClonableVariable<T>((T)((ICloneable)this.Data).Clone(), this.Name);
+            return new ClonableVariable<T>((T)((ICloneable)this.Value).Clone(), this.Name);
         }
     }
 }

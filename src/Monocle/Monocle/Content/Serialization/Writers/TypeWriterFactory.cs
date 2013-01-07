@@ -24,7 +24,7 @@ namespace Monocle.Content.Serialization
             {
                 if (type.IsDefined(typeof(ContentWriterAttribute), false))
                     this.RegisterTypeWriter((ITypeWriter)Activator.CreateInstance(type));
-                else if (type.IsDefined(typeof(GenericContentWriterAttribute), false))
+                else if (type.IsDefined(typeof(GenericTypeWriterAttribute), false))
                     this.RegisterGenericTypeWriter(type);
             }
         }

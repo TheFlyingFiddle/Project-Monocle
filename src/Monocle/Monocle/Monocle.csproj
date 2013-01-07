@@ -52,10 +52,9 @@
     <Compile Include="Content\Serialization\Collections\ListWriter.cs" />
     <Compile Include="Content\Serialization\Collections\SetReader.cs" />
     <Compile Include="Content\Serialization\Collections\SetWriter.cs" />
-    <Compile Include="Content\Serialization\Collections\VariableReader.cs" />
     <Compile Include="Content\Serialization\PrimitiveReaders.cs" />
     <Compile Include="Content\Serialization\PrimitiveWriters.cs" />
-    <Compile Include="Content\Serialization\Readers\BinaryReader.cs" />
+    <Compile Include="Content\Serialization\Readers\AssetReader.cs" />
     <Compile Include="Content\Serialization\Readers\EnumTypeReader.cs" />
     <Compile Include="Content\Serialization\Readers\IReader.cs" />
     <Compile Include="Content\Serialization\Readers\ITypeReader.cs" />
@@ -63,7 +62,7 @@
     <Compile Include="Content\Serialization\Readers\ReflectionTypeReader.cs" />
     <Compile Include="Content\Serialization\Readers\TypeReader.cs" />
     <Compile Include="Content\Serialization\Readers\TypeReaderFactory.cs" />
-    <Compile Include="Content\Serialization\Writers\BinaryWriter.cs" />
+    <Compile Include="Content\Serialization\Writers\AssetWriter.cs" />
     <Compile Include="Content\Serialization\Writers\EnumTypeWriter.cs" />
     <Compile Include="Content\Serialization\Writers\ITypeWriter.cs" />
     <Compile Include="Content\Serialization\Writers\ITypeWriterFactory.cs" />
@@ -102,7 +101,10 @@
     <Compile Include="Utils\Time\Time.cs" />
     <Compile Include="Utils\Variables\Variable.cs" />
     <Compile Include="Utils\Variables\VariableCollection.cs" />
-    <Compile Include="Utils\Variables\VariablesReader.cs" />
+    <Compile Include="Utils\Variables\VariableCollectionReader.cs" />
+    <Compile Include="Utils\Variables\VariableCollectionWriter.cs" />
+    <Compile Include="Utils\Variables\VariableReaders.cs" />
+    <Compile Include="Utils\Variables\VariableWriters.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

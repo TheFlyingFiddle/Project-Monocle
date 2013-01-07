@@ -106,6 +106,5 @@ namespace Monocle.Content.Serialization
         /// </summary>
         /// <returns>A deserialized string.</returns>
         string ReadString();
-
     }
 }

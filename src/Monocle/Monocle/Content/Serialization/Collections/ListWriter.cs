@@ -6,7 +6,7 @@ using System.Text;
 namespace Monocle.Content.Serialization
 {
 
-    [GenericContentWriter]
+    [GenericTypeWriter]
     public class ListWriter<T> : TypeWriter<List<T>>
     {
         public override void WriteType(List<T> toWrite, IWriter writer)

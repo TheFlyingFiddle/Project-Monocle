@@ -120,19 +120,6 @@ namespace Logic_Test
         public void CanSerializeAndDeserializeFSM()
         {
             fsm.AddState("Test");
-            
-            var memStream = new System.IO.MemoryStream();
-
-            var writer = new BinaryWriter(memStream, new TypeWriterFactory());
-            var reader = new BinaryReader(memStream, new TypeReaderFactory());
-
-            writer.Write(fsm);
-
-            memStream.Position = 0;
-
-            var fsmDeserialized = reader.Read<FSMComponent>();
-
-    
         }
     }
 }

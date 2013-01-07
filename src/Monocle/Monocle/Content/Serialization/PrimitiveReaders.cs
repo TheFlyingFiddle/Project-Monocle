@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-   [ContentReader]
+   [TypeReader]
    public class UnsignedByteReader : TypeReader<byte>
     {
        public override byte Read(IReader reader)
@@ -14,7 +14,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class SignedByteReader : TypeReader<sbyte>
     {
         public override sbyte Read(IReader reader)
@@ -23,7 +23,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class Int16Reader : TypeReader<short>
     {
         public override short Read(IReader reader)
@@ -32,7 +32,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class UInt16Reader : TypeReader<ushort>
     {
         public override ushort Read(IReader reader)
@@ -41,7 +41,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class Int32Reader : TypeReader<int>
     {
         public override int Read(IReader reader)
@@ -50,7 +50,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class UInt32Reader : TypeReader<uint>
     {
         public override uint Read(IReader reader)
@@ -59,7 +59,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class Int64Reader : TypeReader<long>
     {
         public override long Read(IReader reader)
@@ -68,7 +68,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class UInt64Reader : TypeReader<ulong>
     {
         public override ulong Read(IReader reader)
@@ -77,7 +77,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class CharacterReader : TypeReader<char>
     {
         public override char Read(IReader reader)
@@ -86,7 +86,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class BooleanReader : TypeReader<bool>
     {
         public override bool Read(IReader reader)
@@ -95,7 +95,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class FloatReader : TypeReader<float>
     {
         public override float Read(IReader reader)
@@ -104,7 +104,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class DoubleReader : TypeReader<double>
     {
         public override double Read(IReader reader)
@@ -113,7 +113,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class DecimalReader : TypeReader<decimal>
     {
         public override decimal Read(IReader reader)
@@ -122,7 +122,7 @@ namespace Monocle.Content.Serialization
         }
     }
 
-    [ContentReader]
+    [TypeReader]
     public class StringReader : TypeReader<string>
     {
         public override string Read(IReader reader)

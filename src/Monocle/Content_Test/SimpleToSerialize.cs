@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Content_Test.Serialization
 {
-    class SimplePrimitiveClass
+    class SimplePrimitiveClass : ICloneable
     {
         public double SomeVar0;
         private bool SomeVar1;
@@ -26,9 +26,11 @@ namespace Content_Test.Serialization
             }
             return false;
         }
+
+        public object Clone() { return new SimplePrimitiveClass(); }
     }
 
-    class SimpleGenericClass<T>
+    class SimpleGenericClass<T> : ICloneable
     {
         private readonly T value;
 
@@ -46,6 +48,11 @@ namespace Content_Test.Serialization
                 return this.value.Equals(other.value);
             }
             return false;
+        }
+
+        public object Clone()
+        {
+            return new SimpleGenericClass<T>();
         }
     }
 

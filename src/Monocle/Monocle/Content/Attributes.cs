@@ -28,7 +28,7 @@ namespace Monocle.Content.Serialization
     { }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ContentReaderAttribute : Attribute
+    public class TypeReaderAttribute : Attribute
     { }
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -36,10 +36,10 @@ namespace Monocle.Content.Serialization
     { }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class GenericContentWriterAttribute : Attribute
+    public class GenericTypeWriterAttribute : Attribute
     { }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class GenericContentReaderAttribute : Attribute
+    public class GenericTypeReaderAttribute : Attribute
     { }
 }

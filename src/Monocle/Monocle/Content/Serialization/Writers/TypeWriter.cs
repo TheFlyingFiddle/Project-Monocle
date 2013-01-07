@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-    public abstract class TypeWriter<T> : ITypeWriter<T>
+    public abstract class TypeWriter<T> : ITypeWriter
     {
         public abstract void WriteType(T toWrite, IWriter writer);
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-    [GenericContentReader]
+    [GenericTypeReader]
     public class SetReader<T> : TypeReader<HashSet<T>>
     {
         public override HashSet<T> Read(IReader reader)

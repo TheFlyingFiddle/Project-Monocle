@@ -22,9 +22,9 @@ namespace Monocle.Content.Serialization
         {
             foreach (var type in toRegister.GetTypes())
             {
-                if (type.IsDefined(typeof(ContentReaderAttribute), false))
+                if (type.IsDefined(typeof(TypeReaderAttribute), false))
                     this.RegisterTypeReader((ITypeReader)Activator.CreateInstance(type));
-                else if (type.IsDefined(typeof(GenericContentReaderAttribute), false))
+                else if (type.IsDefined(typeof(GenericTypeReaderAttribute), false))
                     this.RegisterGenericTypeReader(type);
             }
         }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-    [GenericContentReader]
+    [GenericTypeReader]
     public class DictionaryReader<K,V> : TypeReader<Dictionary<K,V>>
     {
         public override Dictionary<K, V> Read(IReader reader)
