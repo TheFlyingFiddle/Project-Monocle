@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using Monocle.Game;
 using Monocle.Utils;
+using Monocle.Content.Serialization;
 
 namespace Monocle.Core
 {
-    public class Entity : MonocleObject, IEntity
+    public class Entity : MonocleObject
     {
-        public event Action<MonocleObject> ObjectAdded;
-        public event Action<MonocleObject> ObjectRemoved;
+        internal event Action<Component> ComponentAdded;
+        internal event Action<Component> ComponentRemoved;
+        internal event Action<Entity> ChildAdded;
+        internal event Action<Entity> ChildRemoved;
 
         private string name;
         private Entity parent;
@@ -37,6 +40,25 @@ namespace Monocle.Core
             this.children = new List<Entity>();
         }
 
+        private Entity(string name, IVariableCollection variables, HashSet<string> tags, List<Component> components, List<Entity> children)
+        {
+            this.name = name;
+            this.variables = variables;
+            this.tags = tags;
+            this.components = components;
+            this.children = children;
+
+            foreach (var component in components)
+            {
+                component.Owner = this;
+            }
+
+            foreach (var child in this.children)
+            {
+                child.parent = this;
+            }
+        }
+
         private List<Entity> CloneChildren(Entity other)
         {
             var clones = new List<Entity>(other.children.Count);
@@ -55,7 +77,7 @@ namespace Monocle.Core
             set { this.name = value; }
         }
 
-        public IEntity Parent
+        public Entity Parent
         {
             get
             {
@@ -74,7 +96,7 @@ namespace Monocle.Core
             if (value == null)
             {
                 if (this.parent != null)
-                    this.parent.children.Remove(this);
+                    this.parent.RemoveChild(this);
 
             }
             else
@@ -83,12 +105,29 @@ namespace Monocle.Core
                     throw new ArgumentException(string.Format("Parenting {0} to {1} would create a cyclic graph this is not allowed", this, value));
 
                 if (this.parent != null)
-                    this.parent.children.Remove(this);
+                    this.parent.RemoveChild(this);
 
                 this.parent = value;
-                this.parent.children.Add(this);
+                this.parent.AddChild(this);
             }
         }
+
+        private void AddChild(Entity entity)
+        {
+            this.children.Add(entity);
+
+            if (this.ChildAdded != null)
+                this.ChildAdded(entity);
+        }
+
+        private void RemoveChild(Entity entity)
+        {
+            this.children.Remove(entity);
+
+            if (this.ChildRemoved != null)
+                this.ChildRemoved(entity);
+        }
+
 
         private bool ChildrenContainsValue(Entity value)
         {
@@ -106,7 +145,7 @@ namespace Monocle.Core
 
         #endregion
 
-        public IEnumerable<IEntity> Children
+        public IEnumerable<Entity> Children
         {
             get { return this.children; }
         }
@@ -157,17 +196,29 @@ namespace Monocle.Core
             T comp = new T();
             comp.Owner = this;
             this.components.Add(comp);
-            if (this.ObjectAdded != null)
-                this.ObjectAdded(comp);
-
+            this.OnComponentAdded(comp);
+         
             return comp;
+        }
+
+        private void OnComponentAdded(Component component)
+        {
+            if (this.ComponentAdded != null)
+                this.ComponentAdded(component);
         }
 
         public void RemoveComponent(Component component)
         {
             var result = this.components.Remove(component);
-            if (result && this.ObjectRemoved != null)
-                this.ObjectRemoved(component);
+            if (result)
+                this.OnComponentRemoved(component);
+
+        }   
+
+        private void OnComponentRemoved(Component component)
+        {   
+            if (this.ComponentRemoved != null)
+                this.ComponentRemoved(component);
         }
 
         public Variable<T> GetVar<T>(string name)
@@ -247,6 +298,34 @@ namespace Monocle.Core
                 children[i].DestroyImediate();
             }
             this.children = null;
+        }
+
+        [TypeReader]
+        public class EntityReader : TypeReader<Entity>
+        {
+            public override Entity Read(IReader reader)
+            {
+                var name = reader.ReadString();
+                var variables = reader.Read<IVariableCollection>();
+                var tags = reader.Read<HashSet<string>>();
+                var components = reader.Read<List<Component>>();
+                var children = reader.Read<List<Entity>>();
+
+                return new Entity(name, variables, tags, components, children);
+            }
+        }
+
+        [TypeWriter]
+        public class EntityWriter : TypeWriter<Entity>
+        {
+            public override void WriteType(Entity toWrite, IWriter writer)
+            {
+                writer.Write(toWrite.name);
+                writer.Write(toWrite.variables);
+                writer.Write(toWrite.tags);
+                writer.Write(toWrite.components);
+                writer.Write(toWrite.children);
+            }
         }
     }
 }

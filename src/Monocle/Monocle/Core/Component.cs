@@ -4,19 +4,21 @@ using System.Linq;
 using System.Text;
 using Monocle.Utils;
 using Monocle.Game;
+using Monocle.Content.Serialization;
 
 namespace Monocle.Core
 {
     public abstract class Component : MonocleObject
     {
-        private IEntity owner;
-        public IEntity Owner
+        [IgnoreSerialize]
+        private Entity owner;
+        public Entity Owner
         {
             get { return this.owner; }
             internal set { this.owner = value; }
         }
 
-        internal Component Copy(IEntity owner)
+        internal Component Copy(Entity owner)
         {
             var clone = this.Clone();
             clone.Owner = owner;

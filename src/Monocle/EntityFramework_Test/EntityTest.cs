@@ -7,6 +7,8 @@ using Moq;
 using Monocle.Game;
 using Monocle.Utils;
 using Monocle.Core;
+using System.IO;
+using Monocle.Content.Serialization;
 
 namespace EntityFramework_Test
 {
@@ -275,6 +277,46 @@ namespace EntityFramework_Test
             MonocleObject.LifeTimeManager.DestroyObjectsFlaggedForDestruction();
 
             Assert.IsTrue(entity == null);
+        }
+
+        [Test]
+        public void CanSerializeSimple()
+        {
+            this.entity.Name = "Daniel";
+            this.entity.AddVar<string>("Bear", "Dancing in the forest of mordor is a weak cat!");
+
+            Stream memstream = new MemoryStream();
+            AssetWriter.WriteAsset(memstream, entity, new TypeWriterFactory());
+            memstream.Position = 0;
+            var entity2 = AssetReader.ReadAsset<Entity>(memstream, new TypeReaderFactory());
+
+            Assert.AreEqual(entity.Name, entity2.Name);
+            Assert.AreEqual(entity.GetVar<string>("Bear"), entity2.GetVar<string>("Bear"));
+        }
+
+
+        [Test]
+        public void CanSerializeHirachyOfEntities()
+        {
+            var entity1 = new Entity(new VariableCollection());
+            var entity2 = new Entity(new VariableCollection());
+            var entity3 = new Entity(new VariableCollection());
+            
+            entity1.Parent = entity;
+            entity2.Parent = entity1;
+            entity3.Parent = entity;
+
+            entity.Name = "Entity0";
+            entity1.Name = "Entity1";
+            entity2.Name = "Entity2";
+            entity3.Name = "Entity3";
+
+            Stream memstream = new MemoryStream();
+            AssetWriter.WriteAsset(memstream, entity, new TypeWriterFactory());
+            memstream.Position = 0;
+            var resultEntity = AssetReader.ReadAsset<Entity>(memstream, new TypeReaderFactory());
+
+            Assert.IsTrue(resultEntity.Children.Count<Entity>() == 2);
         }
     }
 

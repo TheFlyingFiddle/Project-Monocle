@@ -35,6 +35,25 @@ namespace Monocle.Utils
                 throw new InvalidTypeException(string.Format("The type {0} cannot be used as a variable!", typeof(T)));
         }
 
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj is Variable<T>)
+            {
+                Variable<T> other = obj as Variable<T>;
+                return other.Name == this.Name && other.Value.Equals(this.Value);
+            }
+
+            return false;
+        }
+
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() ^ Value.GetHashCode();
+        }
+
+
         object IVariable.Value
         {
             get { return Value; }

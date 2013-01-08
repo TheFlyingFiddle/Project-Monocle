@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Math_Test", "Math_Test\Math
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audio_Test", "Audio_Test\Audio_Test.csproj", "{CA87AC52-49D7-4567-8C53-7EA6F578B503}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Video_Test", "Video_Test\Video_Test.csproj", "{062E06B4-AB81-4634-BA30-E3DDE5E4F805}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorGUI_Test", "EditorGUI_Test\EditorGUI_Test.csproj", "{123080D0-BCBF-49DF-B8C3-EEBD414F3EEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Network_Test", "Network_Test\Network_Test.csproj", "{66C4912B-9958-48F1-B863-1720A4AC22A0}"
@@ -145,16 +143,6 @@ Global
 		{CA87AC52-49D7-4567-8C53-7EA6F578B503}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CA87AC52-49D7-4567-8C53-7EA6F578B503}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CA87AC52-49D7-4567-8C53-7EA6F578B503}.Release|x86.ActiveCfg = Release|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Release|Any CPU.Build.0 = Release|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{062E06B4-AB81-4634-BA30-E3DDE5E4F805}.Release|x86.ActiveCfg = Release|Any CPU
 		{123080D0-BCBF-49DF-B8C3-EEBD414F3EEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{123080D0-BCBF-49DF-B8C3-EEBD414F3EEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{123080D0-BCBF-49DF-B8C3-EEBD414F3EEF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

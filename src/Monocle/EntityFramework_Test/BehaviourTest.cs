@@ -21,7 +21,7 @@ namespace EntityFramework_Test
             var comp = entity.AddComponent<FakeBehaviour>();
 
             comp.StartCoroutine(Coroutine());
-            comp.RunCoroutines();
+            comp.StepCoroutines();
 
             Assert.IsTrue(corutineCalled);
             

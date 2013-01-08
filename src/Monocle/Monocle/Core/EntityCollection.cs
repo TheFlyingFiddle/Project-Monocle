@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Monocle.Utils;
 using Monocle.Game;
+using Monocle.Content.Serialization;
 
 namespace Monocle.Core
 {
@@ -26,34 +27,69 @@ namespace Monocle.Core
         {
             this.entities = new List<Entity>();
         }
+
+        private EntityCollection(List<Entity> entities)
+           : this()
+        {
+            foreach (var entity in entities)
+            {
+                this.Add(entity);
+            }
+        }
       
-        private void OnComponentAdded(MonocleObject component)
+        private void OnObjectAdded(MonocleObject component)
         {
             if (this.ObjectAdded != null)
                 this.ObjectAdded(component);
         }
 
-        private void OnComponentRemoved(MonocleObject component)
+        private void OnObjectRemoved(MonocleObject component)
         {
             if (this.ObjectRemoved != null)
                 this.ObjectRemoved(component);
+        }
+
+
+        private void ChildAdded(Entity entity)
+        {
+            if (this.entities.Contains(entity))
+                return;
+
+            AddRecurse(entity);
         }
 
         public void Add(Entity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException("entity");
+                        
+            if (entity.Parent != null)
+                entity.Parent = null;
 
-            entity.ObjectAdded += this.OnComponentAdded;
-            entity.ObjectRemoved += this.OnComponentRemoved;
+            AddRecurse(entity);
+
+        }
+
+        private void AddRecurse(Entity entity)
+        {
+            if (this.entities.Contains(entity))
+                return;
+
+            entity.ComponentAdded += this.OnObjectAdded;
+            entity.ComponentRemoved += this.OnObjectRemoved;
+            entity.ChildAdded += this.ChildAdded;
             entity.Destroyed += this.Remove;
             
-
 
             if (this.ObjectAdded != null)
                 this.ObjectAdded(entity);
 
             this.entities.Add(entity);
+
+            foreach (var child in entity.Children)
+            {
+                AddRecurse(child);
+            }
         }
 
         private void Remove(MonocleObject entity)
@@ -66,15 +102,35 @@ namespace Monocle.Core
             var result = this.entities.Remove(entity);
             if (result)
             {
-                entity.ObjectAdded -= this.OnComponentAdded;
-                entity.ObjectRemoved -= this.OnComponentRemoved;
-                entity.Destroyed -= this.Remove;
-
-                if (this.ObjectRemoved != null)
-                    this.ObjectRemoved(entity);
+                RemoveRecurse(entity);
             }
 
             return result;
+        }
+
+        private void RemoveRecurse(Entity entity)
+        {
+
+            entity.ComponentAdded -= this.OnObjectAdded;
+            entity.ComponentRemoved -= this.OnObjectRemoved;
+            entity.ChildAdded -= this.OnObjectAdded;
+            entity.ChildRemoved -= this.OnObjectRemoved;
+            entity.Destroyed -= this.Remove;
+
+            if (this.ObjectRemoved != null)
+                this.ObjectRemoved(entity);
+
+            foreach (var component in entity.GetComponents<Component>())
+            {
+                this.OnObjectRemoved(component);
+            }
+
+            foreach (var child in entity.Children)
+            {
+                RemoveRecurse(child);
+            }
+
+            this.entities.Remove(entity);
         }
 
         public Entity Find(Predicate<Entity> match)
@@ -90,6 +146,35 @@ namespace Monocle.Core
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public class EntityCollectionReader : TypeReader<EntityCollection>
+        {
+            public override EntityCollection Read(IReader reader)
+            {
+                int count = reader.ReadInt32();
+                var list = new List<Entity>();
+                for (int i = 0; i < count; i++)
+                {
+                    list.Add(reader.Read<Entity>());
+                }
+
+                return new EntityCollection(list);
+            }
+        }
+
+        public class EntityCollectionWriter : TypeWriter<EntityCollection>
+        {
+            public override void WriteType(EntityCollection toWrite, IWriter writer)
+            {
+                int count = toWrite.entities.Count((x) => x.Parent == null);
+                writer.Write(count);
+                foreach (var entity in toWrite.entities)
+                {
+                    if(entity.Parent == null)
+                        writer.Write(entity);
+                }
+            }
         }
     }
 }

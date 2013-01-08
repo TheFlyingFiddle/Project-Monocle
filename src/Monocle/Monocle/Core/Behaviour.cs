@@ -4,10 +4,11 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Monocle.Utils;
 
 namespace Monocle.Core
 {
-    public abstract class Behaviour : Component
+    public abstract class Behaviour : Component, IUpdatable, IFixUpdatable, IStartable, IAwakable, IResetable, ICoroutine
     {
         private List<IEnumerator> coroutines;
 
@@ -23,7 +24,7 @@ namespace Monocle.Core
             coroutines.Add(corutine.GetEnumerator());
         }
 
-        public void RunCoroutines()
+        public void StepCoroutines()
         {
             for (int i = coroutines.Count - 1; i >= 0; i--)
             {
@@ -39,5 +40,12 @@ namespace Monocle.Core
             while (sw.Elapsed.TotalSeconds < seconds)
                 yield return 0;
         }
+
+        public virtual void Start() { }
+        public virtual void Awake() { }
+        public virtual void Reset() { }
+        public virtual void Update(Time time) { }
+        public virtual void FixedUpdate(Time time) { }
+        public virtual void OnDestroyed() { }
     }
 }
