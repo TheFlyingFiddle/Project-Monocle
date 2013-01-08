@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Monocle.Game
 {
+    /// <summary>
+    /// The base class of anything managed by Monocle. 
+    /// This includes resources, components, entities and so on. 
+    /// </summary>
     public abstract class MonocleObject
     {
         public static MonocleLifeTimeManager LifeTimeManager;
@@ -26,11 +30,17 @@ namespace Monocle.Game
             internal set { this.instanceID = value; }
         }
 
-        public MonocleObject()
+
+        public event Action<MonocleObject> Destroyed;
+
+        protected MonocleObject()
         {
             LifeTimeManager.InitializeObject(this);
         }
 
+        /// <summary>
+        /// Usefull if someone forgets to destroy the object.
+        /// </summary>
         ~MonocleObject()
         {
             if(this.instanceID != -1)
@@ -84,7 +94,11 @@ namespace Monocle.Game
         {
             LifeTimeManager.DestroyObject(this);
         }
-        
-        internal protected abstract void DestroySelf();
+
+        internal protected virtual void DestroySelf()
+        {
+            if (this.Destroyed != null)
+                this.Destroyed(this);
+        }
     }
 }

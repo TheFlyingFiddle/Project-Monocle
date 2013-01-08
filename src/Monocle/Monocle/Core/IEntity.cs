@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Monocle.Utils;
+using Monocle.Game;
 
 namespace Monocle.Core
 {
-    public interface IEntity : ICloneable
+    public interface IEntity : ICloneable, IMonocleCollection
     {
         /// <summary>
         /// Gets or sets the name of the entity.
@@ -151,5 +152,10 @@ namespace Monocle.Core
         /// Destroys this entity during the next destruction cycle.
         /// </summary>
         void Destroy();
+
+        /// <summary>
+        /// Invoked When the entity is destroyed.
+        /// </summary>
+        event Action<MonocleObject> Destroyed;
     }
 }

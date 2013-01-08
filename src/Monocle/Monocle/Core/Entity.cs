@@ -7,11 +7,13 @@ using Monocle.Utils;
 
 namespace Monocle.Core
 {
-    class Entity : MonocleObject, IEntity
+    public class Entity : MonocleObject, IEntity
     {
+        public event Action<MonocleObject> ObjectAdded;
+        public event Action<MonocleObject> ObjectRemoved;
+
         private string name;
         private Entity parent;
-        private EntityCollection owner;
         private List<Component> components;
         private List<Entity> children;
         private HashSet<string> tags;
@@ -20,19 +22,15 @@ namespace Monocle.Core
         private Entity(Entity other)
         {
             this.name = other.name;
-            this.owner = other.owner;
             this.tags = new HashSet<string>(other.tags);
             this.components = other.components.Select((x) => x.Copy(this)).ToList();
             this.variables = (IVariableCollection)other.variables.Clone();
             this.children = CloneChildren(other);
         }
 
-
-
-        internal Entity(EntityCollection owner, IVariableCollection variables)
+        internal Entity(IVariableCollection variables)
         {
             this.name = string.Empty;
-            this.owner = owner;
             this.tags = new HashSet<string>();
             this.components = new List<Component>();
             this.variables = variables;
@@ -159,15 +157,17 @@ namespace Monocle.Core
             T comp = new T();
             comp.Owner = this;
             this.components.Add(comp);
-            this.owner.OnComponentAdded(comp);
+            if (this.ObjectAdded != null)
+                this.ObjectAdded(comp);
+
             return comp;
         }
 
         public void RemoveComponent(Component component)
         {
             var result = this.components.Remove(component);
-            if(result)
-               this.owner.OnComponentRemoved(component);
+            if (result && this.ObjectRemoved != null)
+                this.ObjectRemoved(component);
         }
 
         public Variable<T> GetVar<T>(string name)
@@ -220,12 +220,12 @@ namespace Monocle.Core
 
         internal protected override void DestroySelf()
         {
-            this.owner.Remove(this);
+            base.DestroySelf();
+
             DestroyComponents();
             DestroyChildren();
 
             this.name = null;
-            this.owner = null;
             this.tags = null;
             this.Parent = null;
             this.variables = null;

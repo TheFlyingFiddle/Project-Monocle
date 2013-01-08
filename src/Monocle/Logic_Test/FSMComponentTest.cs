@@ -123,8 +123,11 @@ namespace Logic_Test
         {
             fsm.AddState("Test");
             var state = fsm.AddState("Foo");
-
             state.AddTransition("BAR", "Test");
+
+            fsm.AddVariable("some_int", 2);
+            fsm.AddVariable("some_string", "Hell0");
+
 
             var stream = new MemoryStream();
 
@@ -135,7 +138,7 @@ namespace Logic_Test
 
             stream.Position = 0;
             var result = AssetReader.ReadAsset<FSMComponent>(stream, rfactory);
-
+            
 
         }
     }

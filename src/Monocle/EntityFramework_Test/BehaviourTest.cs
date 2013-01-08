@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using System.Collections;
 using Monocle.Core;
+using Monocle.Utils;
 
 namespace EntityFramework_Test
 {
@@ -16,8 +17,7 @@ namespace EntityFramework_Test
         [Test]
         public void TestCoroutines()
         {
-            var collection = new EntityCollection();
-            var entity = collection.AddEntity();
+            var entity = new Entity(new VariableCollection());
             var comp = entity.AddComponent<FakeBehaviour>();
 
             comp.StartCoroutine(Coroutine());

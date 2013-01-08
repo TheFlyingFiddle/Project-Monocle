@@ -42,4 +42,30 @@ namespace Monocle.Content.Serialization
     [AttributeUsage(AttributeTargets.Class)]
     public class GenericTypeReaderAttribute : Attribute
     { }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ImporterAttribute : Attribute
+    {
+        public bool IsDefault { get; private set; }
+        public string[] FileEndings { get; private set; }
+
+        public ImporterAttribute(bool isDefault, params string[] fileEndings)
+        {
+            this.FileEndings = fileEndings;
+            this.IsDefault = isDefault;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ProcessorAttribute : Attribute
+    {
+        public bool IsDefault { get; private set; }
+        public Type InputType { get; private set; }
+
+        public ProcessorAttribute(Type inputType, bool isDefault = false) 
+        {
+            this.InputType = inputType;
+            this.IsDefault = isDefault;
+        }
+    }
 }

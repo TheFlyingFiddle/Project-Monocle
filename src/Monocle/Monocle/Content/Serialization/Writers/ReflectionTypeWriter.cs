@@ -157,7 +157,12 @@ namespace Monocle.Content.Serialization
                    !field.FieldType.IsSubclassOf(typeof(Delegate));
         }
 
-        public Type GetWritableType()
+        public Type GetInputType()
+        {
+            return this.type;
+        }
+
+        public Type GetOutputType()
         {
             return this.type;
         }

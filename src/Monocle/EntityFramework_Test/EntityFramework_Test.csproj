@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BehaviourTest.cs" />
-    <Compile Include="ComponentTest.cs" />
     <Compile Include="EntityCollectionTest.cs" />
     <Compile Include="EntityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

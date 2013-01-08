@@ -19,7 +19,12 @@ namespace Monocle.Content.Serialization
             writer.Write((int)toWrite);
         }
 
-        public Type GetWritableType()
+        public Type GetInputType()
+        {
+            return type;
+        }
+
+        public Type GetOutputType()
         {
             return type;
         }

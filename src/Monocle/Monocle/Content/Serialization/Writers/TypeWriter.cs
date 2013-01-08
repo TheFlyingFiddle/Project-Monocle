@@ -14,7 +14,12 @@ namespace Monocle.Content.Serialization
             this.WriteType((T)toWrite, writer);
         }
 
-        public Type GetWritableType()
+        public Type GetInputType()
+        {
+            return typeof(T);
+        }
+
+        public virtual Type GetOutputType()
         {
             return typeof(T);
         }

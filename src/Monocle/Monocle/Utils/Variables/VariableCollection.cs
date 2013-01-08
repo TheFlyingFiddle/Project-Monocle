@@ -106,6 +106,11 @@ namespace Monocle.Utils
             return this.variables.Remove(name);
         }
 
+        public void Clear()
+        {
+            this.variables.Clear();
+        }
+
         public IEnumerator<IVariable> GetEnumerator()
         {
             return this.variables.Values.GetEnumerator();

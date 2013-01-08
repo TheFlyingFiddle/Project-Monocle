@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Content\Attributes.cs" />
+    <Compile Include="Content\IResourceLoader.cs" />
+    <Compile Include="Content\ResourceException.cs" />
+    <Compile Include="Content\ResourceManager.cs" />
     <Compile Include="Content\Serialization\Collections\ArrayReader.cs" />
     <Compile Include="Content\Serialization\Collections\ArrayWriter.cs" />
     <Compile Include="Content\Serialization\Collections\DictionaryReader.cs" />
@@ -52,8 +56,15 @@
     <Compile Include="Content\Serialization\Collections\ListWriter.cs" />
     <Compile Include="Content\Serialization\Collections\SetReader.cs" />
     <Compile Include="Content\Serialization\Collections\SetWriter.cs" />
-    <Compile Include="Content\Serialization\PrimitiveReaders.cs" />
-    <Compile Include="Content\Serialization\PrimitiveWriters.cs" />
+    <Compile Include="Content\Serialization\Importers\Importer.cs" />
+    <Compile Include="Content\Serialization\Importers\TextImporter.cs" />
+    <Compile Include="Content\Serialization\Importers\TextureContent.cs" />
+    <Compile Include="Content\Serialization\Importers\TextureImporter.cs" />
+    <Compile Include="Content\Serialization\Processors\Processor.cs" />
+    <Compile Include="Content\Serialization\Processors\TextProcessor.cs" />
+    <Compile Include="Content\Serialization\Processors\TextureProcessor.cs" />
+    <Compile Include="Content\Serialization\Readers\PrimitiveReaders.cs" />
+    <Compile Include="Content\Serialization\Writers\PrimitiveWriters.cs" />
     <Compile Include="Content\Serialization\Readers\AssetReader.cs" />
     <Compile Include="Content\Serialization\Readers\EnumTypeReader.cs" />
     <Compile Include="Content\Serialization\Readers\IReader.cs" />
@@ -76,7 +87,7 @@
     <Compile Include="Core\Entity.cs" />
     <Compile Include="Core\EntityCollection.cs" />
     <Compile Include="Core\IEntity.cs" />
-    <Compile Include="Core\IEntitySystem.cs" />
+    <Compile Include="Core\IMonocleCollection.cs" />
     <Compile Include="Core\MonocleLifeTimeManager.cs" />
     <Compile Include="Core\MonocleObject.cs" />
     <Compile Include="Logic\Components\FSMComponent.cs" />

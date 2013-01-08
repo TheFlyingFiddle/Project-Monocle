@@ -48,6 +48,7 @@
     <Compile Include="CollectionSerializationIntegrationTests.cs" />
     <Compile Include="HardToSeralize.cs" />
     <Compile Include="ImpossibleToSerialize.cs" />
+    <Compile Include="LoadTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionIntegrationTests.cs" />
     <Compile Include="ReflectionTypeReaderTests.cs" />

@@ -20,7 +20,8 @@ namespace EntityFramework_Test
         public void Setup()
         {
             entityCollection = new EntityCollection();
-            entity = (Entity)entityCollection.AddEntity();
+            entity = new Entity(new VariableCollection());
+            entityCollection.Add(entity);
         }
 
         [TearDown]
@@ -231,7 +232,7 @@ namespace EntityFramework_Test
         [Test]
         public void CanParent()
         {
-            var entity1 = entityCollection.AddEntity();
+            var entity1 = new Entity(new VariableCollection());
             entity.Parent = entity1;
             Assert.AreSame(entity.Parent, entity1);
         }
@@ -239,7 +240,7 @@ namespace EntityFramework_Test
         [Test]
         public void UnParentingRemovesTheEntityFromTheParentsChildren()
         {
-            var entity1 = entityCollection.AddEntity();
+            var entity1 = new Entity(new VariableCollection()); ;
             entity.Parent = entity1;
 
             entity.Parent = null;
@@ -250,7 +251,7 @@ namespace EntityFramework_Test
         [Test]
         public void ParentingAddsEntityAsAChildToTheParent()
         {
-            var entity1 = entityCollection.AddEntity();
+            var entity1 = new Entity(new VariableCollection());
             entity.Parent = entity1;
             Assert.IsTrue(entity1.Children.Contains(entity));
         }
@@ -267,7 +268,7 @@ namespace EntityFramework_Test
         [Test]
         public void DestroyAlsoDestroysAllChildren()
         {
-            var entity1 = entityCollection.AddEntity();
+            var entity1 = new Entity(new VariableCollection());
             entity.Parent = entity1;
 
             entity1.Destroy();

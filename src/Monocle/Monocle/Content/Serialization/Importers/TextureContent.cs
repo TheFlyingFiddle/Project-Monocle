@@ -5,11 +5,8 @@ using System.Text;
 
 namespace Monocle.Content.Serialization
 {
-    public interface ITypeWriter
+    class Texture2DContent
     {
-        void WriteType(object toWrite, IWriter writer);
-        Type GetInputType();
-        Type GetOutputType();
+        //Has stuff.
     }
-
 }

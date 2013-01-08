@@ -86,7 +86,7 @@ namespace Monocle.Content.Serialization
 
         public void RegisterTypeWriter(ITypeWriter writer)
         {
-            Type type = writer.GetWritableType();
+            Type type = writer.GetInputType();
             if (this.typeWriters.ContainsKey(type))
                 throw new ArgumentException(string.Format("A type writer is already registered for the type {0}", type));
 

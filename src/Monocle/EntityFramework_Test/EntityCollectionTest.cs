@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Moq;
 using Monocle.Game;
 using Monocle.Core;
+using Monocle.Utils;
 
 namespace EntityFramework_Test
 {
@@ -30,18 +31,20 @@ namespace EntityFramework_Test
         [Test]
         public void EntityCanBeAdded()
         {
-            var entity = collection.AddEntity();
-            Assert.NotNull(entity);
+            var entity = new Entity(new VariableCollection());
+            collection.Add(entity);
 
+            Assert.NotNull(collection.Find((x) => true));
             entity.Destroy();
         }
 
         [Test]
-        public void EntityCreatedInvokedWhenAnEntityIsCreated()
+        public void ObjectAddedInvokedWhenAnEntityIsAdded()
         {
             IEntity e = null;
-            collection.EntityCreated += (x) => { e = x; };
-            var entity = collection.AddEntity();
+            collection.ObjectAdded += (x) => { e = (IEntity)x; };
+            var entity = new Entity(new VariableCollection());
+            collection.Add(entity);
 
             Assert.AreSame(e, entity);
 
@@ -49,11 +52,12 @@ namespace EntityFramework_Test
         }
 
         [Test]
-        public void EntityDestroyedInvokedWhenAnEntityIsDestroyed()
+        public void ObjectRemovedInvokedWhenAnEntityIsDestroyed()
         {
-            var entity = collection.AddEntity();
+            var entity = new Entity(new VariableCollection());
+            this.collection.Add(entity);
             var called = false;
-            collection.EntityDestroyed += (x) => { called = true; };
+            collection.ObjectRemoved += (x) => { called = true; };
             entity.Destroy();
             MonocleObject.LifeTimeManager.DestroyObjectsFlaggedForDestruction();
             
@@ -63,9 +67,10 @@ namespace EntityFramework_Test
         [Test]
         public void ComponentCreatedInvokedWhenAComponentIsCreated()
         {
-            var entity = collection.AddEntity();
+            var entity = new Entity(new VariableCollection());
+            this.collection.Add(entity);
             var called = false;
-            collection.ComponentCreated += (x) => { called = true; };
+            collection.ObjectAdded += (x) => { called = true; };
             entity.AddComponent<FakeComp>();
             Assert.IsTrue(called);
 
@@ -75,9 +80,10 @@ namespace EntityFramework_Test
         [Test]
         public void ComponentDestroyedInvokedWhenAComponentIsDestroyed()
         {
-            var entity = collection.AddEntity();
+            var entity = new Entity(new VariableCollection());
+            this.collection.Add(entity);
             var called = false;
-            collection.ComponentDestroyed += (x) => { called = true; };
+            collection.ObjectRemoved += (x) => { called = true; };
             entity.AddComponent<FakeComp>();
             entity.GetComponent<FakeComp>().Destroy();
 
@@ -91,7 +97,8 @@ namespace EntityFramework_Test
         [Test]
         public void FindCanFindEntities()
         {
-            var entity = collection.AddEntity();
+            var entity = new Entity(new VariableCollection());
+            this.collection.Add(entity);
             entity.Name = "Daniel";
 
             var result = collection.Find((e) => e.Name == "Daniel");

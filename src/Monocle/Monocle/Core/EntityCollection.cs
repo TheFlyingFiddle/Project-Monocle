@@ -3,70 +3,86 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Monocle.Utils;
+using Monocle.Game;
 
 namespace Monocle.Core
 {
-    public interface IEntityCollection : IEnumerable<IEntity> 
+    public interface IEntityCollection : IMonocleCollection , IEnumerable<Entity> 
     {
-        IEntity AddEntity();
-        IEntity Find(Predicate<IEntity> match);
+        Entity Find(Predicate<Entity> match);
 
-        event Action<IEntity> EntityCreated;
-        event Action<IEntity> EntityDestroyed;
-        event Action<Component> ComponentCreated;
-        event Action<Component> ComponentDestroyed;
+        void Add(Entity e);
+        bool Remove(Entity e);
     }
 
-    class EntityCollection : IEntityCollection
+    public class EntityCollection : IEntityCollection
     {
-        private readonly List<IEntity> entities;
+        private readonly List<Entity> entities;
 
-        public event Action<IEntity> EntityCreated;
-        public event Action<IEntity> EntityDestroyed;
-        public event Action<Component> ComponentCreated;
-        public event Action<Component> ComponentDestroyed;
+        public event Action<MonocleObject> ObjectAdded;
+        public event Action<MonocleObject> ObjectRemoved;
 
         public EntityCollection()
         {
-            this.entities = new List<IEntity>();
+            this.entities = new List<Entity>();
         }
       
-        internal void OnComponentAdded(Component component)
+        private void OnComponentAdded(MonocleObject component)
         {
-            if (this.ComponentCreated != null)
-                this.ComponentCreated(component);
+            if (this.ObjectAdded != null)
+                this.ObjectAdded(component);
         }
 
-        internal void OnComponentRemoved(Component component)
+        private void OnComponentRemoved(MonocleObject component)
         {
-            if (this.ComponentDestroyed != null)
-                this.ComponentDestroyed(component);
+            if (this.ObjectRemoved != null)
+                this.ObjectRemoved(component);
         }
 
-        internal void Remove(Entity entity)
+        public void Add(Entity entity)
         {
-            if (this.EntityDestroyed != null)
-                this.EntityDestroyed(entity);
+            if (entity == null)
+                throw new ArgumentNullException("entity");
 
-            this.entities.Remove(entity);
-        }
+            entity.ObjectAdded += this.OnComponentAdded;
+            entity.ObjectRemoved += this.OnComponentRemoved;
+            entity.Destroyed += this.Remove;
+            
 
-        public IEntity AddEntity()
-        {
-            var entity = new Entity(this, new VariableCollection());
-            if (this.EntityCreated != null)
-                this.EntityCreated(entity);
+
+            if (this.ObjectAdded != null)
+                this.ObjectAdded(entity);
 
             this.entities.Add(entity);
-            return entity;
         }
 
-        public IEntity Find(Predicate<IEntity> match)
+        private void Remove(MonocleObject entity)
+        {
+            this.Remove((Entity)entity);
+        }
+
+        public bool Remove(Entity entity)
+        {
+            var result = this.entities.Remove(entity);
+            if (result)
+            {
+                entity.ObjectAdded -= this.OnComponentAdded;
+                entity.ObjectRemoved -= this.OnComponentRemoved;
+                entity.Destroyed -= this.Remove;
+
+                if (this.ObjectRemoved != null)
+                    this.ObjectRemoved(entity);
+            }
+
+            return result;
+        }
+
+        public Entity Find(Predicate<Entity> match)
         {
             return this.entities.Find(match);
         }
 
-        public IEnumerator<IEntity> GetEnumerator()
+        public IEnumerator<Entity> GetEnumerator()
         {
             return this.entities.GetEnumerator();
         }

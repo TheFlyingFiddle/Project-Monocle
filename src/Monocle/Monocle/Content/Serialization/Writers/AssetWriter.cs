@@ -54,11 +54,10 @@ namespace Monocle.Content.Serialization
             this.writer.Write(this.typeWriters.Count);
             foreach (var item in this.typeWriters)
             {
-                this.Write(item.GetWritableType().AssemblyQualifiedName);
+                this.Write(item.GetOutputType().AssemblyQualifiedName);
             }
         }
         
-
         public void Write(object toWrite)
         {
             Type t = toWrite.GetType();
@@ -75,7 +74,6 @@ namespace Monocle.Content.Serialization
                 this.AddType(t);
                 WriteType(t, toWrite);
             }
-
         }
 
         private void AddType(Type t)
