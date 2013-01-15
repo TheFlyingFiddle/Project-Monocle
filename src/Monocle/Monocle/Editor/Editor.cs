@@ -46,7 +46,6 @@ namespace Monocle.Editor
             private set;
         }
 
-
         public Editor(IResourceManager resource, IEntityCollection entityCollection, ISystemManager systems,
                       IGUIManager guis, IUndoRedo undoRedo, IDragAndDrop dragAndDrop)
         {

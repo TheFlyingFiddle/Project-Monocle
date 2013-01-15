@@ -15,6 +15,7 @@ namespace Monocle.Utils
         private readonly Clock clock;
         private readonly long target;
         private readonly bool highResolutionWait;
+        private volatile bool isRunning;
 
         public GameLoop(int fps, bool highResolutionWait)
         {
@@ -23,12 +24,11 @@ namespace Monocle.Utils
             this.highResolutionWait = highResolutionWait;
         }
 
-
         public void StartLoop()
         {
             clock.Reset();
             long next_target = Clock.Now + target;
-            while (true)
+            while (isRunning)
             {                
                 if (Update != null)
                     Update(new Time(clock.TotalTime, clock.Elapsed));
@@ -44,9 +44,20 @@ namespace Monocle.Utils
             }
         }
 
-
-        private void UpdateReferenceTime()
+        public void Stop()
         {
+            this.isRunning = false;
+        }
+
+        public void Pause()
+        {
+            clock.Pause();
+
+        }
+
+        public void UnPause()
+        {
+            clock.UnPause();
         }
     }
 }

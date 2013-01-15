@@ -12,7 +12,7 @@ namespace Monocle.Core
         void AddRenderSystem(IRenderSystem system);
 
         void Update(Time time);
-        void Draw();
+        void Draw(Time time);
     }
 
     public class SystemManager : ISystemManager
@@ -42,16 +42,17 @@ namespace Monocle.Core
 
         public void Update(Time time)
         {
+            //TODO: Add code for multithreading here. 
             foreach (var system in logicSystems)
             {
-                system.Exceute(time);
+                if(system.Enabled)
+                    system.Exceute(time);
             }
         }
 
-        public void Draw()
+        public void Draw(Time time)
         {
             throw new NotImplementedException();
         }
     }
-
 }

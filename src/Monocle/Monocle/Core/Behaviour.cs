@@ -8,7 +8,7 @@ using Monocle.Utils;
 
 namespace Monocle.Core
 {
-    public abstract class Behaviour : Component, IUpdatable, IFixUpdatable, IStartable, IAwakable, IResetable, ICoroutine
+    public abstract class Behaviour : Component, IUpdatable, IFixUpdatable, IStartable, IResetable, ICoroutine
     {
         private List<IEnumerator> coroutines;
 

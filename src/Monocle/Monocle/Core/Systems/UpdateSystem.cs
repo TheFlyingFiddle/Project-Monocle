@@ -56,4 +56,22 @@ namespace Monocle.Core.Systems
             }
         }
     }
+
+    public class CoroutineSystem : InterfaceSystem<ICoroutine>
+    {
+        public override void Exceute(Time time)
+        {
+            foreach (var coroutine in this.Tracking)
+            {
+                try
+                {
+                    coroutine.StepCoroutines();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+             }
+        }
+    }
 }

@@ -49,6 +49,16 @@ namespace Monocle.Utils
             lastTime = count;
         }
 
+        public void Pause()
+        {
+            this.suspended = true;
+        }
+
+        public void UnPause()
+        {
+            this.suspended = false;
+        }
+
         public static long Now
         {
             get { return Stopwatch.GetTimestamp(); }

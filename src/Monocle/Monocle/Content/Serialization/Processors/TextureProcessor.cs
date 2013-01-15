@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
+using Monocle.Graphics;
 
 
 namespace Monocle.Content.Serialization
 {
     [Processor(typeof(Texture2DContent))]
-    class TextureProcessor : Processor<Bitmap, Texture2DContent>
+    class TextureProcessor : Processor<Bitmap, Texture2D>
     {
         public PixelFormat PixelFormat
         {
@@ -22,10 +24,11 @@ namespace Monocle.Content.Serialization
             set;
         }
 
-        public override Texture2DContent Process(Bitmap input)
+        public override Texture2D Process(Bitmap input)
         {
-            //Do some stuff.
-            return new Texture2DContent();
+
+
+            return null;
         }
     }
 

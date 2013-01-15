@@ -18,12 +18,8 @@ namespace Monocle.Core
 
     public interface IStartable
     {
-        void Start();
-    }
-
-    public interface IAwakable
-    {
         void Awake();
+        void Start();
     }
 
     public interface IResetable

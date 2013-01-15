@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Monocle.Content.Serialization;
 
 namespace Monocle.Game
 {
@@ -18,7 +19,8 @@ namespace Monocle.Game
             //Initialize with default lifeTimeManager.
             MonocleObject.LifeTimeManager = new DefaultLifeTimeManager();
         }
-
+        
+        [IgnoreSerialize]
         private long instanceID;
 
         /// <summary>
@@ -29,7 +31,6 @@ namespace Monocle.Game
             get { return this.instanceID; }
             internal set { this.instanceID = value; }
         }
-
 
         public event Action<MonocleObject> Destroyed;
 

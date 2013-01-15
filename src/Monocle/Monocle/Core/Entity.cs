@@ -8,7 +8,7 @@ using Monocle.Content.Serialization;
 
 namespace Monocle.Core
 {
-    public class Entity : MonocleObject
+    public sealed class Entity : MonocleObject
     {
         internal event Action<Component> ComponentAdded;
         internal event Action<Component> ComponentRemoved;
