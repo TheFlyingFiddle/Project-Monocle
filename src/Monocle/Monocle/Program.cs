@@ -132,9 +132,10 @@ namespace Monocle
             Vector2 origin = font.MessureString("The brown dog jumped over the lazy fox!?");
             fontBatch.Draw(font, "The brown dog jumped over the lazy fox!?", Vector2.Zero);
             fontBatch.Draw(font, "The brown dog jumped over the lazy fox!?", new Vector2(0, origin.Y), Color4.Black);
-            fontBatch.Draw(font, "This is a \nmulti line text!", new Vector2(0, origin.Y) * 2, Color4.Yellow);
-                       
+
+            fontBatch.Draw(font, "This is a \nmulti line text!", new Vector2(0, origin.Y) * 2, Color4.Yellow);           
             fontBatch.Draw(font, "This is scaled text!.", new Vector2(0, origin.Y) * 4, Color4.Green, Vector2.Zero, new Vector2(2,2));
+            
             fontBatch.Draw(font, "This is mirrored text!.", new Vector2(0, origin.Y) * 6, Color4.Red, Vector2.Zero, Vector2.One, 0, true);
             fontBatch.Draw(font, "This is rotated and scaled text!.", new Vector2(15, origin.Y) * 8, Color4.Purple, Vector2.Zero, new Vector2(1.5f,1.4f), 0.5f, false);
 
@@ -142,8 +143,10 @@ namespace Monocle
             fontBatch.Draw(font2, "This is a small arial text.", new Vector2(700, 300), Color4.Gold, Vector2.Zero);
 
             fontBatch.Draw(font1, text.ToString(), new Vector2(650, 0), Color4.White);
-
             fontBatch.Draw(font2, "This is a small very scaled font text.", new Vector2(300, 400), Color4.Gold, Vector2.Zero, new Vector2(5,5));
+
+
+            fontBatch.Draw(font, "This font should be cut of if the characters ar outside the box.", TextAlignment.Left, Color4.White, new Rect(600, 500, 200, 100), Vector2.Zero);  
 
             fontBatch.End();
             

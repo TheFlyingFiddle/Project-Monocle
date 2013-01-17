@@ -5,16 +5,13 @@ using System.Text;
 
 namespace Monocle.GUI
 {
-    class ImageRenderer : GUIRenderer<ImageBox>
+    class ImageBoxRenderer : ControlRenderer<ImageBox>
     {
-        public ImageRenderer(GUISkin skin) : base(skin, "Box") { }
+        public ImageBoxRenderer(GUISkin skin) : base(skin, "Box") { }
 
-        public override void Render(IGUIRenderingContext context, Utils.Time time, ImageBox control, LookAndFeel lookAndFeel)
+        public override void Render(IGUIRenderingContext context, Utils.Time time, ImageBox control)
         {
-            if (control.Image != null)
-            {
-                //context.DrawTexture(control.Image, control.Bounds, control.BGColor, control.SrcRect);
-            }
+            context.DrawFrame(control.Frame, control.Bounds, control.Tint);
         }
     }
 }

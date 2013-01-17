@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Monocle.GUI
 {
-    class TextFieldRenderer : GUIRenderer<TextField>
+    class TextFieldRenderer : ControlRenderer<TextField>
     {
         public TextFieldRenderer(GUISkin skin) : base(skin, "TextFied") { }
 
-        public override void Render(IGUIRenderingContext context, Utils.Time time, TextField control, LookAndFeel lookAndFeel)
+        public override void Render(IGUIRenderingContext context, Utils.Time time, TextField control)
         {
             throw new NotImplementedException();
         }

@@ -78,7 +78,7 @@ namespace Monocle.GUI
             } 
                          
         }
-
+        
         /// <summary>
         /// Gets or sets the order that this GUIControl will be rendered. Larger is later.
         /// </summary>

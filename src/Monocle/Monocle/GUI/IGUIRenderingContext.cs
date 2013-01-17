@@ -6,55 +6,68 @@ using Monocle.Graphics;
 using Monocle.Utils;
 using OpenTK;
 using Monocle.Utils.Logging;
+using OpenTK.Graphics;
 
 namespace Monocle.GUI
 {
     public interface IGUIRenderingContext
     {
-        void Render(IGUIControl gUIControl, Utils.Time time);
-        void DrawTexture(Texture2D texture2D, Rect rect, OpenTK.Graphics.Color4 color, Rect srcRect);
-        void DrawTexture(Texture2D texture2D, Vector2 position, OpenTK.Graphics.Color4 color, Rect srcRect);
-        void DrawString(string text, Rect rect, OpenTK.Graphics.Color4 color, TextAlignment textAlignment);
+        void DrawMarkedText(TextureFont font, string text, TextAlignment alignment, Color4 tint, Rect bounds, int startPos, int endPos, Vector2 offset = default(Vector2));
+        void DrawText(TextureFont font, string text, TextAlignment alignment, Color4 tint, Rect bounds, Vector2 offset = default(Vector2));
+        void DrawFrame(Frame frame, Rect bounds, Color4 tint, Vector2 offset = default(Vector2));
+        void DrawBorder(Frame borderFrame, Rect bounds, Color4 tint, int width);
+
+        void Begin(ref Matrix4 projection);
+        void End();
     }
 
     public class GUIRenderingContext : IGUIRenderingContext
     {
-        private Batch batch;
-        private LookAndFeel lookAndFeel;
-        private Matrix4 projection;
+        private readonly FontBatch fontBatch;
+        private readonly Batch frameBatch;
 
-        public Matrix4 Projection
+        public GUIRenderingContext(Batch frameBatch, FontBatch fontBatch)
         {
-            get { return this.projection; }
-            set { this.projection = value; }
+            this.frameBatch = frameBatch;
+            this.fontBatch = fontBatch;
         }
 
-        public GUIRenderingContext(Batch batch, LookAndFeel lookAndFeel, Matrix4 projection)
+        public void DrawMarkedText(TextureFont font, string text, TextAlignment alignment, Color4 tint, Rect bounds, int startPos, int endPos, Vector2 offset = default(Vector2))
         {
-            this.batch = batch;
-            this.lookAndFeel = lookAndFeel;
-            this.projection = projection;
+            throw new NotImplementedException();
         }
 
-        public void Render(IGUIControl guiControl, Time time)
+        public void DrawText(TextureFont font, string text, TextAlignment alignment, Color4 tint, Rect bounds, Vector2 offset = default(Vector2))
         {
-            this.batch.Begin(ref projection);
-            this.batch.End();
+            fontBatch.Draw(font, text, alignment, tint, bounds, offset);
         }
 
-        public void DrawTexture(Texture2D texture2D, Rect dest, OpenTK.Graphics.Color4 tint, Rect srcRect)
+        public void DrawFrame(Frame frame, Rect bounds, Color4 tint, Vector2 offset = default(Vector2))
         {
-            batch.Draw(texture2D, dest, tint, srcRect);
+            this.frameBatch.Draw(frame.Texture2D, bounds, tint, frame.SrcRect);
         }
 
-        public void DrawTexture(Texture2D texture2D, Vector2 position, OpenTK.Graphics.Color4 tint, Rect rect)
+        public void DrawBorder(Frame borderFrame, Rect bounds, Color4 tint, int width)
         {
-            batch.Draw(texture2D, position, tint, rect);
+            bounds.X -= width;
+            bounds.Y -= width;
+            bounds.Width += width;
+            bounds.Height += width;
+
+            this.frameBatch.Draw(borderFrame.Texture2D, bounds, tint, borderFrame.SrcRect);
         }
 
-        public void DrawString(string text, Rect rect, OpenTK.Graphics.Color4 color, TextAlignment textAlignment)
+
+        public void Begin(ref Matrix4 projection)
         {
-            Debug.LogInfo("The text: " + text + " was supposed to be written.!");
+            this.fontBatch.Begin(ref projection);
+            this.frameBatch.Begin(ref projection);
+        }
+
+        public void End()
+        {
+            this.fontBatch.End();
+            this.frameBatch.End();
         }
     }
 }

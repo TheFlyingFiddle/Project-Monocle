@@ -15,12 +15,6 @@ namespace Monocle.GUI
             set;
         }
 
-        public string Text
-        {
-            get;
-            set;
-        }
-
         public GUIState Normal
         {
             get;

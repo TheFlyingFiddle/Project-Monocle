@@ -8,12 +8,6 @@ namespace Monocle.GUI
 {
     public class ToggleButton : ButtonBase
     {
-        public bool Down
-        {
-            get;
-            private set;
-        }
-
         public ToggleButton()
             : base()
         {
@@ -48,7 +42,7 @@ namespace Monocle.GUI
         protected override void OnClicked()
         {
             base.OnClicked();
-            this.Down = !this.Down;
+            this.Active = !this.Active;
         }
     }
 }

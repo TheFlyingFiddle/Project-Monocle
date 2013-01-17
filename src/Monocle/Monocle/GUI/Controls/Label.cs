@@ -26,5 +26,7 @@ namespace Monocle.GUI
             this.Text = string.Empty;
             this.Alignment = TextAlignment.Left;
         }
+
+        public TextAlignment TextAlignment { get; set; }
     }
 }

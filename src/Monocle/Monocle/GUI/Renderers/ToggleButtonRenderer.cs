@@ -7,61 +7,35 @@ using Monocle.Graphics;
 
 namespace Monocle.GUI
 {
-    class ToggleButtonRenderer : GUIRenderer<ToggleButton>
+    class ToggleButtonRenderer : ControlRenderer<ToggleButton>
     {
 
         public ToggleButtonRenderer(GUISkin skin) : base(skin, "ToggleButton") { }
 
-        public override void Render(IGUIRenderingContext context, Utils.Time time, ToggleButton control, LookAndFeel lookAndFeel)
+        public override void Render(IGUIRenderingContext context, Utils.Time time, ToggleButton control)
         {
-     /*       if (control.Down)
+            GUIStyle style = control.SpecialStyle == null ? this.DefaultStyle : control.SpecialStyle;
+
+            if (control.Active)
             {
-                VisibleElement down = lookAndFeel[downKey];
-                context.DrawTexture(down.Texture,
-                        control.Bounds,
-                        control.BGColor,
-                        down.SrcRect);
+                context.DrawFrame(style.Active.Frame, control.Bounds, style.Active.FrameTint);
+                context.DrawText(style.Font, control.Text, TextAlignment.Center, style.Active.TextColor, control.Bounds);
             }
-            else if (control.Pressed && control.MouseHover)
+            else if (control.Pressed && control.Hover)
             {
-                VisibleElement pressed = lookAndFeel[pressedKey];
-                context.DrawTexture(pressed.Texture,
-                           control.Bounds,
-                           control.BGColor,
-                           pressed.SrcRect);
+                context.DrawFrame(style.Pressed.Frame, control.Bounds, style.Pressed.FrameTint);
+                context.DrawText(style.Font, control.Text, TextAlignment.Center, style.Pressed.TextColor, control.Bounds);
             }
-            else if (control.MouseHover)
+            else if (control.Hover)
             {
-                VisibleElement over = lookAndFeel[overKey];
-                context.DrawTexture(over.Texture,
-                           control.Bounds,
-                           control.BGColor,
-                           over.SrcRect);
+                context.DrawFrame(style.Hover.Frame, control.Bounds, style.Hover.FrameTint);
+                context.DrawText(style.Font, control.Text, TextAlignment.Center, style.Hover.TextColor, control.Bounds);
             }
             else
             {
-                VisibleElement background = lookAndFeel[backgroundKey];
-                context.DrawTexture(background.Texture,
-                        control.Bounds,
-                        control.BGColor,
-                        background.SrcRect);
+                context.DrawFrame(style.Normal.Frame, control.Bounds, style.Normal.FrameTint);
+                context.DrawText(style.Font, control.Text, TextAlignment.Center, style.Normal.TextColor, control.Bounds);
             }
-
-            if (control.Image != null)
-                DrawImage(control, context);
-            */
-            DrawText(control, context);
-        }
-
-        private void DrawImage(ToggleButton control, IGUIRenderingContext context)
-        {
-            Vector2 position = control.Bounds.Center;
-           // context.DrawTexture(control.Image, position, control.FGColor, control.Image.Bounds);
-        }
-
-        private void DrawText(ToggleButton control, IGUIRenderingContext context)
-        {
-            context.DrawString(control.Text, control.Bounds, control.TextColor, TextAlignment.Center);
         }
     }
 }

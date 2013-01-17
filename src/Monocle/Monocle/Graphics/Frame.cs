@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Monocle.Graphics;
 
-namespace Monocle.GUI
+namespace Monocle.Graphics
 {
     public struct Frame
     {

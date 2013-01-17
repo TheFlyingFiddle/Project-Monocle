@@ -9,11 +9,6 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Monocle.Graphics
 {
-    public interface IFontBatch
-    {
-        
-    }
-
     public class FontBatch
     {
         private const int Max_Sprites = 4096;
@@ -147,6 +142,116 @@ namespace Monocle.Graphics
                 DrawBackwards(fontUsed, toDraw, position, color, origin, scale, rotation);
             else
                 DrawForward(fontUsed, toDraw, position, color, origin, scale, rotation);
+        }
+
+        public void Draw(TextureFont font, string text, GUI.TextAlignment alignment, Color4 tint, Rect bounds, Vector2 offset)
+        {
+            Vector2 cursor = Vector2.Zero;
+            Vector2 position = new Vector2(bounds.X, bounds.Y);            
+            Vector2 origin;
+            if (alignment == GUI.TextAlignment.Left)
+                origin = Vector2.Zero;
+            else if (alignment == GUI.TextAlignment.Center)
+                origin = new Vector2(bounds.Width / 2, 0);
+            else
+                origin = new Vector2(bounds.Width, 0);
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+
+                if (c == '\n')
+                {
+                    cursor.Y += font.LineHeight;
+                    cursor.X = 0;
+                    continue;
+                }
+                else if (c == '\t')
+                {
+                    CharInfo ci = font[' '];
+                    cursor.X += ci.Advance * 4;
+                    continue;
+                }
+
+                if (cursor.X >= bounds.Width)
+                    continue;
+
+                CharInfo info = font[c];
+                if (c == ' ')
+                {
+                    cursor.X += info.Advance;
+                    continue;
+                }
+
+                if (info == null)
+                {
+                    info = font['\u00A5'];
+                }
+                
+                Vector4 src = info.SrcRect.ToVector4();
+                src.X /= (font.Page.Width);
+                src.Z /= (font.Page.Width);
+                src.Y /= (font.Page.Height);
+                src.W /= (font.Page.Height);
+
+                int color = tint.ToArgb();
+
+
+                float leftOffset = cursor.X + (info.Offset.X - origin.X);
+                float topOffset = cursor.Y + (info.Offset.Y - origin.Y);
+
+                float rightOffset = leftOffset + info.SrcRect.Width;
+                float bottomOffset = topOffset + info.SrcRect.Height;
+
+                unsafe
+                {
+                    fixed (Vertex* fixedPtr = &this.vertices[this.charCount * 4])
+                    {
+                        var ptr = fixedPtr;
+
+                        Vector2 dest;
+                        dest.X = leftOffset + position.X;
+                        dest.Y = topOffset + position.Y;
+
+                        ptr->Position = dest;
+                        ptr->TexCoords = new Vector2(src.X, src.Y);
+                        ptr->Tint = color;
+
+                        ++ptr;
+
+                        dest.X = rightOffset + position.X;
+                        dest.Y = topOffset + position.Y;
+
+                        ptr->Position = dest;
+                        ptr->TexCoords = new Vector2(src.Z, src.Y);
+                        ptr->Tint = color;
+
+                        ++ptr;
+
+                        dest.X = rightOffset + position.X;
+                        dest.Y = bottomOffset + position.Y;
+
+
+                        ptr->Position = dest;
+                        ptr->TexCoords = new Vector2(src.Z, src.W);
+                        ptr->Tint = color;
+
+                        ++ptr;
+
+                        dest.X = leftOffset + position.X;
+                        dest.Y = bottomOffset + position.Y;
+
+                        ptr->Position = dest;
+                        ptr->TexCoords = new Vector2(src.X, src.W);
+                        ptr->Tint = color;
+                    }
+                }
+
+                cursor.X += info.Advance;
+
+                this.fonts[this.charCount] = font;
+                this.charCount++;
+            }
         }
 
 

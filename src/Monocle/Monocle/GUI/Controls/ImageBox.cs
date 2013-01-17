@@ -7,15 +7,10 @@ using OpenTK.Input;
 
 namespace Monocle.GUI
 {
+    [GUIControl(typeof(ImageBoxRenderer))]
     class ImageBox : GUIControl
     {
-        public Texture2D Image
-        {
-            get;
-            set;
-        }
-
-        public Rect SrcRect
+        public Frame Frame
         {
             get;
             set;
@@ -24,5 +19,7 @@ namespace Monocle.GUI
         public ImageBox() : base() 
         {
         }
+
+        public OpenTK.Graphics.Color4 Tint { get; set; }
     }
 }
