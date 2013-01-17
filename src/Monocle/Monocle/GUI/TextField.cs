@@ -8,21 +8,17 @@ namespace Monocle.GUI
 {
     public class TextField : TextBase
     {
-        private static readonly TextFieldRenderer Default_Renderer = new TextFieldRenderer();
-
         private int markerPosition;
-
         public bool Editable
         {
             get;
             set;
         }
 
-        public TextField(MouseDevice device) : base(device)
+        public TextField() : base()
         {
             this.markerPosition = 0;
             this.Text = string.Empty;
-            this.Renderer = Default_Renderer;
         }
 
         protected override void OnKeyDown(OpenTK.KeyPressEventArgs args)

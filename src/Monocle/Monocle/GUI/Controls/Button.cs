@@ -8,11 +8,9 @@ namespace Monocle.GUI
 {
     class Button : ButtonBase
     {
-        private static ButtonRenderer Default_Renderer = new ButtonRenderer();
-
-        public Button(MouseDevice device) : base(device)
+        public Button() 
+            : base()
         {
-            this.Renderer = Default_Renderer;
         }
 
         protected override void OnMouseEnter(MouseEventArgs device)

@@ -8,8 +8,6 @@ namespace Monocle.GUI
 {
     public class Label : GUIControl
     {
-        private static readonly LabelRenderer Default_Renderer = new LabelRenderer();
-
         public string Text
         {
             get;
@@ -22,10 +20,9 @@ namespace Monocle.GUI
             set;
         }
 
-        public Label(MouseDevice device)
-            : base(device)
+        public Label()
+            : base()
         {
-            this.Renderer = Default_Renderer;
             this.Text = string.Empty;
             this.Alignment = TextAlignment.Left;
         }

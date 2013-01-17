@@ -19,6 +19,14 @@ namespace Monocle.GUI
 
     public abstract class GUIRenderer<T> : IGUIRenderer<T> where T : IGUIControl
     {
+        protected readonly GUIStyle DefaultStyle;
+
+        public GUIRenderer(GUISkin skin, string styleID)
+        {
+            this.DefaultStyle = skin[styleID];
+        }
+
+
         public void Render(IGUIRenderingContext context, Time time, IGUIControl control, LookAndFeel lookAndFeel)
         {
             this.Render(context, time, (T)control, lookAndFeel);

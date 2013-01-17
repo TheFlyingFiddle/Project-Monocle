@@ -12,7 +12,7 @@ namespace Monocle.GUI
 {
 
 
-    public abstract class GUIControl : IGUIControl
+    public abstract class GUIControl : Monocle.GUI.IGUIControl 
     {
         private Rect bounds;
 
@@ -33,19 +33,7 @@ namespace Monocle.GUI
             get { return new Rect(0, 0, this.bounds.Width, this.bounds.Height); }
         }
 
-        public Color4 FGColor
-        {
-            get;
-            set;
-        }
-
-        public Color4 BGColor
-        {
-            get;
-            set;
-        }
-
-        public IGUIRenderer Renderer
+        public GUIStyle SpecialStyle
         {
             get;
             set;
@@ -75,6 +63,22 @@ namespace Monocle.GUI
             }
         }
 
+        public bool Active
+        {
+            get;
+            set;
+        }
+
+        public bool Hover
+        {
+            get
+            {
+                return this.CurrentState is MouseEventStateOver ||
+                       this.CurrentState is MouseEventStateDragOver;
+            } 
+                         
+        }
+
         /// <summary>
         /// Gets or sets the order that this GUIControl will be rendered. Larger is later.
         /// </summary>
@@ -96,20 +100,36 @@ namespace Monocle.GUI
         /// <summary>
         /// Creates a gui control.
         /// </summary>
-        public GUIControl(MouseDevice mdevice)
+        public GUIControl()
         {
             this.bounds = Rect.Zero;
-            this.BGColor = Color4.White;
-            this.FGColor = Color4.White;
             this.enabled = true;
             this.focused = false;
+            this.Active = false;
 
-            mdevice.ButtonDown += this.MouseButtonDown;
-            mdevice.ButtonUp += this.MouseButtonUp;
-            mdevice.Move += this.MouseMove;
             this.CurrentState = new MouseEventStateNone(this);
         }
         
+
+        internal protected virtual void RegisterMouseEvents(GUIInputDevice inputDevice)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal protected virtual void UnRegisterMouseEvents(GUIInputDevice inputDevice)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal protected virtual void RegisterKeyboardEvents(GUIInputDevice inputDevice)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal protected virtual void UnRegisterKeyboardEvents(GUIInputDevice inputDevice)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Invoked when a user clicks the GUIControl.

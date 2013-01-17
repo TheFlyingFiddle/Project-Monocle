@@ -6,10 +6,9 @@ using System.IO;
 
 namespace Monocle.Content.Serialization
 {
-    [Importer(true,".txt")]
+    [Importer(true,".txt", ".vert" , ".frag")]
     class TextImporter : Importer<string>
     {
-
         public override string Import(Stream data)
         {
             var reader = new StreamReader(data);

@@ -41,7 +41,7 @@ uniform sampler2D tex;
 
 void main(void)
 {
-  out_frag_color = texture(tex, coords) * tint;
+  out_frag_color = texture(tex, coords) * tint.bgra;
 }";
     }
 }

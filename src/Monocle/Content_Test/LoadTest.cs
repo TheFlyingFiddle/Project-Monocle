@@ -12,7 +12,7 @@ namespace Content_Test
     [TestFixture]
     class LoadTest
     {
-        IResourceManager manager;
+        IResourceContext manager;
 
         [SetUp]
         public void Setup()
@@ -22,7 +22,7 @@ namespace Content_Test
             var loader = new ResourceLoader();
             loader.AddImportersAndProcessors(typeof(IImporter).Assembly);
 
-            manager = new ResourceManager(readerFactory, writerFactory, loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
+            manager = new ResourceContext(readerFactory, writerFactory, loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
         }
 
         [Test]

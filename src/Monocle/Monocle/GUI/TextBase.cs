@@ -23,7 +23,7 @@ namespace Monocle.GUI
             }
         }
 
-        public TextBase(MouseDevice device) : base(device) { }
+        public TextBase() : base() { }
 
         private void OnTextChanged(string old, string _new)
         {

@@ -9,26 +9,14 @@ namespace Monocle.GUI
 {
     class ButtonRenderer : GUIRenderer<ButtonBase>
     {
-        private string backgroundKey;
-        private string overKey;
-        private string downKey;
 
-        public ButtonRenderer()
-            : this(LookAndFeelAssets.Button_BG.ToString(),
-                   LookAndFeelAssets.Button_Over.ToString(),
-                   LookAndFeelAssets.Button_Pressed.ToString())
+        public ButtonRenderer(GUISkin skin)
+            : base(skin, "Button")
         { }
-
-        public ButtonRenderer(string background, string over, string down)
-        {
-            this.backgroundKey = background;
-            this.overKey = over;
-            this.downKey = down;
-        }
                    
         public override void Render(IGUIRenderingContext context, Utils.Time time, ButtonBase control, LookAndFeel lookAndFeel)
         {
-
+/*
             if (control.Pressed && control.MouseHover)
             {
                 VisibleElement down = lookAndFeel[downKey];
@@ -57,14 +45,14 @@ namespace Monocle.GUI
 
             if (control.Image != null)
                 DrawImage(control, context);
-
+            */
             DrawText(control, context);
         }
 
         private void DrawImage(ButtonBase control, IGUIRenderingContext context)
         {
             Vector2 position = control.Bounds.Center;
-            context.DrawTexture(control.Image, position, control.FGColor, control.Image.Bounds);
+            //context.DrawTexture(control.Image, position, control.FGColor, control.Image.Bounds);
         }
 
         private void DrawText(ButtonBase control, IGUIRenderingContext context)

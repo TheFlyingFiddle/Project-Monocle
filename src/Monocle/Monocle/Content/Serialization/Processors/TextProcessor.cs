@@ -8,7 +8,7 @@ namespace Monocle.Content.Serialization
     [Processor(typeof(string), true)]
     class TextProcessor : Processor<string, string>
     {
-        public override string Process(string input)
+        public override string Process(string input, IResourceContext context)
         {
             return input;
         }

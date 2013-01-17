@@ -10,7 +10,7 @@ namespace Monocle.Editor
 {
     class Editor
     {
-        public IResourceManager Resource
+        public IResourceContext Resource
         {
             get;
             private set;
@@ -46,7 +46,7 @@ namespace Monocle.Editor
             private set;
         }
 
-        public Editor(IResourceManager resource, IEntityCollection entityCollection, ISystemManager systems,
+        public Editor(IResourceContext resource, IEntityCollection entityCollection, ISystemManager systems,
                       IGUIManager guis, IUndoRedo undoRedo, IDragAndDrop dragAndDrop)
         {
             this.Resource = resource;

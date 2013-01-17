@@ -9,29 +9,12 @@ namespace Monocle.GUI
 {
     class ToggleButtonRenderer : GUIRenderer<ToggleButton>
     {
-        private string backgroundKey;
-        private string overKey;
-        private string pressedKey;
-        private string downKey;
 
-        public ToggleButtonRenderer()
-            : this(LookAndFeelAssets.Button_BG.ToString(),
-                   LookAndFeelAssets.Button_Over.ToString(),
-                   LookAndFeelAssets.Button_Pressed.ToString(), 
-                   LookAndFeelAssets.Button_Down.ToString())
-        { }
-
-        public ToggleButtonRenderer(string background, string over,string pressed, string down)
-        {
-            this.backgroundKey = background;
-            this.overKey = over;
-            this.pressedKey = pressed;
-            this.downKey = down;
-        }
+        public ToggleButtonRenderer(GUISkin skin) : base(skin, "ToggleButton") { }
 
         public override void Render(IGUIRenderingContext context, Utils.Time time, ToggleButton control, LookAndFeel lookAndFeel)
         {
-            if (control.Down)
+     /*       if (control.Down)
             {
                 VisibleElement down = lookAndFeel[downKey];
                 context.DrawTexture(down.Texture,
@@ -66,14 +49,14 @@ namespace Monocle.GUI
 
             if (control.Image != null)
                 DrawImage(control, context);
-
+            */
             DrawText(control, context);
         }
 
         private void DrawImage(ToggleButton control, IGUIRenderingContext context)
         {
             Vector2 position = control.Bounds.Center;
-            context.DrawTexture(control.Image, position, control.FGColor, control.Image.Bounds);
+           // context.DrawTexture(control.Image, position, control.FGColor, control.Image.Bounds);
         }
 
         private void DrawText(ToggleButton control, IGUIRenderingContext context)

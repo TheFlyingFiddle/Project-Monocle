@@ -37,8 +37,12 @@ namespace Monocle.Graphics
         Vertex[] vertices = new Vertex[Max_Sprites * 4];
         Texture2D[] textures = new Texture2D[Max_Sprites];
 
-        public Batch()
+        public Batch(Effect effect)
         {
+            if (effect == null)
+                throw new ArgumentNullException("effect");
+
+            this.effect = effect;
             InitEffect();
             InitIndices();
             InitBuffers();
@@ -47,7 +51,6 @@ namespace Monocle.Graphics
 
         private void InitEffect()
         {
-            effect = Effect.CreateEffect(BasicEffect.VertexShaderSource, BasicEffect.FragmentShaderSource);
             effect.Use();
             effect.SetUniform("tex", 0);
 
@@ -216,7 +219,6 @@ namespace Monocle.Graphics
                 toDraw++;
             }
             toUse.Bind(TextureUnit.Texture0);
-
             GL.DrawElements(BeginMode.Triangles, toDraw * 6, DrawElementsType.UnsignedShort, (spriteCount - toDraw) * 6 * sizeof(ushort));
  
             this.spriteCount = 0;

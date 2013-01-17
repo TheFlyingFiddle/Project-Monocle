@@ -11,7 +11,7 @@ namespace Monocle.Content
     public interface IResourceLoader 
     {
         object ImportContent(Stream stream, string fileExt, IImporter importer = null);
-        object ProcessContent(object content, IProcessor processor = null);
+        object ProcessContent(string filePath, object content, IResourceContext context, IProcessor processor = null);
     }
 
     public class ResourceLoader : IResourceLoader
@@ -86,16 +86,18 @@ namespace Monocle.Content
             {
                 importer = GetDefaultImporter(fileExt);
             }
-
+            
             return importer.Import(stream);
         }
 
-        public object ProcessContent(object content, IProcessor processor = null)
+        public object ProcessContent(string filePath, object content, IResourceContext context, IProcessor processor = null)
         {
             if (processor == null)
                 processor = GetDefaultProcessor(content.GetType());
 
-            return processor.Process(content);
+            processor.ResourcePath = filePath;
+
+            return processor.Process(content, context);
         }
     }
 }

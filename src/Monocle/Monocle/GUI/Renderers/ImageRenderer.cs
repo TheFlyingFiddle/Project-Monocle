@@ -7,11 +7,13 @@ namespace Monocle.GUI
 {
     class ImageRenderer : GUIRenderer<ImageBox>
     {
+        public ImageRenderer(GUISkin skin) : base(skin, "Box") { }
+
         public override void Render(IGUIRenderingContext context, Utils.Time time, ImageBox control, LookAndFeel lookAndFeel)
         {
             if (control.Image != null)
             {
-                context.DrawTexture(control.Image, control.Bounds, control.BGColor, control.SrcRect);
+                //context.DrawTexture(control.Image, control.Bounds, control.BGColor, control.SrcRect);
             }
         }
     }

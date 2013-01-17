@@ -7,16 +7,19 @@ namespace Monocle.Content.Serialization
 {
     public interface IProcessor
     {
-        object Process(object input);
+        string ResourcePath { get; set; }
+        object Process(object input, IResourceContext context);
     }
 
     public abstract class Processor<I, O> : IProcessor
     {
-        public abstract O Process(I input);
+        public string ResourcePath { get; set;  }
 
-        public object Process(object input)
+        public abstract O Process(I input, IResourceContext context);
+
+        public object Process(object input, IResourceContext context)
         {
-            return Process((I)input);
+            return Process((I)input, context);
         }
     }
 }

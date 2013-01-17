@@ -16,7 +16,7 @@ namespace Monocle.Graphics
         int openglID;
         public readonly int Width, Height;
 
-        private Texture2D(int openglID, int width, int height)
+        internal Texture2D(int openglID, int width, int height)
         {
             this.openglID = openglID;
             this.Width = width;

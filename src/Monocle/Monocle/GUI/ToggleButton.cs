@@ -8,18 +8,15 @@ namespace Monocle.GUI
 {
     public class ToggleButton : ButtonBase
     {
-        private readonly static ToggleButtonRenderer Default_Renderer = new ToggleButtonRenderer();
-
         public bool Down
         {
             get;
             private set;
         }
 
-        public ToggleButton(MouseDevice device)
-            : base(device)
+        public ToggleButton()
+            : base()
         {
-            this.Renderer = Default_Renderer;
         }
 
         protected override void OnMouseEnter(MouseEventArgs device)

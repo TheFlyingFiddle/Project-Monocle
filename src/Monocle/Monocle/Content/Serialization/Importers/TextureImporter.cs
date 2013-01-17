@@ -13,9 +13,6 @@ namespace Monocle.Content.Serialization
         public override Bitmap Import(Stream data)
         {
             var bitmap = new Bitmap(data);
-            
-
-            //Do stuff.
             return bitmap;
         }
     }

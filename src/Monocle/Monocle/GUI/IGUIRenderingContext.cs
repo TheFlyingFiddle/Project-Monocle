@@ -39,12 +39,8 @@ namespace Monocle.GUI
         public void Render(IGUIControl guiControl, Time time)
         {
             this.batch.Begin(ref projection);
-
-            var renderer = guiControl.Renderer;
-            renderer.Render(this, time, guiControl, lookAndFeel);
             this.batch.End();
         }
-
 
         public void DrawTexture(Texture2D texture2D, Rect dest, OpenTK.Graphics.Color4 tint, Rect srcRect)
         {

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Monocle.Content
 {
-    public interface IResourceManager
+    public interface IResourceContext
     {
         /// <summary>
         /// Loads a object.
@@ -42,10 +42,11 @@ namespace Monocle.Content
         /// The root directory that resources are managed in.
         /// </summary>
         string RootDirectory { get; }
+
     }
 
 
-    class ResourceManager : IResourceManager
+    class ResourceContext : IResourceContext
     {
         private const string ASSET_EXT = ".asset";
 
@@ -62,8 +63,14 @@ namespace Monocle.Content
             private set;
         }
 
+        public bool ShouldSaveAllLoadedAssets
+        {
+            get;
+            set;
+        }
 
-        public ResourceManager(ITypeReaderFactory trfactory, ITypeWriterFactory twfactory, IResourceLoader loader, string assetDir, string rootDir)
+
+        public ResourceContext(ITypeReaderFactory trfactory, ITypeWriterFactory twfactory, IResourceLoader loader, string assetDir, string rootDir)
         {
             this.loaded = new Dictionary<string, object>();
             this.trfactory = trfactory;
@@ -71,6 +78,14 @@ namespace Monocle.Content
             this.resourceLoader = loader;
             this.assetDirectory = assetDir;
             this.RootDirectory = rootDir;
+            this.ShouldSaveAllLoadedAssets = true;
+        }
+
+
+
+        public T LoadResource<T>(string path, IImporter importer = null, IProcessor processor = null)
+        {
+            throw new NotImplementedException();
         }
 
 
@@ -90,27 +105,30 @@ namespace Monocle.Content
             }
             else
             {
-                result = ImportAndLoadAsset<T>(filePath, assetPath, importer, processor);
+                result = ImportAndLoadAsset<T>(relativePath, filePath, assetPath, importer, processor);
             }
 
             this.loaded.Add(relativePath, result);
             return result;
         }
 
-        private T ImportAndLoadAsset<T>(string filePath, string assetPath, IImporter importer, IProcessor processor)
+        private T ImportAndLoadAsset<T>(string relativePath, string filePath, string assetPath, IImporter importer, IProcessor processor)
         {
             object asset;
             using (Stream stream = new FileStream(filePath, FileMode.Open))
             {
                 asset = this.resourceLoader.ImportContent(stream, Path.GetExtension(filePath), importer);
             }
-            asset = this.resourceLoader.ProcessContent(asset, processor);
+            asset = this.resourceLoader.ProcessContent(relativePath, asset, this, processor);
 
-            using (Stream stream = new FileStream(assetPath, FileMode.Create,FileAccess.ReadWrite, FileShare.None))
+            if (this.ShouldSaveAllLoadedAssets)
             {
-                AssetWriter.WriteAsset(stream, asset, this.twfactory);
-                stream.Position = 0;
-                asset = AssetReader.ReadAsset<T>(stream, this.trfactory);
+                using (Stream stream = new FileStream(assetPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+                {
+                    AssetWriter.WriteAsset(stream, asset, this.twfactory);
+                    stream.Position = 0;
+                    asset = AssetReader.ReadAsset<T>(stream, this.trfactory);
+                }
             }
 
             return (T)asset;

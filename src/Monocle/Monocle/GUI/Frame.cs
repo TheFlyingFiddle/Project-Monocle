@@ -3,26 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Monocle.Graphics;
-using OpenTK.Input;
 
 namespace Monocle.GUI
 {
-    class ImageBox : GUIControl
+    public struct Frame
     {
-        public Texture2D Image
-        {
-            get;
-            set;
-        }
-
         public Rect SrcRect
         {
             get;
             set;
         }
 
-        public ImageBox() : base() 
+        public Texture2D Texture2D
         {
+            get;
+            set;
+        }
+
+        public Frame(Rect srcRect, Texture2D texture)
+            : this()
+        {
+            SrcRect = srcRect;
+            Texture2D = texture;
         }
     }
 }

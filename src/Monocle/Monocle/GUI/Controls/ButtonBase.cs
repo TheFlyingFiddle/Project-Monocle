@@ -40,7 +40,7 @@ namespace Monocle.GUI
             set;
         }
 
-        public ButtonBase(MouseDevice device) : base(device)
+        public ButtonBase() : base()
         {
             this.Text = string.Empty;
             this.Pressed = false;
