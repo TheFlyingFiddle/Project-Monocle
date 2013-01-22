@@ -31,8 +31,8 @@ namespace Monocle.Content.Serialization.Importers
             }
 
             if (string.IsNullOrEmpty(content.FragmentShaderPath) ||
-               string.IsNullOrEmpty(content.VertexShaderPath))
-                throw new ResourceException("The effect was not valid!");
+                string.IsNullOrEmpty(content.VertexShaderPath))
+                    throw new ResourceException("The effect was not valid!");
 
             return content;
         }

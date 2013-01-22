@@ -68,6 +68,12 @@ namespace Monocle.Graphics
             GL.Uniform1(location, value);
         }
 
+        public void SetUniform(string name, float value)
+        {
+            int location = GL.GetUniformLocation(this.programID, name);
+            GL.Uniform1(location, value);
+        }
+
         public void SetUniform(string name , ref Matrix4 value)
         {
             int location = GL.GetUniformLocation(this.programID, name);
@@ -82,5 +88,6 @@ namespace Monocle.Graphics
             GL.DeleteShader(this.fragmentID);
             GL.DeleteProgram(this.programID);
         }
+
     }
 }

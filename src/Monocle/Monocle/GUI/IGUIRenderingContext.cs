@@ -23,10 +23,10 @@ namespace Monocle.GUI
 
     public class GUIRenderingContext : IGUIRenderingContext
     {
-        private readonly FontBatch fontBatch;
+        private readonly SpriteBatch fontBatch;
         private readonly Batch frameBatch;
 
-        public GUIRenderingContext(Batch frameBatch, FontBatch fontBatch)
+        public GUIRenderingContext(Batch frameBatch, SpriteBatch fontBatch)
         {
             this.frameBatch = frameBatch;
             this.fontBatch = fontBatch;
@@ -39,7 +39,6 @@ namespace Monocle.GUI
 
         public void DrawText(TextureFont font, string text, TextAlignment alignment, Color4 tint, Rect bounds, Vector2 offset = default(Vector2))
         {
-            fontBatch.Draw(font, text, alignment, tint, bounds, offset);
         }
 
         public void DrawFrame(Frame frame, Rect bounds, Color4 tint, Vector2 offset = default(Vector2))

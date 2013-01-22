@@ -9,6 +9,12 @@ namespace Monocle.Graphics
     public class CharInfo
     {
         public readonly float Advance;
+        private readonly Vector4 textureCoords;
+
+        public Vector4 TextureCoords
+        {
+            get { return this.textureCoords; }
+        }
 
         public Rect SrcRect
         {
@@ -22,11 +28,17 @@ namespace Monocle.Graphics
             private set;
         }
 
-        public CharInfo(Rect rect, Vector2 offset, float advance)
+        public CharInfo(Texture2D page, Rect rect, Vector2 offset, float advance)
         {
             this.SrcRect = rect;
             this.Offset = offset;
             this.Advance = advance;
+         
+            this.textureCoords = this.SrcRect.ToVector4();
+            this.textureCoords.X /= (page.Width);
+            this.textureCoords.Z /= (page.Width);
+            this.textureCoords.Y /= (page.Height);
+            this.textureCoords.W /= (page.Height);
         }
     }
 
@@ -37,16 +49,16 @@ namespace Monocle.Graphics
         public readonly float Size;
         public readonly float Base;
         public readonly float LineHeight;
+        private readonly CharInfo[] chars;
 
         public Texture2D Page
         {
             get;
             private set;
         }
-        
-        private Dictionary<char, CharInfo> charMap;
 
-        public TextureFont(string face, int size, int _base, int lineHeight, Texture2D page, Dictionary<char, CharInfo> charMap)
+
+        public TextureFont(string face, int size, int _base, int lineHeight, Texture2D page, CharInfo[] chars)
         {
             // TODO: Complete member initialization
             this.Face = face;
@@ -54,17 +66,17 @@ namespace Monocle.Graphics
             this.Base = _base;
             this.LineHeight = lineHeight;
             this.Page = page;
-            this.charMap = charMap;
+            this.chars = chars;
         }
 
         public CharInfo this[char character]
         {
             get
             {
-                CharInfo info;
-                this.charMap.TryGetValue(character, out info);
-                    
-                return info;
+                if (character > this.chars.Length)
+                    return null;
+
+                return this.chars[character];
             }
         }
 

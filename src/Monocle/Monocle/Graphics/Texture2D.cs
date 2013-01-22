@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace Monocle.Graphics
 {
-    public class Texture2D 
+    public class Texture2D : IComparable<Texture2D>
     {
         int openglID;
         public readonly int Width, Height;
@@ -115,6 +115,11 @@ namespace Monocle.Graphics
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
                 return new Texture2D(id, width, data.Length / width);
             }
+        }
+
+        public int CompareTo(Texture2D other)
+        {
+            return other.openglID - this.openglID;
         }
     }
 }

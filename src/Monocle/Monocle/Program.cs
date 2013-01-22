@@ -25,12 +25,15 @@ namespace Monocle
         Texture2D texture1;
         Batch batch;
 
-        FontBatch fontBatch;
+        SpriteBatch fontBatch;
         TextureFont font;
         TextureFont font1;
         TextureFont font2;
-
+        Effect customEffect;
         EditableText text;
+
+        StringBuilder builder = new StringBuilder(4096);
+
 
         public HelloGL3()
             : base(1280, 720,
@@ -57,8 +60,10 @@ namespace Monocle
             this.font2 = resourceContext.LoadAsset<TextureFont>("Arial_No_Rly.fnt");
                         
             Effect effect = resourceContext.LoadAsset<Effect>("Basic.effect");
+            this.customEffect = resourceContext.LoadAsset<Effect>("Sin.effect");
 
-            this.fontBatch = new FontBatch(effect);
+
+            this.fontBatch = new SpriteBatch(effect);
             batch = new Batch(effect);
             text = new EditableText(-1, true);
 
@@ -74,6 +79,19 @@ namespace Monocle
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            var r = new Random();
+            int c = 100000;
+
+            builder.Clear();
+            for (int i = 0; i < c; i++)
+            {
+                if (i % 500 == 0 && i != 0)
+                    this.builder.Append('\n');
+                else 
+                    this.builder.Append((char)r.Next('a', 'z' + 1)); 
+            }
+
+
             if (Keyboard[OpenTK.Input.Key.Escape])
                 Exit();
         }
@@ -121,6 +139,7 @@ namespace Monocle
             return cursorPos;
         }
 
+        float rot = 0;
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
@@ -128,29 +147,47 @@ namespace Monocle
 
             Matrix4 projectionMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, -1, 10);
 
-            fontBatch.Begin(ref projectionMatrix);
+            rot += (float)e.Time;
+
+            this.customEffect.Use();
+            this.customEffect.SetUniform("rotation", rot);
+
+
+            fontBatch.Begin(ref projectionMatrix, null);
             Vector2 origin = font.MessureString("The brown dog jumped over the lazy fox!?");
-            fontBatch.Draw(font, "The brown dog jumped over the lazy fox!?", Vector2.Zero);
-            fontBatch.Draw(font, "The brown dog jumped over the lazy fox!?", new Vector2(0, origin.Y), Color4.Black);
+            fontBatch.DrawString(font, "The brown dog jumped over the lazy fox!?", Vector2.Zero, Color4.White, Vector2.Zero, Vector2.One, renderLayer: 1.0f);
+            fontBatch.DrawString(font, "The brown dog jumped over the lazy fox!?", new Vector2(0, origin.Y), Color4.Black, Vector2.Zero, Vector2.One, renderLayer: 1.0f);
 
-            fontBatch.Draw(font, "This is a \nmulti line text!", new Vector2(0, origin.Y) * 2, Color4.Yellow);           
-            fontBatch.Draw(font, "This is scaled text!.", new Vector2(0, origin.Y) * 4, Color4.Green, Vector2.Zero, new Vector2(2,2));
+            fontBatch.DrawString(font, "This is a \nmulti line text!", new Vector2(0, origin.Y) * 2, Color4.Yellow, Vector2.Zero, Vector2.One, renderLayer: 1.0f);           
+            fontBatch.DrawString(font, "This is scaled text!.", new Vector2(0, origin.Y) * 4, Color4.Green, Vector2.Zero, new Vector2(2,2), renderLayer: 1.0f);
             
-            fontBatch.Draw(font, "This is mirrored text!.", new Vector2(0, origin.Y) * 6, Color4.Red, Vector2.Zero, Vector2.One, 0, true);
-            fontBatch.Draw(font, "This is rotated and scaled text!.", new Vector2(15, origin.Y) * 8, Color4.Purple, Vector2.Zero, new Vector2(1.5f,1.4f), 0.5f, false);
+            fontBatch.DrawString(font, "This is mirrored text!.", new Vector2(0, origin.Y) * 6, Color4.Red, Vector2.Zero, Vector2.One, 0, true);
+            fontBatch.DrawString(font, "This is rotated and scaled text!.", new Vector2(15, origin.Y) * 8, Color4.Purple, Vector2.Zero, new Vector2(1.5f,1.4f), 0.5f, false);
 
-            fontBatch.Draw(font1, "This is a consolas text!", new Vector2(400, 100), Color4.DimGray, Vector2.Zero);
-            fontBatch.Draw(font2, "This is a small arial text.", new Vector2(700, 300), Color4.Gold, Vector2.Zero);
+            fontBatch.DrawString(font1, "This is a consolas text!", new Vector2(400, 100), Color4.DimGray, Vector2.Zero);
+            fontBatch.DrawString(font2, "This is a small arial text.", new Vector2(700, 300), Color4.Gold, Vector2.Zero);
 
-            fontBatch.Draw(font1, text.ToString(), new Vector2(650, 0), Color4.White);
-            fontBatch.Draw(font2, "This is a small very scaled font text.", new Vector2(300, 400), Color4.Gold, Vector2.Zero, new Vector2(5,5));
+            fontBatch.DrawString(font1, text.ToString(), new Vector2(650, 0), Color4.White);
+            fontBatch.DrawString(font2, "This is a small very scaled font text.", new Vector2(300, 400), Color4.Gold, Vector2.Zero, new Vector2(5,5));
 
+            string s = this.builder.ToString();
 
-            fontBatch.Draw(font, "This font should be cut of if the characters ar outside the box.", TextAlignment.Left, Color4.White, new Rect(600, 500, 200, 100), Vector2.Zero);  
-
+            fontBatch.DrawString(font2, s,Vector2.Zero, Color4.Black);
             fontBatch.End();
             
             SwapBuffers();
+        }
+
+        Random r = new Random();
+
+        private Color4 RandomColor()
+        {
+            return new Color4((byte)r.Next(0, 256), (byte)r.Next(0, 256), (byte)r.Next(0, 256), (byte)255); 
+        }
+
+        private Vector2 RandomPos()
+        {
+            return new Vector2(r.Next(0, this.Width), r.Next(0, this.Height));
         }
 
         public static void Main(string[] args)

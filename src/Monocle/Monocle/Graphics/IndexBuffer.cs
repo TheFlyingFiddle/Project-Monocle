@@ -17,17 +17,17 @@ namespace Monocle.Graphics
             this.hint = hint;
         }
 
-        public void SetData(short[] data)
+        public void SetData(ushort[] data)
         {
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(data.Length * 2), data, hint);
         }
 
-        public void SetSubData(short[] data, int offset)
+        public void SetSubData(ushort[] data, int offset)
         {
             GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(data.Length * 2), data);
         }
 
-        public void SetSubData(short[] data, int offset, int length)
+        public void SetSubData(ushort[] data, int offset, int length)
         {
             GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(length * 2), data);
         }

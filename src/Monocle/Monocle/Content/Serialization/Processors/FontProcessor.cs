@@ -21,17 +21,19 @@ namespace Monocle.Content.Serialization.Processors
             string face = input.Info.Face + "-" + input.Info.Size + "-" + (input.Info.Bold == 1 ? "b" : "") + (input.Info.Italic == 1 ? "i" : "");
             var texture = LoadTexture(input.Pages[0].File, context);
 
-            var charMap = new Dictionary<char, CharInfo>();
+            int largest = input.Chars.Max((x) => x.ID);
+
+            var charMap = new CharInfo[largest + 1];
             for (int i = 0; i < input.Chars.Count; i++)
             {
                 FontChar c = input.Chars[i];
 
                 var info =
-                    new CharInfo(new Rect(c.X - 1f, c.Y - 1f, c.Width + 1f, c.Height + 1f),
+                    new CharInfo(texture, new Rect(c.X - 1f, c.Y - 1f, c.Width + 1f, c.Height + 1f),
                                  new Vector2(c.XOffset, c.YOffset),
                                  c.XAdvance);
 
-                charMap.Add((char)c.ID, info);
+                charMap[c.ID] = info;
             }
             
             return new TextureFont(face, input.Info.Size, input.Common.Base, input.Common.LineHeight, texture, charMap);
