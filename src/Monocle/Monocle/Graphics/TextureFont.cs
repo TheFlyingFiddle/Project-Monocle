@@ -49,14 +49,9 @@ namespace Monocle.Graphics
         public readonly float Size;
         public readonly float Base;
         public readonly float LineHeight;
+        public readonly Texture2D Page;
+
         private readonly CharInfo[] chars;
-
-        public Texture2D Page
-        {
-            get;
-            private set;
-        }
-
 
         public TextureFont(string face, int size, int _base, int lineHeight, Texture2D page, CharInfo[] chars)
         {

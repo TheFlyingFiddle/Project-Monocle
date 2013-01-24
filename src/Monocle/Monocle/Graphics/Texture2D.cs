@@ -13,12 +13,14 @@ namespace Monocle.Graphics
 {
     public class Texture2D : IComparable<Texture2D>
     {
-        int openglID;
+        public readonly IGraphicsContext GraphicsContext;
+        public readonly int Handle;
         public readonly int Width, Height;
-
-        internal Texture2D(int openglID, int width, int height)
+        
+        internal Texture2D(IGraphicsContext context, int openglID, int width, int height)
         {
-            this.openglID = openglID;
+            this.GraphicsContext = context;
+            this.Handle = openglID;
             this.Width = width;
             this.Height = height;
         }
@@ -29,41 +31,34 @@ namespace Monocle.Graphics
         }
 
 
-        public static Texture2D LoadTexture(Stream stream)
+        public static Texture2D LoadTexture(IGraphicsContext context, Stream stream)
         {
             Bitmap bitmap = new Bitmap(stream);
             BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
-            int id = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, id);
+            int id = context.GenTexture();
+            context.BindTexture(TextureTarget.Texture2D, id);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+            context.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, false,
                           OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
             bitmap.UnlockBits(data);
 
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            context.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            return new Texture2D(id, data.Width, data.Height);
+            return new Texture2D(context, id, data.Width, data.Height);
         }
-
-
-        public void Bind(TextureUnit unit)
-        {
-            GL.ActiveTexture(unit);
-            GL.BindTexture(TextureTarget.Texture2D, this.openglID);
-        }
-
+        
         public void Destroy()
         {
-            GL.DeleteTexture(openglID);
+            GL.DeleteTexture(Handle);
         }
 
         public override bool Equals(object obj)
         {
             if (obj is Texture2D)
             {
-                return this.openglID == ((Texture2D)obj).openglID;
+                return this.Handle == ((Texture2D)obj).Handle;
             }
 
             return false;
@@ -71,7 +66,7 @@ namespace Monocle.Graphics
 
         public override int GetHashCode()
         {
-            return this.openglID;
+            return this.Handle;
         }
 
         public void GetImageData<T>(T[] data) where T : struct
@@ -92,6 +87,7 @@ namespace Monocle.Graphics
             public override void WriteType(Texture2D toWrite, IWriter writer)
             {
                 int[] array = new int[toWrite.Width * toWrite.Height];
+                GL.BindTexture(TextureTarget.Texture2D, toWrite.Handle);
                 GL.GetTexImage<int>(TextureTarget.Texture2D, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, array);
                 writer.Write(toWrite.Width);
                 writer.Write(array);
@@ -103,7 +99,7 @@ namespace Monocle.Graphics
         {
             public override Texture2D Read(IReader reader)
             {
-                int width = reader.ReadInt32();
+                /*int width = reader.ReadInt32();
                 int[] data = reader.Read<int[]>();
 
                 int id = GL.GenTexture();
@@ -113,13 +109,15 @@ namespace Monocle.Graphics
                               OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data);
 
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-                return new Texture2D(id, width, data.Length / width);
+                return new Texture2D(id, width, data.Length / width);*/
+
+                throw new NotImplementedException();
             }
         }
 
         public int CompareTo(Texture2D other)
         {
-            return other.openglID - this.openglID;
+            return other.Handle - this.Handle;
         }
     }
 }

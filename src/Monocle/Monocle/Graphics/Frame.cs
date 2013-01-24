@@ -8,23 +8,24 @@ namespace Monocle.Graphics
 {
     public struct Frame
     {
+        private readonly Rect srcRect;
+        private readonly Texture2D texture;
+
         public Rect SrcRect
         {
-            get;
-            set;
+            get { return this.srcRect; }
         }
 
         public Texture2D Texture2D
         {
-            get;
-            set;
+            get { return this.texture; }
         }
 
         public Frame(Rect srcRect, Texture2D texture)
             : this()
         {
-            SrcRect = srcRect;
-            Texture2D = texture;
+            this.srcRect = srcRect;
+            this.texture = texture;
         }
     }
 }

@@ -74,7 +74,10 @@
     <Compile Include="Content\Serialization\Processors\FontProcessor.cs" />
     <Compile Include="Content\Serialization\Processors\Processor.cs" />
     <Compile Include="Content\Serialization\Processors\TextProcessor.cs" />
-    <Compile Include="Graphics\IFontBatch.cs" />
+    <Compile Include="Graphics\GraphicsContext.cs" />
+    <Compile Include="Graphics\IGraphicsContext.cs" />
+    <Compile Include="Graphics\ISpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\IndexBuffer.cs" />
     <Compile Include="Graphics\IVertex.cs" />
     <Compile Include="Graphics\SortMode.cs" />
@@ -104,7 +107,6 @@
     <Compile Include="Core\Entity.cs" />
     <Compile Include="Core\EntityCollection.cs" />
     <Compile Include="Graphics\BasicEffect.cs" />
-    <Compile Include="Graphics\Batch.cs" />
     <Compile Include="Graphics\Effect.cs" />
     <Compile Include="Core\IMonocleCollection.cs" />
     <Compile Include="Core\ISystem.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="Utils\EditableText.cs" />
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\InvalidTypeException.cs" />
+    <Compile Include="Utils\IServiceLocator.cs" />
     <Compile Include="Utils\Logging\ConsoleLogger.cs" />
     <Compile Include="Utils\Logging\Debug.cs" />
     <Compile Include="Utils\Logging\ILogger.cs" />

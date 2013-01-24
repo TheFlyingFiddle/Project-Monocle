@@ -7,21 +7,29 @@ using System.Runtime.InteropServices;
 
 namespace Monocle.Graphics
 {
-    public class VertexBuffer<T>  where T : struct, IVertex
+    public abstract class VertexBuffer
     {
-        private int bufferHandle;
-        private BufferUsageHint hint;
+        public readonly IGraphicsContext GraphicsContext;
+        internal readonly int Handle;
+        protected readonly BufferUsageHint hint;
 
-        public VertexBuffer(BufferUsageHint hint)
+        public VertexBuffer(IGraphicsContext context, BufferUsageHint hint)
         {
+            this.GraphicsContext = context;
             this.hint = hint;
-            InitBuffer();
-        }
 
-        private unsafe void InitBuffer()
-        {
-            GL.GenBuffers(1, out bufferHandle);
+            this.GraphicsContext.GenBuffers(1, out Handle);
         }
+            
+    
+    }
+
+
+    public class VertexBuffer<T>  : VertexBuffer where T : struct, IVertex
+    {
+        public VertexBuffer(IGraphicsContext context, BufferUsageHint hint)
+            : base(context, hint)
+        { }
 
         public void SetData(T[] data)
         {
@@ -30,7 +38,7 @@ namespace Monocle.Graphics
             else if(data.Length < 1)
                 throw new ArgumentException("Data must contain atleas one element!");
 
-            GL.BufferData<T>(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * data[0].SizeInBytes), data, hint);
+            this.GraphicsContext.BufferData<T>(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * data[0].SizeInBytes), data, hint);
         }
 
         public void SetSubData(T[] data, int offset)
@@ -41,19 +49,12 @@ namespace Monocle.Graphics
                 throw new ArgumentException("Data must contain atleas one element!");
 
 
-            GL.BufferSubData<T>(BufferTarget.ArrayBuffer, (IntPtr)(offset * data[0].SizeInBytes), (IntPtr)(data.Length * data[0].SizeInBytes), data);
+            this.GraphicsContext.BufferSubData<T>(BufferTarget.ArrayBuffer, (IntPtr)(offset * data[0].SizeInBytes), (IntPtr)(data.Length * data[0].SizeInBytes), data);
         }
-
-
 
         public void SetSubData(T[] data, int offset, int count)
         {
-            GL.BufferSubData<T>(BufferTarget.ArrayBuffer, (IntPtr)(offset * data[0].SizeInBytes), (IntPtr)(count * data[0].SizeInBytes), data);
-        }
-
-        public void Bind()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this.bufferHandle);
+            this.GraphicsContext.BufferSubData<T>(BufferTarget.ArrayBuffer, (IntPtr)(offset * data[0].SizeInBytes), (IntPtr)(count * data[0].SizeInBytes), data);
         }
     }
 }

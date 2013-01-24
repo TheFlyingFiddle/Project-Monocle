@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Monocle.Content.Serialization;
 using System.IO;
+using Monocle.Utils;
 
 namespace Monocle.Content
 {
@@ -43,19 +44,26 @@ namespace Monocle.Content
         /// </summary>
         string RootDirectory { get; }
 
+
+        IServiceLocator Locator { get; }
     }
 
 
-    class ResourceContext : IResourceContext
+    public class ResourceContext : IResourceContext
     {
         private const string ASSET_EXT = ".asset";
 
         private readonly Dictionary<string, object> loaded;
         private readonly ITypeReaderFactory trfactory;
         private readonly ITypeWriterFactory twfactory;
-        private readonly IResourceLoader resourceLoader;
-
+        private readonly IResourceLoader resourceLoader;    
         private readonly string assetDirectory;
+        
+        public IServiceLocator Locator
+        {
+            get;
+            private set;
+        }
 
         public string RootDirectory
         {
@@ -69,8 +77,7 @@ namespace Monocle.Content
             set;
         }
 
-
-        public ResourceContext(ITypeReaderFactory trfactory, ITypeWriterFactory twfactory, IResourceLoader loader, string assetDir, string rootDir)
+        public ResourceContext(IServiceLocator provider, ITypeReaderFactory trfactory, ITypeWriterFactory twfactory, IResourceLoader loader, string assetDir, string rootDir)
         {
             this.loaded = new Dictionary<string, object>();
             this.trfactory = trfactory;
@@ -78,9 +85,10 @@ namespace Monocle.Content
             this.resourceLoader = loader;
             this.assetDirectory = assetDir;
             this.RootDirectory = rootDir;
+            this.Locator = provider;
+
             this.ShouldSaveAllLoadedAssets = true;
         }
-
 
 
         public T LoadResource<T>(string path, IImporter importer = null, IProcessor processor = null)
@@ -133,6 +141,15 @@ namespace Monocle.Content
 
             return (T)asset;
         }
+
+        public static void Use(Stream stream, Action action)
+        {
+            using (stream)
+            {
+                action();
+            }
+        }
+
 
         private T LoadAssetAsset<T>(string filePath, string assetPath)
         {

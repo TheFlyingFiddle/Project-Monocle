@@ -6,67 +6,63 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Monocle.Graphics
 {
-    class ShortIndexBuffer
+    public class ShortIndexBuffer
     {
+        public readonly IGraphicsContext context;
+
         private readonly BufferUsageHint hint;
-        private readonly int handle;
+        internal readonly int Handle;
         
-        public ShortIndexBuffer(BufferUsageHint hint)
+        public ShortIndexBuffer(IGraphicsContext context, BufferUsageHint hint)
         {
-            GL.GenBuffers(1, out handle);
+            this.context = context;
             this.hint = hint;
+            context.GenBuffers(1, out Handle);
         }
 
         public void SetData(ushort[] data)
         {
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(data.Length * 2), data, hint);
+            context.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(data.Length * 2), data, hint);
         }
 
         public void SetSubData(ushort[] data, int offset)
         {
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(data.Length * 2), data);
+            context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(data.Length * 2), data);
         }
 
         public void SetSubData(ushort[] data, int offset, int length)
         {
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(length * 2), data);
-        }
-
-        public void Bind()
-        {
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.handle);
+            context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(length * 2), data);
         }
     }
 
-    class IntIndexBuffer
+    public class IntIndexBuffer
     {
+        public readonly IGraphicsContext context;
         private readonly BufferUsageHint hint;
-        private readonly int handle;
+        internal readonly int Handle;
 
-        public IntIndexBuffer(BufferUsageHint hint)
+        public IntIndexBuffer(IGraphicsContext context, BufferUsageHint hint)
         {
-            GL.GenBuffers(1, out handle);
+            this.context = context;
             this.hint = hint;
+            context.GenBuffers(1, out Handle);
         }
 
         public void SetData(int[] data)
         {
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(data.Length * 4), data, hint);
+            context.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(data.Length * 4), data, hint);
         }
 
         public void SetSubData(int[] data, int offset)
         {
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 4), (IntPtr)(data.Length * 4), data);
+            context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 4), (IntPtr)(data.Length * 4), data);
         }
 
         public void SetSubData(int[] data, int offset, int length)
         {
-            GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 4), (IntPtr)(length * 4), data);
+            context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 4), (IntPtr)(length * 4), data);
         }
 
-        public void Bind()
-        {
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.handle);
-        }
     }
 }

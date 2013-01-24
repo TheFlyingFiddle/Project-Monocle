@@ -24,11 +24,9 @@ namespace Monocle.GUI
     public class GUIRenderingContext : IGUIRenderingContext
     {
         private readonly SpriteBatch fontBatch;
-        private readonly Batch frameBatch;
 
-        public GUIRenderingContext(Batch frameBatch, SpriteBatch fontBatch)
+        public GUIRenderingContext(SpriteBatch fontBatch)
         {
-            this.frameBatch = frameBatch;
             this.fontBatch = fontBatch;
         }
 
@@ -43,7 +41,6 @@ namespace Monocle.GUI
 
         public void DrawFrame(Frame frame, Rect bounds, Color4 tint, Vector2 offset = default(Vector2))
         {
-            this.frameBatch.Draw(frame.Texture2D, bounds, tint, frame.SrcRect);
         }
 
         public void DrawBorder(Frame borderFrame, Rect bounds, Color4 tint, int width)
@@ -53,20 +50,15 @@ namespace Monocle.GUI
             bounds.Width += width;
             bounds.Height += width;
 
-            this.frameBatch.Draw(borderFrame.Texture2D, bounds, tint, borderFrame.SrcRect);
         }
 
 
         public void Begin(ref Matrix4 projection)
         {
-            this.fontBatch.Begin(ref projection);
-            this.frameBatch.Begin(ref projection);
         }
 
         public void End()
         {
-            this.fontBatch.End();
-            this.frameBatch.End();
         }
     }
 }
