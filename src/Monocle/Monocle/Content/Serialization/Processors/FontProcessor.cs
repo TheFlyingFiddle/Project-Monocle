@@ -35,8 +35,9 @@ namespace Monocle.Content.Serialization.Processors
 
                 charMap[c.ID] = info;
             }
-            
-            return new TextureFont(face, input.Info.Size, input.Common.Base, input.Common.LineHeight, texture, charMap);
+
+
+            return new TextureFont(face, input.Info.Size, input.Common.LineHeight, texture, charMap);
         }
 
         private Texture2D LoadTexture(string fileName, IResourceContext context)

@@ -37,10 +37,10 @@ namespace Monocle.Graphics
         private IntIndexBuffer indexBuffer;
 
         //The default effect that will be used if a user does not provide a custom effect.
-        private Effect default_effect;
+        private ShaderProgram default_effect;
 
         //The effect that is currently in use.
-        private Effect activeEffect;
+        private ShaderProgram activeEffect;
 
         //Vertecies that are to be sent to the graphics card.
         private Vertex[] vertices = new Vertex[Max_Sprites * 4];
@@ -74,7 +74,7 @@ namespace Monocle.Graphics
         /// </summary>
         /// <remarks>The effect must use a vertex shader that uses the vertex format <see cref="SpriteBatch.Vertex"/></remSarks>
         /// <param name="effect">A effect.</param>
-        public SpriteBatch(IGraphicsContext context, Effect effect)
+        public SpriteBatch(IGraphicsContext context, ShaderProgram effect)
         {
             if (effect == null)
                 throw new ArgumentNullException("effect");
@@ -120,18 +120,18 @@ namespace Monocle.Graphics
         }
 
         //Prepares the supplied effect for drawing.
-        private void PrepareEffect(ref Matrix4 transformation, Effect effect)
+        private void PrepareShaderProgram(ref Matrix4 transformation, ShaderProgram program)
         {
-            effect.Use();
-            effect.SetUniform("tex", 0);
+            this.GraphicsContext.UseShaderProgram(program);
+            program.SetUniform("tex", 0);
             activeEffect.SetUniform("projection_matrix", ref transformation);
 
 
-            int posIndex = this.GraphicsContext.GetAttribLocation(effect.programID, "in_position");
-            int texIndex = this.GraphicsContext.GetAttribLocation(effect.programID, "in_coords");
-            int coloIndex = this.GraphicsContext.GetAttribLocation(effect.programID, "in_tint");
-            int offsetIndex = this.GraphicsContext.GetAttribLocation(effect.programID, "in_offset");
-            int rotationIndex = this.GraphicsContext.GetAttribLocation(effect.programID, "in_rotation");
+            int posIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_position");
+            int texIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_coords");
+            int coloIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_tint");
+            int offsetIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_offset");
+            int rotationIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_rotation");
 
 
             this.GraphicsContext.BindVertexBuffer(this.vertexBuffer);
@@ -299,8 +299,8 @@ namespace Monocle.Graphics
             Vector2 infoOffset = info.Offset;
 
             Vector4 dest;
-            dest.X = (cursor.X + (infoOffset.X - origin.X) * scale.X);
-            dest.Y = (cursor.Y + (infoOffset.Y - origin.Y) * scale.Y);
+            dest.X = (cursor.X + (infoOffset.X + origin.X) * scale.X);
+            dest.Y = (cursor.Y + (infoOffset.Y + origin.Y) * scale.Y);
             dest.Z = dest.X + info.SrcRect.Width * scale.X;
             dest.W = dest.Y + info.SrcRect.Height * scale.Y;
             
@@ -437,14 +437,14 @@ namespace Monocle.Graphics
         /// <summary>
         /// Draws any objects added to the batch through the various Add methods.
         /// </summary>
-        public void End(ref Matrix4 transformation, Effect effect = null, SortMode mode = SortMode.Deffered)
+        public void End(ref Matrix4 transformation, ShaderProgram effect = null, SortMode mode = SortMode.Deffered)
         {
             if (effect == null)
                 this.activeEffect = default_effect;
             else
                 this.activeEffect = effect;
 
-            this.PrepareEffect(ref transformation, this.activeEffect);
+            this.PrepareShaderProgram(ref transformation, this.activeEffect);
                     
             if (mode == SortMode.Deffered)
             {
@@ -459,7 +459,7 @@ namespace Monocle.Graphics
             }
 
             this.elementCount = 0;
-            this.GraphicsContext.UseProgram(0);
+            this.GraphicsContext.UseShaderProgram(null);
         }
 
         private unsafe void Sort(SortMode mode)

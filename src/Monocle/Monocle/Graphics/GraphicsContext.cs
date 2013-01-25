@@ -151,13 +151,13 @@ namespace Monocle.Graphics
         {
             GL.LinkProgram(program);
         }
-
-        public void UseProgram(int id)
-        {
-            GL.UseProgram(id);
-        }
-
         #region Uniforms
+
+
+        public int GetUniformLocation(int programID, string name)
+        {
+            return GL.GetUniformLocation(programID, name);
+        }
 
         public void Uniform1(int location, float value)
         {
@@ -300,6 +300,36 @@ namespace Monocle.Graphics
         }
 
         #endregion
+
+        public void TexParameter(TextureTarget textureTarget, TextureParameterName textureParameterName, int format)
+        {
+            GL.TexParameter(textureTarget, textureParameterName, format);
+        }
+
+        public void UseShaderProgram(ShaderProgram program)
+        {
+            GL.UseProgram(program != null ? program.Handle : 0);
+        }
+
+        public string GetShaderInfoLog(int shaderID)
+        {
+            return GL.GetShaderInfoLog(shaderID);
+        }
+
+        public string GetProgramInfoLog(int programID)
+        {
+            return GL.GetProgramInfoLog(programID);
+        }
+
+        public void Viewport(int x, int y, int Width, int Height)
+        {
+            GL.Viewport(x, y, Width, Height);
+        }
+
+        public void Clear(ClearBufferMask mask)
+        {
+            GL.Clear(mask);
+        }
     }
 
     class DebugGraphicsContext : IGraphicsContext
@@ -568,7 +598,6 @@ namespace Monocle.Graphics
             CheckGLError();
         }
 
-
         public void Enable(EnableCap enableCap)
         {
             forwarding.Enable(enableCap);
@@ -584,12 +613,6 @@ namespace Monocle.Graphics
         public void ClearColor(Color4 color4)
         {
             forwarding.ClearColor(color4);
-            CheckGLError();
-        }
-
-        public void UseProgram(int id)
-        {
-            forwarding.UseProgram(id);
             CheckGLError();
         }
 
@@ -611,7 +634,6 @@ namespace Monocle.Graphics
             CheckGLError();
         }
 
-
         public void BindVertexBuffer(VertexBuffer buffer)
         {
             forwarding.BindVertexBuffer(buffer);
@@ -631,6 +653,46 @@ namespace Monocle.Graphics
         public void TexParameter(TextureTarget textureTarget, TextureParameterName textureParameterName, int filter)
         {
             forwarding.TexParameter(textureTarget, textureParameterName, filter);
+            CheckGLError();
+        }
+
+        public void UseShaderProgram(ShaderProgram program)
+        {
+            forwarding.UseShaderProgram(program);
+            CheckGLError();
+        }
+
+        public string GetShaderInfoLog(int vertID)
+        {
+            var tmp = forwarding.GetShaderInfoLog(vertID);
+            CheckGLError();
+            return tmp;
+        }
+
+        public string GetProgramInfoLog(int programID)
+        {
+            var tmp = forwarding.GetProgramInfoLog(programID);
+            CheckGLError();
+            return tmp;
+        }
+
+        public int GetUniformLocation(int p, string name)
+        {
+            var tmp = forwarding.GetUniformLocation(p, name);
+            CheckGLError();
+            return tmp;
+        }
+
+
+        public void Viewport(int x, int y, int Width, int Height)
+        {
+            forwarding.Viewport(x, y, Width, Height);
+            CheckGLError();
+        }
+
+        public void Clear(ClearBufferMask mask)
+        {
+            forwarding.Clear(mask);
             CheckGLError();
         }
     }

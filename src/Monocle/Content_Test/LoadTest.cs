@@ -22,7 +22,7 @@ namespace Content_Test
             var loader = new ResourceLoader();
             loader.AddImportersAndProcessors(typeof(IImporter).Assembly);
 
-            manager = new ResourceContext(readerFactory, writerFactory, loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
+            manager = new ResourceContext(null, readerFactory, writerFactory, loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
         }
 
         [Test]

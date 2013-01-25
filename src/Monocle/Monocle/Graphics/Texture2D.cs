@@ -51,7 +51,7 @@ namespace Monocle.Graphics
         
         public void Destroy()
         {
-            GL.DeleteTexture(Handle);
+            this.GraphicsContext.DeleteTexture(Handle);
         }
 
         public override bool Equals(object obj)
@@ -71,13 +71,7 @@ namespace Monocle.Graphics
 
         public void GetImageData<T>(T[] data) where T : struct
         {
-            
-            GL.GetTexImage<T>(TextureTarget.Texture2D, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data);
-
-            if (GL.GetError() != ErrorCode.NoError)
-            {
-                throw new ArgumentException("The data must be large enough to store the entire texture!");
-            }
+            this.GraphicsContext.GetTexImage<T>(TextureTarget.Texture2D, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data);
         }
 
 
@@ -87,8 +81,8 @@ namespace Monocle.Graphics
             public override void WriteType(Texture2D toWrite, IWriter writer)
             {
                 int[] array = new int[toWrite.Width * toWrite.Height];
-                GL.BindTexture(TextureTarget.Texture2D, toWrite.Handle);
-                GL.GetTexImage<int>(TextureTarget.Texture2D, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, array);
+                toWrite.GraphicsContext.BindTexture(TextureTarget.Texture2D, toWrite.Handle);
+                toWrite.GraphicsContext.GetTexImage<int>(TextureTarget.Texture2D, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, array);
                 writer.Write(toWrite.Width);
                 writer.Write(array);
             }

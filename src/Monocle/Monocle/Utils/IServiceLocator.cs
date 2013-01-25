@@ -24,11 +24,11 @@ namespace Monocle.Utils
             }
         }
 
-        private readonly Dictionary<Type, Provider> provider;
+        private readonly Dictionary<Type, Provider> provider = new Dictionary<Type,Provider>();
 
         public void RegisterService<T>(T service)
         {
-            provider.Add(service.GetType(), new Provider(service));
+            provider.Add(typeof(T), new Provider(service));
         }
 
         public void UnregisterService<T>()

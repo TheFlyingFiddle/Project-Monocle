@@ -201,6 +201,16 @@ namespace Monocle.Core
             return comp;
         }
 
+        public void AddComponent(Component comp)
+        {
+            if (comp == null)
+                throw new ArgumentNullException("comp");
+
+            comp.Owner = this;
+            this.components.Add(comp);
+            this.OnComponentAdded(comp);
+        }
+
         private void OnComponentAdded(Component component)
         {
             if (this.ComponentAdded != null)

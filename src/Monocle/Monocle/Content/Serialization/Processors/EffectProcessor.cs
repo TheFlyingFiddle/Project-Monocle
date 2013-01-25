@@ -9,14 +9,17 @@ using System.IO;
 namespace Monocle.Content.Serialization.Processors
 {
     [Processor(typeof(EffectContent), true)]
-    public class EffectProcessor : Processor<EffectContent, Effect>
+    public class EffectProcessor : Processor<EffectContent, ShaderProgram>
     {
-        public override Effect Process(EffectContent input, IResourceContext context)
+        public override ShaderProgram Process(EffectContent input, IResourceContext context)
         {
             string vertexSource = LoadShaderSource(input.VertexShaderPath, context);
             string fragmentSource = LoadShaderSource(input.FragmentShaderPath, context);
 
-            return Effect.CreateEffect(vertexSource, fragmentSource);
+            var gc = context.Locator.GetService<IGraphicsContext>();
+
+
+            return ShaderProgram.CreateProgram(gc, vertexSource, fragmentSource);
         }
 
         private string LoadShaderSource(string path, IResourceContext context)

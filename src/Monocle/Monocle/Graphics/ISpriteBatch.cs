@@ -18,6 +18,6 @@ namespace Monocle.Graphics
         void AddString(TextureFont fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin);
         void AddString(TextureFont fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, 
                         float angle = 0, bool mirror = false, float renderLayer = 0.0f);
-        void End(ref OpenTK.Matrix4 transformation, Effect effect = null, SortMode mode = SortMode.Deffered);
+        void End(ref OpenTK.Matrix4 transformation, ShaderProgram effect = null, SortMode mode = SortMode.Deffered);
     }
 }

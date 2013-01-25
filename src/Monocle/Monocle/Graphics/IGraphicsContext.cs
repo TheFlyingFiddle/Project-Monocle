@@ -10,6 +10,7 @@ namespace Monocle.Graphics
         void BindVertexBuffer(VertexBuffer buffer);
         void BindIndexBuffer(IntIndexBuffer buffer);
         void BindIndexBuffer(ShortIndexBuffer buffer);
+        void UseShaderProgram(ShaderProgram program);
 
         void BindTexture(TextureTarget target, int id);
         void BufferData<T>(BufferTarget target, IntPtr size, T[] data, BufferUsageHint hint) where T : struct;
@@ -68,12 +69,18 @@ namespace Monocle.Graphics
         void BlendFunc(BlendingFactorSrc blendingFactorSrc, BlendingFactorDest blendingFactorDest);
 
         void ClearColor(OpenTK.Graphics.Color4 color4);
-
-        void UseProgram(int id);
-
         void DrawElements(BeginMode beginMode, int p, DrawElementsType drawElementsType, int p_2);
 
         void TexParameter(TextureTarget textureTarget, TextureParameterName textureParameterName, int p);
+
+        string GetShaderInfoLog(int vertID);
+
+        string GetProgramInfoLog(int programID);
+
+        int GetUniformLocation(int programID, string name);
+
+        void Viewport(int x, int y, int Width, int Height);
+        void Clear(ClearBufferMask mask);
     }
 
 

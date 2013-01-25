@@ -8,85 +8,71 @@ using OpenTK;
 
 namespace Monocle.Graphics
 {
-    public sealed class Effect
+    public sealed class ShaderProgram
     {
-        int vertexID, fragmentID;
-        public int programID;
+        public readonly IGraphicsContext GraphicsContext;
 
-        private Effect(int vertexID, int fragmentID, int programID)
+        internal readonly int Handle;
+        int vertexID, fragmentID;
+
+        private ShaderProgram(IGraphicsContext context, int vertexID, int fragmentID, int programID)
         {
             this.vertexID = vertexID;
             this.fragmentID = fragmentID;
-            this.programID = programID;
+            this.Handle = programID;
+            this.GraphicsContext = context;
         }
 
-        public static Effect CreateEffect(string vertexSource, string fragmentSource)
+        public static ShaderProgram CreateProgram(IGraphicsContext context, string vertexSource, string fragmentSource)
         {
-            int vertID = GL.CreateShader(ShaderType.VertexShader);
-            int fragID = GL.CreateShader(ShaderType.FragmentShader);
+            int vertID = context.CreateShader(ShaderType.VertexShader);
+            int fragID = context.CreateShader(ShaderType.FragmentShader);
 
 
-            GL.ShaderSource(vertID, vertexSource);
-            GL.ShaderSource(fragID, fragmentSource);
+            context.ShaderSource(vertID, vertexSource);
+            context.ShaderSource(fragID, fragmentSource);
 
-            GL.CompileShader(vertID);
-            GL.CompileShader(fragID);
+            context.CompileShader(vertID);
+            context.CompileShader(fragID);
 
-            Debug.LogInfo(GL.GetShaderInfoLog(vertID));
-            Debug.LogInfo(GL.GetShaderInfoLog(fragID));
+            Debug.LogInfo(context.GetShaderInfoLog(vertID));
+            Debug.LogInfo(context.GetShaderInfoLog(fragID));
 
-            int programID = GL.CreateProgram();
+            int programID = context.CreateProgram();
 
-            GL.AttachShader(programID, vertID);
-            GL.AttachShader(programID, fragID);
+            context.AttachShader(programID, vertID);
+            context.AttachShader(programID, fragID);
 
-            GL.LinkProgram(programID);
+            context.LinkProgram(programID);
 
-            Debug.LogInfo(GL.GetProgramInfoLog(programID));
+            Debug.LogInfo(context.GetProgramInfoLog(programID));
 
-            ErrorCode code = GL.GetError();
-            if (code != ErrorCode.NoError)
-            {
-                GL.DeleteShader(vertID);
-                GL.DeleteShader(fragID);
-                GL.DeleteProgram(programID);
-
-                throw new OpenTK.GraphicsException("Effect could not be compleated correctly!");
-            }
-
-            return new Effect(vertID, fragID, programID);   
-        }
-
-        public void Use()
-        {
-            GL.UseProgram(this.programID);
+            return new ShaderProgram(context, vertID, fragID, programID);   
         }
 
         public void SetUniform(string name, int value)
         {
-            int location = GL.GetUniformLocation(this.programID, name);
-            GL.Uniform1(location, value);
+            int location = this.GraphicsContext.GetUniformLocation(this.Handle, name);
+            GraphicsContext.Uniform1(location, value);
         }
 
         public void SetUniform(string name, float value)
         {
-            int location = GL.GetUniformLocation(this.programID, name);
-            GL.Uniform1(location, value);
+            int location = GraphicsContext.GetUniformLocation(this.Handle, name);
+            GraphicsContext.Uniform1(location, value);
         }
 
         public void SetUniform(string name , ref Matrix4 value)
         {
-            int location = GL.GetUniformLocation(this.programID, name);
-            ErrorCode error = GL.GetError();
-            GL.UniformMatrix4(location, false, ref value);
-            error = GL.GetError();
+            int location = GraphicsContext.GetUniformLocation(this.Handle, name);
+            GraphicsContext.UniformMatrix4(location, ref value, false);
         }
 
         public void Delete()
         {
-            GL.DeleteShader(this.vertexID);
-            GL.DeleteShader(this.fragmentID);
-            GL.DeleteProgram(this.programID);
+            GraphicsContext.DeleteShader(this.vertexID);
+            GraphicsContext.DeleteShader(this.fragmentID);
+            GraphicsContext.DeleteProgram(this.Handle);
         }
 
     }

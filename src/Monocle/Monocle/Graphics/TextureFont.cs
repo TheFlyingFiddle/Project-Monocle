@@ -43,22 +43,20 @@ namespace Monocle.Graphics
     }
 
 
-    public class TextureFont
+    public class TextureFont : ICloneable
     {
         public readonly string Face;
         public readonly float Size;
-        public readonly float Base;
         public readonly float LineHeight;
         public readonly Texture2D Page;
 
         private readonly CharInfo[] chars;
 
-        public TextureFont(string face, int size, int _base, int lineHeight, Texture2D page, CharInfo[] chars)
+        public TextureFont(string face, int size, int lineHeight, Texture2D page, CharInfo[] chars)
         {
             // TODO: Complete member initialization
             this.Face = face;
             this.Size = size;
-            this.Base = _base;
             this.LineHeight = lineHeight;
             this.Page = page;
             this.chars = chars;
@@ -112,5 +110,10 @@ namespace Monocle.Graphics
             return size;
         }
 
+
+        public object Clone()
+        {
+            return this;
+        }
     }
 }

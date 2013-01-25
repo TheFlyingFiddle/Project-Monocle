@@ -17,6 +17,8 @@ using Monocle.GUI;
 using Monocle.Content;
 
 using GContext = Monocle.Graphics.IGraphicsContext;
+using Monocle.EntityGUI;
+using Monocle.Core;
 
 namespace Monocle
 {
@@ -28,11 +30,13 @@ namespace Monocle
         TextureFont font;
         TextureFont font1;
         TextureFont font2;
-        Effect customEffect;
         EditableText text;
-
         StringBuilder builder = new StringBuilder(4096);
         GContext context;
+        IServiceLocator locator;
+
+        GFSMComponent gfsmComponent;
+
 
         public HelloGL3()
             : base(1280, 720,
@@ -45,10 +49,16 @@ namespace Monocle
         {
             VSync = VSyncMode.On;
 
+            locator = new ServiceLocator();
+            this.context = new DebugGraphicsContext(new OpenGLGraphicsContext());
+            locator.RegisterService<GContext>(this.context);
+
             var loader = new ResourceLoader();
             loader.AddImportersAndProcessors(this.GetType().Assembly);
 
-            ResourceContext resourceContext = new ResourceContext(new TypeReaderFactory(), new TypeWriterFactory(), loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
+
+
+            ResourceContext resourceContext = new ResourceContext(this.locator, new TypeReaderFactory(), new TypeWriterFactory(), loader, Environment.CurrentDirectory + "\\Assets", Environment.CurrentDirectory);
             resourceContext.ShouldSaveAllLoadedAssets = false;
             
             this.texture = resourceContext.LoadAsset<Texture2D>("overButton.png");
@@ -56,19 +66,22 @@ namespace Monocle
             
             this.font = resourceContext.LoadAsset<TextureFont>("Arial_22.fnt");
             this.font1 = resourceContext.LoadAsset<TextureFont>("Consolas.fnt");
-            this.font2 = resourceContext.LoadAsset<TextureFont>("Arial_No_Rly.fnt");
+            this.font2 = resourceContext.LoadAsset<TextureFont>("Arial_No_Rly.fnt"); 
                         
-            Effect effect = resourceContext.LoadAsset<Effect>("Basic.effect");
-            this.customEffect = resourceContext.LoadAsset<Effect>("Sin.effect");
-
-
-            
-            this.context = new DebugGraphicsContext(new OpenGLGraphicsContext());
-
+            ShaderProgram effect = resourceContext.LoadAsset<ShaderProgram>("Basic.effect");
             this.fontBatch = new SpriteBatch(context, effect);
             text = new EditableText(-1, true);
 
+            this.gfsmComponent = CreateButton();
 
+            var entity = new Entity(new VariableCollection());
+
+            entity.AddVar<Rect>("Bounds", new Rect(100, 100, 200, 200));
+            entity.AddVar<string>("Text", "Enter");
+            entity.AddVar<Frame>("BG", new Frame(this.texture.Bounds, this.texture));
+            entity.AddVar<TextureFont>("Font", this.font);
+
+            entity.AddComponent(this.gfsmComponent);
 
             // Other state
             context.Enable(EnableCap.Blend);
@@ -78,22 +91,18 @@ namespace Monocle
             this.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
         }
 
+        private GFSMComponent CreateButton()
+        {
+            var idleFrameAction = new GFSMFrameAction("BG", "Bounds");
+            var idleTextAction = new GFSMTextAction("Font", "Bounds", "Text");
+            var idleState = new GFSMState(new int[0], new GFSMAction[] { idleFrameAction, idleTextAction });
+
+            return new GFSMComponent(new GFSMState[] { idleState });
+        }
+
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            var r = new Random();
-            int c = 100000;
-
-            builder.Clear();
-            for (int i = 0; i < c; i++)
-            {
-                if (i % 500 == 0 && i != 0)
-                    this.builder.Append('\n');
-                else 
-                    this.builder.Append((char)r.Next('a', 'z' + 1)); 
-            }
-
-
             if (Keyboard[OpenTK.Input.Key.Escape])
                 Exit();
         }
@@ -144,15 +153,12 @@ namespace Monocle
         float rot = 0;
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.Viewport(0, 0, Width, Height);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+   /*      
 
             Matrix4 projectionMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, -1, 10);
 
             rot += (float)e.Time;
-
-            this.customEffect.Use();
-            this.customEffect.SetUniform("rotation", rot);
+            
 
             Vector2 origin = font.MessureString("The brown dog jumped over the lazy fox!?");
             fontBatch.AddString(font, "The brown dog jumped over the lazy fox!?", Vector2.Zero, Color4.White, Vector2.Zero, Vector2.One, renderLayer: 1.0f);
@@ -165,16 +171,24 @@ namespace Monocle
             fontBatch.AddString(font, "This is rotated and scaled text!.", new Vector2(15, origin.Y) * 8, Color4.Purple, Vector2.Zero, new Vector2(1.5f,1.4f), 0.5f, false);
 
             fontBatch.AddString(font1, "This is a consolas text!", new Vector2(400, 100), Color4.DimGray, Vector2.Zero);
-            fontBatch.AddString(font2, "This is a small arial text.", new Vector2(700, 300), Color4.Gold, Vector2.Zero);
+          //  fontBatch.AddString(font2, "This is a small arial text.", new Vector2(700, 300), Color4.Gold, Vector2.Zero);
 
             fontBatch.AddString(font1, text.ToString(), new Vector2(650, 0), Color4.White);
-            fontBatch.AddString(font2, "This is a small very scaled font text.", new Vector2(300, 400), Color4.Gold, Vector2.Zero, new Vector2(5,5));
+           // fontBatch.AddString(font2, "This is a small very scaled font text.", new Vector2(300, 400), Color4.Gold, Vector2.Zero, new Vector2(5,5));
 
-            string s = this.builder.ToString();
+        //    string s = this.builder.ToString();
 
          //   fontBatch.AddString(font2, s,Vector2.Zero, Color4.Black);
+            fontBatch.End(ref projectionMatrix);*/
+
+            context.Viewport(0, 0, Width, Height);
+            context.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            Matrix4 projectionMatrix = Matrix4.CreateOrthographicOffCenter(0, this.Width, this.Height, 0, -1, 10);
+
+            this.gfsmComponent.Draw(Vector2.Zero, this.fontBatch);
             fontBatch.End(ref projectionMatrix);
-            
+
             SwapBuffers();
         }
 
