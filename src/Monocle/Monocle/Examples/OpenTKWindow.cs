@@ -49,7 +49,7 @@ namespace Monocle
         public OpenTKWindow(int width, int height, int fps, string title, string resourceFolder)
         {
             window = new GameWindow(width, height, new OpenTK.Graphics.GraphicsMode(),
-                                    title, 0, DisplayDevice.Default, 3, 0, 
+                                    title, 0, DisplayDevice.Default, 3, 3, 
                                     OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible 
                                     | OpenTK.Graphics.GraphicsContextFlags.Debug);
             this.fps = fps;

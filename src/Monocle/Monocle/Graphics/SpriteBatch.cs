@@ -12,6 +12,7 @@ using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
 using BufferUsageHint = OpenTK.Graphics.OpenGL.BufferUsageHint;
 using DrawElementsType = OpenTK.Graphics.OpenGL.DrawElementsType;
 using BufferTarget = OpenTK.Graphics.OpenGL.BufferTarget;
+using OpenTK.Graphics.OpenGL;
 
 
 namespace Monocle.Graphics
@@ -26,7 +27,8 @@ namespace Monocle.Graphics
 
         private const int Max_Sprites = 1024;
         private const int Elements_Per_Square = 6;
-        
+        private int vertexArrayHandle;
+
         //Current number of items (text character or frame) that is currently in the batch.
         protected int elementCount;
 
@@ -117,6 +119,9 @@ namespace Monocle.Graphics
             this.vertexBuffer.SetData(this.vertices);
 
             this.GraphicsContext.BindVertexBuffer(null);
+
+            
+            GL.GenVertexArrays(1, out this.vertexArrayHandle);
         }
 
         //Prepares the supplied effect for drawing.
@@ -133,23 +138,20 @@ namespace Monocle.Graphics
             int offsetIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_offset");
             int rotationIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_rotation");
 
+            GL.BindVertexArray(this.vertexArrayHandle);
 
             this.GraphicsContext.BindVertexBuffer(this.vertexBuffer);
             this.GraphicsContext.EnableVertexAttribArray(posIndex);
-
-            this.GraphicsContext.VertexAttribPointer(posIndex, 2, VertexAttribPointerType.Float, false, this.vertices[0].SizeInBytes, 0);
-
             this.GraphicsContext.EnableVertexAttribArray(texIndex);
-            this.GraphicsContext.VertexAttribPointer(texIndex, 2, VertexAttribPointerType.Float, false, this.vertices[0].SizeInBytes, Vector2.SizeInBytes);
-
             this.GraphicsContext.EnableVertexAttribArray(coloIndex);
-            this.GraphicsContext.VertexAttribPointer(coloIndex, 4, VertexAttribPointerType.UnsignedByte, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2);
-
             this.GraphicsContext.EnableVertexAttribArray(offsetIndex);
-            this.GraphicsContext.VertexAttribPointer(offsetIndex, 2, VertexAttribPointerType.Float, false, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2 + sizeof(int));
-
             this.GraphicsContext.EnableVertexAttribArray(rotationIndex);
-            this.GraphicsContext.VertexAttribPointer(rotationIndex, 1, VertexAttribPointerType.Float, false, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 3 + sizeof(int));
+
+            this.GraphicsContext.VertexAttribPointer(posIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, 0);
+            this.GraphicsContext.VertexAttribPointer(texIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes);
+            this.GraphicsContext.VertexAttribPointer(coloIndex, 4, VertexAttribPointerType.UnsignedByte, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2);
+            this.GraphicsContext.VertexAttribPointer(offsetIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2 + sizeof(int));
+            this.GraphicsContext.VertexAttribPointer(rotationIndex, 1, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 3 + sizeof(int));
 
         }
 

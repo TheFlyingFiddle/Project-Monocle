@@ -11,7 +11,7 @@ namespace Monocle
         public static void Main(string[] args)
         {
             //Set this to the foulder containing all assets used. 
-            string resourceFolder = "C:\\Users\\Lukas\\Desktop\\MonocleResources";
+            string resourceFolder = "C:\\Users\\LukasFiddle\\Dropbox\\Public\\Monocle\\MonocleResources";
 
             /*LabelExample example = new LabelExample(resourceFolder);
             example.Run();
