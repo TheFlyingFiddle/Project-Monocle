@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Monocle.Utils
 {
-    public class EditableText
+    public class EditableText : ICloneable
     {
         private const char BackSpace = '\u0008';
         private const char Delete = '\u007F';
@@ -23,17 +23,17 @@ namespace Monocle.Utils
             get;
             set;
         }
-
+        
         public int Length
         {
             get { return this.builder.Length; }
         }
 
-        public EditableText(int maxSize = -1, bool multiline = false)
+        public EditableText(string text = "", int maxSize = -1, bool multiline = false)
         {
             this.MaxSize = maxSize;
             if (maxSize <= 0)
-                builder = new StringBuilder();
+                builder = new StringBuilder(text);
             else
                 builder = new StringBuilder(maxSize);
             this.Multiline = multiline;
@@ -52,7 +52,7 @@ namespace Monocle.Utils
                     return cursorPos;
                 case Delete :
                     this.RemoveChar(cursorPos);
-                    if (cursorPos != 0)
+                    if (cursorPos != 0 && cursorPos != this.Length)
                         return cursorPos - 1;
                     return cursorPos;
                 default:
@@ -86,6 +86,17 @@ namespace Monocle.Utils
         public override string ToString()
         {
             return builder.ToString();
+        }
+
+
+        public static implicit operator string(EditableText text)
+        {
+            return text.builder.ToString();
+        }
+
+        public object Clone()
+        {
+            return new EditableText(this.builder.ToString(), this.MaxSize, this.Multiline);
         }
     }
 }

@@ -20,15 +20,15 @@ namespace Monocle.Graphics
     /// A class that enables fast dynamic drawing of text and frames.
     /// <remarks>This class is NOT thread safe, ONLY use the rendering thread when interacting with this class.</remarks>
     /// </summary>
-    public class SpriteBatch : Monocle.Graphics.ISpriteBatch
+    public class SpriteBuffer : Monocle.Graphics.ISpriteBuffer
     {
-        public readonly IGraphicsContext GraphicsContext;
+        private readonly Monocle.Graphics.IGraphicsContext graphicsContext;
 
         private const int Max_Sprites = 1024;
         private const int Elements_Per_Square = 6;
         
         //Current number of items (text character or frame) that is currently in the batch.
-        private int elementCount;
+        protected int elementCount;
 
         //The object used to send vertecies to the graphics card.
         private VertexBuffer<Vertex> vertexBuffer;
@@ -47,10 +47,10 @@ namespace Monocle.Graphics
         private Vertex[] sortedVertecies = new Vertex[Max_Sprites * 4];
   
         //Texture used by the diffrent vertices elements.
-        private Texture2D[] textures = new Texture2D[Max_Sprites];
+        protected Texture2D[] textures = new Texture2D[Max_Sprites];
                 
         //Order that verices are to be rendered. IF SortMode.RenderOrder is used.
-        private float[] renderOrder = new float[Max_Sprites];
+        protected float[] renderOrder = new float[Max_Sprites];
         
         //Used to sort verticies.
         private int[] sortedIndexes = new int[Max_Sprites];
@@ -74,12 +74,12 @@ namespace Monocle.Graphics
         /// </summary>
         /// <remarks>The effect must use a vertex shader that uses the vertex format <see cref="SpriteBatch.Vertex"/></remSarks>
         /// <param name="effect">A effect.</param>
-        public SpriteBatch(IGraphicsContext context, ShaderProgram effect)
+        public SpriteBuffer(Monocle.Graphics.IGraphicsContext context, ShaderProgram effect)
         {
             if (effect == null)
                 throw new ArgumentNullException("effect");
 
-            this.GraphicsContext = context;
+            this.graphicsContext = context;
             this.default_effect = effect;
             InitIndices();
             InitBuffers();
@@ -153,6 +153,11 @@ namespace Monocle.Graphics
 
         }
 
+        public Monocle.Graphics.IGraphicsContext GraphicsContext
+        {
+            get { return this.graphicsContext; }
+        }
+
 
         /// <summary>
         /// Adds a string to be drawn in the next batch draw call.
@@ -161,9 +166,9 @@ namespace Monocle.Graphics
         /// <param name="toDraw">The string to be drawn.</param>
         /// <param name="position">The upper left corner position of the string.</param>
         /// <param name="color">The color to draw with.</param>
-        public void AddString(TextureFont fontUsed, string toDraw, Vector2 position, Color4 color)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color)
         {
-            this.AddString(fontUsed, toDraw, position, color, Vector2.Zero, Vector2.One, 0, false);
+            this.BufferString(fontUsed, toDraw, position, color, Vector2.Zero, Vector2.One, 0, false);
         }
 
         /// <summary>
@@ -174,9 +179,9 @@ namespace Monocle.Graphics
         /// <param name="position">The upper left corner position of the string.</param>
         /// <param name="color">The color to draw with.</param>
         /// <param name="origin">The origin point used.</param>
-        public void AddString(TextureFont fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin)
         {
-            this.AddString(fontUsed, toDraw, position, color, origin, Vector2.One, 0, false);
+            this.BufferString(fontUsed, toDraw, position, color, origin, Vector2.One, 0, false);
         }
 
         /// <summary>
@@ -191,9 +196,9 @@ namespace Monocle.Graphics
         /// <param name="angle">The angle the text should be totated.</param>
         /// <param name="mirror">A fralg indicating if the text should be mirrored or not.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void AddString(TextureFont font, StringBuilder toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        public void BufferString(Font font, StringBuilder toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
-            this.AddString(font, toDraw.ToString(), position, color, origin, scale, angle, mirror, renderLayer);
+            this.BufferString(font, toDraw.ToString(), position, color, origin, scale, angle, mirror, renderLayer);
         }
 
 
@@ -209,44 +214,42 @@ namespace Monocle.Graphics
         /// <param name="angle">The angle the text should be totated.</param>
         /// <param name="mirror">A fralg indicating if the text should be mirrored or not.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void AddString(TextureFont fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
             if (fontUsed == null || toDraw == null)
                 throw new ArgumentNullException();
 
-            Vector2 cursor = Vector2.Zero;
+            Vector2 cursor = new Vector2(-origin.X * scale.X, -origin.Y * scale.Y);
             int tint = color.ToArgb();
             unsafe
             {
+                if (this.elementCount + toDraw.Length >= this.textures.Length)
+                    this.Resize();
+
+
                 fixed (char* ptr = toDraw)
                 {
                     if (!mirror)
                     {
                         for (int i = 0; i < toDraw.Length; i++)
                         {
-                            if (this.elementCount >= this.textures.Length)
-                                this.Resize();
-
                             char c = ptr[i];
-                            AddChar(fontUsed, ref position, ref origin, ref scale, ref cursor, false, tint, angle, renderLayer, c);
+                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, false, tint, angle, renderLayer, c);
                         }
                     }
                     else
                     {
                         for (int i = toDraw.Length - 1; i >= 0; i--)
                         {
-                            if (this.elementCount >= this.vertices.Length)
-                                this.Resize();
-
                             char c = ptr[i];
-                            AddChar(fontUsed, ref position, ref origin, ref scale, ref cursor, true, tint, angle, renderLayer, c);
+                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, true, tint, angle, renderLayer, c);
                         }
                     }
                 }
             }
         }
 
-        private void Resize()
+        protected void Resize()
         {
             Array.Resize<Vertex>(ref this.vertices, this.vertices.Length * 2);
             Array.Resize<Vertex>(ref this.sortedVertecies, this.sortedVertecies.Length * 2);
@@ -259,24 +262,24 @@ namespace Monocle.Graphics
             this.SetupIndices(this.textures.Length);
         }
 
-        private void AddChar(TextureFont fontUsed, ref Vector2 position, ref Vector2 origin, ref Vector2 scale, ref Vector2 cursor, bool mirror, int tint, float angle, float renderLayer, char c)
+        private void BufferChar(Font fontUsed, ref Vector2 position, ref Vector2 origin, ref Vector2 scale, ref Vector2 cursor, bool mirror, int tint, float angle, float renderLayer, char c)
         {
             if (c == '\r') 
                 return;
             else if (c == '\n')
             {
                 cursor.Y += fontUsed.LineHeight * scale.Y;
-                cursor.X = 0;
+                cursor.X = -origin.X * scale.X;
                 return;
             }
             else if (c == '\t')
             {
                 CharInfo ci = fontUsed[' '];
-                cursor.X += ci.Advance * 4 * scale.X;
+                cursor.X += ci.Advance * Font.TabToSpaceCount * scale.X;
                 return;
             }
-            CharInfo info = fontUsed[c];
 
+            CharInfo info = fontUsed[c];
             if (c == ' ')
             {
                 cursor.X += info.Advance * scale.X;
@@ -285,7 +288,7 @@ namespace Monocle.Graphics
 
             if (info == null)
             {
-                info = fontUsed['\u00A5'];
+                info = fontUsed.UnkownChar;
             }
 
             Vector4 src = info.TextureCoords;
@@ -299,10 +302,10 @@ namespace Monocle.Graphics
             Vector2 infoOffset = info.Offset;
 
             Vector4 dest;
-            dest.X = (cursor.X + (infoOffset.X + origin.X) * scale.X);
-            dest.Y = (cursor.Y + (infoOffset.Y + origin.Y) * scale.Y);
-            dest.Z = dest.X + info.SrcRect.Width * scale.X;
-            dest.W = dest.Y + info.SrcRect.Height * scale.Y;
+            dest.X = (cursor.X + (infoOffset.X) * scale.X);
+            dest.Y = (cursor.Y + (infoOffset.Y) * scale.Y);
+            dest.Z = dest.X + info.SrcRect.W * scale.X;
+            dest.W = dest.Y + info.SrcRect.H * scale.Y;
             
             this.CreateRect(ref dest, ref src, ref position, tint, angle);
 
@@ -314,7 +317,7 @@ namespace Monocle.Graphics
             return;
         }
 
-        private unsafe void CreateRect(ref Vector4 dest, ref Vector4 src, ref Vector2 pos, int tint, float angle)
+        protected unsafe void CreateRect(ref Vector4 dest, ref Vector4 src, ref Vector2 pos, int tint, float angle)
         {
             fixed (Vertex* fixedPtr = &this.vertices[this.elementCount * 4])
             {
@@ -376,8 +379,11 @@ namespace Monocle.Graphics
         /// <param name="rotation">The rotation of the frame.</param>
         /// <param name="mirror">A fralg indicating if the frame should be mirrored.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void AddFrame(Frame frame, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float rotation = 0.0f, bool mirror = false, float renderLayer = 0)
+        public void BufferFrame(Frame frame, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float rotation = 0.0f, bool mirror = false, float renderLayer = 0)
         {
+            if (this.elementCount >= this.textures.Length)
+                this.Resize();
+         
             if (frame.Texture2D == null)
                 throw new ArgumentNullException();
 
@@ -398,8 +404,8 @@ namespace Monocle.Graphics
             Vector4 dest;
             dest.X = -origin.X * scale.X;
             dest.Y = -origin.Y * scale.Y;
-            dest.Z = dest.X + frame.SrcRect.Width * scale.X;
-            dest.W = dest.Y + frame.SrcRect.Height * scale.Y;
+            dest.Z = dest.X + frame.SrcRect.W * scale.X;
+            dest.W = dest.Y + frame.SrcRect.H * scale.Y;
 
 
 
@@ -407,6 +413,7 @@ namespace Monocle.Graphics
 
             this.textures[this.elementCount] = frame.Texture2D;
             this.renderOrder[this.elementCount++] = renderLayer;
+
         }
 
         /// <summary>
@@ -417,9 +424,9 @@ namespace Monocle.Graphics
         /// <param name="color">The color of the frame.</param>
         /// <param name="rotation">The rotation of the frame.</param>
         /// <param name="mirror"> </param>
-        public void AddFrame(Frame frame, Rect position, Color4 color, float rotation = 0, bool mirror = false)
+        public void BufferFrame(Frame frame, Rect position, Color4 color, float rotation = 0, bool mirror = false)
         {
-            this.AddFrame(frame, new Vector2(position.X, position.Y), color, Vector2.Zero, new Vector2((position.Width / frame.SrcRect.Width), position.Height / frame.SrcRect.Height), rotation, mirror);
+            this.BufferFrame(frame, new Vector2(position.X, position.Y), color, Vector2.Zero, new Vector2((position.W / frame.SrcRect.W), position.H / frame.SrcRect.H), rotation, mirror);
         }
 
 
@@ -429,16 +436,19 @@ namespace Monocle.Graphics
         /// <param name="frame">The frame to draw.</param>
         /// <param name="position">The top left corner position of the frame.</param>
         /// <param name="color">The color of the frame.</param>
-        public void AddFrame(Frame frame, Vector2 position, Color4 color)
+        public void BufferFrame(Frame frame, Vector2 position, Color4 color)
         {
-            this.AddFrame(frame, position, color, Vector2.Zero, Vector2.One, 0f, false);
+            this.BufferFrame(frame, position, color, Vector2.Zero, Vector2.One, 0f, false);
         }
 
         /// <summary>
         /// Draws any objects added to the batch through the various Add methods.
         /// </summary>
-        public void End(ref Matrix4 transformation, ShaderProgram effect = null, SortMode mode = SortMode.Deffered)
+        public void Draw(ref Matrix4 transformation, ShaderProgram effect = null, SortMode mode = SortMode.Deffered)
         {
+            if (this.elementCount <= 0)
+                return;
+
             if (effect == null)
                 this.activeEffect = default_effect;
             else
@@ -553,9 +563,9 @@ namespace Monocle.Graphics
 
         private class RenderOrderSorter : IComparer<int>
         {
-            private readonly SpriteBatch parent;
+            private readonly SpriteBuffer parent;
 
-            public RenderOrderSorter(SpriteBatch batch)
+            public RenderOrderSorter(SpriteBuffer batch)
             {
                 this.parent = batch;
             }
@@ -573,9 +583,9 @@ namespace Monocle.Graphics
 
         private class TextureSorter : IComparer<int>
         {
-            private readonly SpriteBatch parent;
+            private readonly SpriteBuffer parent;
 
-            public TextureSorter(SpriteBatch batch)
+            public TextureSorter(SpriteBuffer batch)
             {
                 this.parent = batch;
             }

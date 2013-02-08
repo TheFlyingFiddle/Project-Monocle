@@ -6,7 +6,7 @@ using Monocle.Graphics;
 
 namespace Monocle.Graphics
 {
-    public struct Frame
+    public class Frame
     {
         private readonly Rect srcRect;
         private readonly Texture2D texture;
@@ -22,7 +22,6 @@ namespace Monocle.Graphics
         }
 
         public Frame(Rect srcRect, Texture2D texture)
-            : this()
         {
             this.srcRect = srcRect;
             this.texture = texture;

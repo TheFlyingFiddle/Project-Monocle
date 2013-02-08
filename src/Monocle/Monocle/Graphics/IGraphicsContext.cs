@@ -1,9 +1,13 @@
 ﻿using System;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics;
 namespace Monocle.Graphics
 {
     public interface IGraphicsContext
     {
+        Rect Viewport { get; set; }
+        Rect Scissor { get; set; }
+
         Texture2D this[int index] { set; }
 
         void AttachShader(int programID, int shaderID);
@@ -68,7 +72,6 @@ namespace Monocle.Graphics
 
         void BlendFunc(BlendingFactorSrc blendingFactorSrc, BlendingFactorDest blendingFactorDest);
 
-        void ClearColor(OpenTK.Graphics.Color4 color4);
         void DrawElements(BeginMode beginMode, int p, DrawElementsType drawElementsType, int p_2);
 
         void TexParameter(TextureTarget textureTarget, TextureParameterName textureParameterName, int p);
@@ -78,10 +81,6 @@ namespace Monocle.Graphics
         string GetProgramInfoLog(int programID);
 
         int GetUniformLocation(int programID, string name);
-
-        void Viewport(int x, int y, int Width, int Height);
-        void Clear(ClearBufferMask mask);
+        void Clear(Color4 color, ClearBufferMask mask);
     }
-
-
 }

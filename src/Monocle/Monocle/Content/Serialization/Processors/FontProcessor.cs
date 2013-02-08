@@ -10,9 +10,9 @@ using System.IO;
 namespace Monocle.Content.Serialization.Processors
 {
     [Processor(typeof(FontFile), true)]
-    class FontProcessor : Processor<FontFile, TextureFont>
+    class FontProcessor : Processor<FontFile, Font>
     {
-        public override TextureFont Process(FontFile input, IResourceContext context)
+        public override Font Process(FontFile input, IResourceContext context)
         {
             if (input.Pages.Count > 1)
                 throw new ArgumentException("The font system can only handle fonts that are in a single page!" +
@@ -28,21 +28,24 @@ namespace Monocle.Content.Serialization.Processors
             {
                 FontChar c = input.Chars[i];
 
+                
                 var info =
                     new CharInfo(texture, new Rect(c.X - 1f, c.Y - 1f, c.Width + 1f, c.Height + 1f),
                                  new Vector2(c.XOffset, c.YOffset),
                                  c.XAdvance);
 
                 charMap[c.ID] = info;
+                
+
             }
 
 
-            return new TextureFont(face, input.Info.Size, input.Common.LineHeight, texture, charMap);
+            return new Font(face, input.Info.Size, input.Common.LineHeight, texture, charMap);
         }
 
         private Texture2D LoadTexture(string fileName, IResourceContext context)
         {
-            string path = Path.GetDirectoryName(this.ResourcePath) + fileName;
+            string path = Path.Combine(Path.GetDirectoryName(this.ResourcePath), fileName);
             return context.LoadAsset<Texture2D>(path, processor: new TextureProcessor(System.Drawing.Imaging.PixelFormat.Format32bppPArgb));
         }
     }

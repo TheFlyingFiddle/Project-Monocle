@@ -36,7 +36,7 @@ namespace Monocle.Content.Serialization
 
             bitmap.UnlockBits(data);
 
-            gc.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            //gc.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
 
             gc.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);

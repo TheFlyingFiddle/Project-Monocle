@@ -20,10 +20,7 @@ namespace Monocle.Graphics
 
             this.GraphicsContext.GenBuffers(1, out Handle);
         }
-            
-    
     }
-
 
     public class VertexBuffer<T>  : VertexBuffer where T : struct, IVertex
     {

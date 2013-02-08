@@ -10,6 +10,30 @@ namespace Monocle.Graphics
 {
     class OpenGLGraphicsContext : IGraphicsContext
     {
+        private Rect viewport;
+        private Rect scissor;
+
+        public Rect Viewport
+        {
+            get { return this.viewport; }
+            set
+            {
+                this.viewport = value;
+                GL.Viewport((int)value.X, (int)value.Y, (int)value.W, (int)value.H);            
+            }
+        }
+
+        public Rect Scissor
+        {
+            get { return this.scissor; }
+            set
+            {
+                this.scissor = value;
+                GL.Scissor((int)value.X, (int)(this.viewport.H - value.Y - value.H), (int)value.W, (int)value.H);
+            }
+        }
+
+
         #region Texture
 
         public int GenTexture()
@@ -284,12 +308,7 @@ namespace Monocle.Graphics
         {
             GL.BlendFunc(blendingFactorSrc, blendingFactorDest);
         }
-
-        public void ClearColor(Color4 color)
-        {
-            GL.ClearColor(color);
-        }
-
+        
         #endregion
 
         #region Drawing
@@ -321,13 +340,9 @@ namespace Monocle.Graphics
             return GL.GetProgramInfoLog(programID);
         }
 
-        public void Viewport(int x, int y, int Width, int Height)
+        public void Clear(Color4 color, ClearBufferMask mask)
         {
-            GL.Viewport(x, y, Width, Height);
-        }
-
-        public void Clear(ClearBufferMask mask)
-        {
+            GL.ClearColor(color);
             GL.Clear(mask);
         }
     }
@@ -335,6 +350,8 @@ namespace Monocle.Graphics
     class DebugGraphicsContext : IGraphicsContext
     {
         private readonly IGraphicsContext forwarding;
+        public int GLCALLS = 0;
+
 
         public DebugGraphicsContext(IGraphicsContext forwarding)
         {
@@ -352,36 +369,45 @@ namespace Monocle.Graphics
         {
             forwarding.AttachShader(programID, shaderID);
             CheckGLError();
+
+            GLCALLS++;
         }
 
         public void BindTexture(TextureTarget target, int id)
         {
             forwarding.BindTexture(target, id);
             CheckGLError();
+
+
+            GLCALLS++;
         }
 
         public void BufferData<T>(BufferTarget target, IntPtr size, T[] data, BufferUsageHint hint) where T : struct
         {
             forwarding.BufferData(target, size, data, hint);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void BufferSubData<T>(BufferTarget target, IntPtr offset, IntPtr length, T[] data) where T : struct
         {
             forwarding.BufferSubData(target, offset, length, data);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void CompileShader(int id)
         {
             forwarding.CompileShader(id);
             CheckGLError();
+            GLCALLS++;
         }
 
         public int CreateProgram()
         {
             int tmp = forwarding.CreateProgram();
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
@@ -389,6 +415,7 @@ namespace Monocle.Graphics
         {
            int tmp = forwarding.CreateShader(type);
            CheckGLError();
+           GLCALLS++;
            return tmp;
         }
 
@@ -396,60 +423,70 @@ namespace Monocle.Graphics
         {
             forwarding.DeleteBuffers(id);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void DeleteBuffers(int[] ids)
         {
             forwarding.DeleteBuffers(ids);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void DeleteProgram(int id)
         {
             forwarding.DeleteProgram(id);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void DeleteShader(int id)
         {
             forwarding.DeleteShader(id);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void DeleteTexture(int texture)
         {
             forwarding.DeleteTexture(texture);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void EnableVertexAttribArray(int index)
         {
             forwarding.EnableVertexAttribArray(index);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void GenBuffers(int count, out int buffers)
         {
             forwarding.GenBuffers(count, out buffers);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void GenBuffers(int count, int[] buffers)
         {
             forwarding.GenBuffers(count, buffers);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void GenerateMipmap(GenerateMipmapTarget target)
         {
             forwarding.GenerateMipmap(target);
             CheckGLError();
+            GLCALLS++;
         }
 
         public int GenTexture()
         {
             int tmp = forwarding.GenTexture();
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
@@ -457,6 +494,7 @@ namespace Monocle.Graphics
         {
             int tmp = forwarding.GetAttribLocation(programID, name);
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
@@ -464,180 +502,203 @@ namespace Monocle.Graphics
         {
             forwarding.GetTexImage(target, level, format, pixelType, storage);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void LinkProgram(int program)
         {
             forwarding.LinkProgram(program);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void ShaderSource(int id, string src)
         {
             forwarding.ShaderSource(id, src);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void TexImage2D(TextureTarget target, int level, PixelInternalFormat intenalFormat, int width, int height, bool border, PixelFormat format, PixelType pixelType, IntPtr data)
         {
             forwarding.TexImage2D(target, level, intenalFormat, width, height, border, format, pixelType, data);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform1(int location, int value)
         {
             forwarding.Uniform1(location, value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform1(int location, float value)
         {
             forwarding.Uniform1(location, value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform1(int location, uint value)
         {
             forwarding.Uniform1(location, value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform2(int location, ref Vector2 value)
         {
             forwarding.Uniform2(location, ref value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform2(int location, int value0, int value1)
         {
             forwarding.Uniform2(location, value0, value1);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform2(int location, float value0, float value1)
         {
             forwarding.Uniform2(location, value0, value1);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform2(int location, uint value0, uint value1)
         {
             forwarding.Uniform2(location, value0, value1);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform3(int location, ref Vector3 value)
         {
             forwarding.Uniform3(location, ref value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform3(int location, int value0, int value1, int value2)
         {
             forwarding.Uniform3(location, value0, value1, value2);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform3(int location, float value0, float value1, float value2)
         {
             forwarding.Uniform3(location, value0, value1, value2);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform3(int location, uint value0, uint value1, uint value2)
         {
             forwarding.Uniform3(location, value0, value1, value2);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform4(int location, ref Vector4 value)
         {
             forwarding.Uniform4(location, ref value);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform4(int location, int value0, int value1, int value2, int value3)
         {
             forwarding.Uniform4(location, value0, value1, value2, value3);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform4(int location, float value0, float value1, float value2, float value3)
         {
             forwarding.Uniform4(location, value0, value1, value2, value3);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Uniform4(int location, uint value0, uint value1, uint value2, uint value3)
         {
             forwarding.Uniform4(location, value0, value1, value2, value3);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void UniformMatrix2(int location, float[] matrix, bool transpose)
         {
             forwarding.UniformMatrix2(location, matrix, transpose);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void UniformMatrix3(int location, float[] matrix, bool transpose)
         {
             forwarding.UniformMatrix3(location, matrix, transpose);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void UniformMatrix4(int location, ref Matrix4 matrix, bool transpose)
         {
             forwarding.UniformMatrix4(location, ref matrix, transpose);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void VertexAttribPointer(int index, int size, VertexAttribPointerType type, bool normalized, int strideInBytes, int offsetInBytes)
         {
             forwarding.VertexAttribPointer(index, size, type, normalized, strideInBytes, offsetInBytes);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void Enable(EnableCap enableCap)
         {
             forwarding.Enable(enableCap);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void BlendFunc(BlendingFactorSrc blendingFactorSrc, BlendingFactorDest blendingFactorDest)
         {
             forwarding.BlendFunc(blendingFactorSrc, blendingFactorDest);
             CheckGLError();
-        }
-
-        public void ClearColor(Color4 color4)
-        {
-            forwarding.ClearColor(color4);
-            CheckGLError();
+            GLCALLS++;
         }
 
         public void DrawElements(BeginMode beginMode, int elementCount, DrawElementsType drawElementsType, int offsetInBytes)
         {
             forwarding.DrawElements(beginMode, elementCount, drawElementsType, offsetInBytes);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void BindIndexBuffer(IntIndexBuffer buffer)
         {
             forwarding.BindIndexBuffer(buffer);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void BindIndexBuffer(ShortIndexBuffer buffer)
         {
             forwarding.BindIndexBuffer(buffer);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void BindVertexBuffer(VertexBuffer buffer)
         {
             forwarding.BindVertexBuffer(buffer);
             CheckGLError();
+            GLCALLS++;
 
         }
 
@@ -654,18 +715,21 @@ namespace Monocle.Graphics
         {
             forwarding.TexParameter(textureTarget, textureParameterName, filter);
             CheckGLError();
+            GLCALLS++;
         }
 
         public void UseShaderProgram(ShaderProgram program)
         {
             forwarding.UseShaderProgram(program);
             CheckGLError();
+            GLCALLS++;
         }
 
         public string GetShaderInfoLog(int vertID)
         {
             var tmp = forwarding.GetShaderInfoLog(vertID);
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
@@ -673,6 +737,7 @@ namespace Monocle.Graphics
         {
             var tmp = forwarding.GetProgramInfoLog(programID);
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
@@ -680,20 +745,28 @@ namespace Monocle.Graphics
         {
             var tmp = forwarding.GetUniformLocation(p, name);
             CheckGLError();
+            GLCALLS++;
             return tmp;
         }
 
-
-        public void Viewport(int x, int y, int Width, int Height)
+        public void Clear(Color4 color, ClearBufferMask mask)
         {
-            forwarding.Viewport(x, y, Width, Height);
+            forwarding.Clear(color, mask);
             CheckGLError();
+            GLCALLS++;
+        }
+        
+
+        public Rect Viewport
+        {
+            get { return this.forwarding.Viewport; }
+            set { this.forwarding.Viewport = value; }
         }
 
-        public void Clear(ClearBufferMask mask)
+        public Rect Scissor
         {
-            forwarding.Clear(mask);
-            CheckGLError();
+            get { return this.forwarding.Scissor; }
+            set { this.forwarding.Scissor = value; }
         }
     }
 }
