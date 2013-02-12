@@ -194,7 +194,7 @@ namespace Monocle.EntityGUI
             Rect bounds = new Rect(this.scrollbar.X,0, this.size.X, this.size.Y);
             if (bounds.ContainsPoint(_event.Position))
             {
-                MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - scrollbar.X, _event.Y - scrollbar.Y));
+                MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - scrollbar.X, _event.Y - scrollbar.Y), _event.Modifiers);
                 this.scrollbar.OnMouseDownEvent(_internalEvent);
             }
         }
@@ -202,7 +202,7 @@ namespace Monocle.EntityGUI
         protected internal override void OnMouseUpEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseUpEvent(_event);
-            MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - scrollbar.X, _event.Y - scrollbar.Y));
+            MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - scrollbar.X, _event.Y - scrollbar.Y), _event.Modifiers);
             this.scrollbar.OnMouseUpEvent(_internalEvent);
         }
 

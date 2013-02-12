@@ -345,6 +345,37 @@ namespace Monocle.Graphics
             GL.ClearColor(color);
             GL.Clear(mask);
         }
+
+
+        public void GenRenderBuffers(int n, out int handle)
+        {
+            GL.GenRenderbuffers(n, out handle);
+        }
+
+        public void GenFrameBuffers(int n, out int handle)
+        {
+            GL.GenFramebuffers(n, out handle);
+        }
+
+        public void BindFrameBuffer(FramebufferTarget framebufferTarget, int handle)
+        {
+            GL.BindFramebuffer(framebufferTarget, handle);
+        }
+
+        public void FrameBufferTexture2D(FramebufferTarget framebufferTarget, FramebufferAttachment framebufferAttachment, TextureTarget textureTarget, int textureHandle, int level)
+        {
+            GL.FramebufferTexture2D(framebufferTarget, framebufferAttachment, textureTarget, textureHandle, level);
+        }
+
+        public void DeleteFrameBuffers(int handle)
+        {
+            GL.DeleteFramebuffers(1, ref handle);
+        }
+
+        public void DeleterRenderBuffers(int handle)
+        {
+            GL.DeleteRenderbuffers(1, ref handle);
+        }
     }
 
     class DebugGraphicsContext : IGraphicsContext
@@ -767,6 +798,44 @@ namespace Monocle.Graphics
         {
             get { return this.forwarding.Scissor; }
             set { this.forwarding.Scissor = value; }
+        }
+
+
+        public void GenRenderBuffers(int n, out int handle)
+        {
+            forwarding.GenRenderBuffers(n, out handle);
+            CheckGLError();
+        }
+
+        public void GenFrameBuffers(int n, out int handle)
+        {
+            forwarding.GenFrameBuffers(n, out handle);
+            CheckGLError();
+        }
+
+        public void BindFrameBuffer(FramebufferTarget framebufferTarget, int handle)
+        {
+            forwarding.BindFrameBuffer(framebufferTarget, handle);
+            CheckGLError();
+        }
+
+        public void FrameBufferTexture2D(FramebufferTarget framebufferTarget, FramebufferAttachment framebufferAttachment, TextureTarget textureTarget, int textureHandle, int level)
+        {
+            forwarding.FrameBufferTexture2D(framebufferTarget, framebufferAttachment, textureTarget, textureHandle, level);
+            CheckGLError();
+        }
+
+
+        public void DeleteFrameBuffers(int handle)
+        {
+            forwarding.DeleteFrameBuffers(handle); 
+            CheckGLError();
+        }
+
+        public void DeleterRenderBuffers(int handle)
+        {
+            forwarding.DeleterRenderBuffers(handle);
+            CheckGLError();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Monocle.EntityGUI
             this.BackgroundImage = frame;
         }
 
-        protected internal override void Draw(ref Rect drawableArea, IGUIRenderer renderer)
+        protected internal override void DrawContent(ref Rect drawableArea, IGUIRenderer renderer)
         {
             if (this.BackgroundImage != null)
             {
@@ -32,7 +32,7 @@ namespace Monocle.EntityGUI
             }
 
 
-            base.Draw(ref drawableArea, renderer);
+            base.DrawContent(ref drawableArea, renderer);
         }
 
 

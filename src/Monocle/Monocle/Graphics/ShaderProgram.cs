@@ -15,12 +15,19 @@ namespace Monocle.Graphics
         internal readonly int Handle;
         int vertexID, fragmentID;
 
+        //TEMPORARY FIX IN A BETTER FASION!!!!!
+        private readonly Dictionary<string, int> attributeMap;
+        private readonly Dictionary<string, int> uniformMap;
+
         private ShaderProgram(IGraphicsContext context, int vertexID, int fragmentID, int programID)
         {
             this.vertexID = vertexID;
             this.fragmentID = fragmentID;
             this.Handle = programID;
             this.GraphicsContext = context;
+
+            this.attributeMap = new Dictionary<string, int>();
+            this.uniformMap = new Dictionary<string, int>();
         }
 
         public static ShaderProgram CreateProgram(IGraphicsContext context, string vertexSource, string fragmentSource)
@@ -44,7 +51,7 @@ namespace Monocle.Graphics
             context.AttachShader(programID, fragID);
 
             context.LinkProgram(programID);
-
+            
             Debug.LogInfo(context.GetProgramInfoLog(programID));
 
             return new ShaderProgram(context, vertID, fragID, programID);   
@@ -52,20 +59,65 @@ namespace Monocle.Graphics
 
         public void SetUniform(string name, int value)
         {
-            int location = this.GraphicsContext.GetUniformLocation(this.Handle, name);
-            GraphicsContext.Uniform1(location, value);
+            int location;
+            if (!uniformMap.TryGetValue(name, out location))
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+
+            GraphicsContext.Uniform1(location, value);    
         }
 
         public void SetUniform(string name, float value)
         {
-            int location = GraphicsContext.GetUniformLocation(this.Handle, name);
-            GraphicsContext.Uniform1(location, value);
+            int location;
+            if (!uniformMap.TryGetValue(name, out location))
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+
+            GraphicsContext.Uniform1(location, value);    
         }
 
         public void SetUniform(string name , ref Matrix4 value)
         {
-            int location = GraphicsContext.GetUniformLocation(this.Handle, name);
-            GraphicsContext.UniformMatrix4(location, ref value, false);
+            int location;
+            if(!uniformMap.TryGetValue(name, out location)) 
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+
+            GraphicsContext.UniformMatrix4(location, ref value, false);        
+        }
+
+        //TEMPORARY METHOD REMOVE THIS AS SOON AS POSSIBLE!!!
+        public int GetAttributeLocation(string name)
+        {
+            int location;
+            if (attributeMap.TryGetValue(name, out location))
+            {
+                return location;
+            }
+
+            location = this.GraphicsContext.GetAttribLocation(this.Handle, name);
+            if (location == -1)
+                throw new ArgumentException();
+            else
+                this.attributeMap.Add(name, location);
+
+            return location;
         }
 
         public void Delete()

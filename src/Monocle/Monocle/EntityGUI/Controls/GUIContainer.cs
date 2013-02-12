@@ -5,53 +5,26 @@ using System.Text;
 using OpenTK;
 using Monocle.Graphics;
 using OpenTK.Input;
+using Monocle.EntityGUI.Controls;
 
 namespace Monocle.EntityGUI
 {
-    class GUIContainer : GUIControl, IEnumerable<GUIControl>
+    class GUIContainer : ScrollableControl, IEnumerable<GUIControl>
     {
         private readonly List<GUIControl> controls;
-        private int focusIndex = 0;
-
-        private GUIControl FocusedComponent
-        {
-            get
-            {
-                return focusIndex < controls.Count ? controls[focusIndex] : null;
-            }
-        }
-
-        private void SetFocus(int focusIndex)
-        {
-            if (focusIndex >= 0 && focusIndex < this.controls.Count)
-            {
-                this.RemoveFocus();
-
-                this.focusIndex = focusIndex;
-                this.controls[focusIndex].Focused = true;
-            }
-        }
-
-        private void SetFocus(GUIControl item)
-        {
-            if (item.Focused)
-                return;
-
-            var index = this.controls.IndexOf(item);
-            this.SetFocus(index);
-        }
-
-
-        private void RemoveFocus()
-        {
-            if (this.FocusedComponent != null && this.FocusedComponent.Focused)
-                this.FocusedComponent.Focused = false;
-        }
+        private readonly IFocusManager focusManager;
 
         public GUIContainer()
+            : this(new SimpleFocusManager())
+        {
+        }
+
+        public GUIContainer(IFocusManager focusManager)
         {
             this.controls = new List<GUIControl>();
+            this.focusManager = new SimpleFocusManager();
         }
+
 
         public void AddControl(GUIControl component)
         {
@@ -61,29 +34,13 @@ namespace Monocle.EntityGUI
 
         public void RemoveControl(GUIControl component)
         {
-            var index = this.controls.IndexOf(component);
-            if (index > focusIndex)
-            {
-                this.controls.RemoveAt(index);
-                this.OnControlRemoved(component);
-            }
-            else if (index == focusIndex && index != 0)
-            {
-                this.SetFocus(focusIndex - 1);
-                this.controls.RemoveAt(index);
-                this.OnControlRemoved(component);
-            }
-            else if(index > 0)
-            {
-                this.focusIndex--;
-                this.controls.RemoveAt(index);
-                this.OnControlRemoved(component);
-            }
+            var result = this.controls.Remove(component);
+            this.OnControlRemoved(component);
         }
 
-        protected internal override void Draw(ref Rect drawableArea, IGUIRenderer renderer)
+        protected internal override void DrawContent(ref Rect drawableArea, IGUIRenderer renderer)
         {
-            Vector2 _offset = new Vector2(drawableArea.X, drawableArea.Y) + this.Bounds.TopLeft;
+            Vector2 _offset = drawableArea.TopLeft + this.Bounds.TopLeft - this.ScrollOffset;
             foreach (var control in this.controls)
             {
                 if (!control.Visible) continue;
@@ -91,9 +48,7 @@ namespace Monocle.EntityGUI
                 Rect bounds = control.Bounds;
                 bounds.Displace(_offset);
                 if (renderer.SetSubRectDrawableArea(ref drawableArea, ref bounds, out bounds))
-                {
                     control.Draw(ref bounds, renderer);
-                }
             }
         }
 
@@ -107,17 +62,29 @@ namespace Monocle.EntityGUI
             }
         }
 
-        protected virtual void OnControlAdded(GUIControl component)
+        protected virtual void OnControlAdded(GUIControl control)
         {
-
+            this.focusManager.ContainerItemAdded(control);
+            FixContentArea();          
         }
 
-        protected virtual void OnControlRemoved(GUIControl component)
+        protected virtual void OnControlRemoved(GUIControl control)
         {
-
+            this.focusManager.ContainerItemRemoved(control);
+            FixContentArea();
         }
 
+        private void FixContentArea()
+        {
+            float minHeight = this.controls.Min(x => x.Bounds.Top);
+            float minWidth = this.controls.Min(x => x.Bounds.Left);
 
+            float maxHeight = this.controls.Max((x) => x.Bounds.Bottom);
+            float maxWidth = this.controls.Max(x => x.Bounds.Right);
+
+            this.ContentArea = new Rect(minWidth, minHeight, maxWidth - minWidth, maxHeight - minHeight);         
+        }
+                
         protected internal override void OnMouseEnter(MouseMoveEventArgs _event)
         {
             base.OnMouseEnter(_event);  
@@ -144,8 +111,8 @@ namespace Monocle.EntityGUI
         protected internal override void OnMouseMoveEvent(MouseMoveEventArgs _event)
         {
             base.OnMouseMoveEvent(_event);  
-            Vector2 position = _event.Position - Bounds.TopLeft;
-            Vector2 oldPos = position - _event.Delta;
+            Vector2 position = _event.Position - Bounds.TopLeft + this.ScrollOffset;
+            Vector2 oldPos = position - _event.Delta + this.ScrollOffset;
             foreach (var item in this)
             {
                 if (!item.Visible) continue;
@@ -167,7 +134,7 @@ namespace Monocle.EntityGUI
                 {
                     item.OnMouseMoveEvent(innerEvent);
                 }
-                else if (item == this.FocusedComponent)
+                else if (item == focusManager.FocusedControl)
                 {
                     item.OnMouseMoveEvent(innerEvent);
                 }
@@ -177,17 +144,17 @@ namespace Monocle.EntityGUI
         protected internal override void OnMouseDownEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseDownEvent(_event);  
-            Vector2 position = _event.Position - Bounds.TopLeft;
+            Vector2 position = _event.Position - Bounds.TopLeft + this.ScrollOffset;
             foreach (var item in this)
             {
                 if (!item.Visible) continue;
 
                 if (item.Bounds.ContainsPoint(position))
                 {
-                    MouseButtonEventArgs innerEvent = new MouseButtonEventArgs(_event.Button, position - item.Bounds.TopLeft);
+                    MouseButtonEventArgs innerEvent = new MouseButtonEventArgs(_event.Button, position - item.Bounds.TopLeft, _event.Modifiers);
                     if (_event.Button == MouseButton.Left || _event.Button == MouseButton.Right)
                     {
-                        this.SetFocus(item);
+                        this.focusManager.GiveFocus(item);
                     }
 
                     item.OnMouseDownEvent(innerEvent);
@@ -198,64 +165,61 @@ namespace Monocle.EntityGUI
         protected internal override void OnMouseUpEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseUpEvent(_event);  
-            Vector2 position = _event.Position - this.Bounds.TopLeft;
-            if(this.FocusedComponent != null && this.FocusedComponent.Visible)
+            Vector2 position = _event.Position - this.Bounds.TopLeft + this.ScrollOffset;
+            var focused = this.focusManager.FocusedControl;
+            if (focused != null && focused.Visible)
             {
-                if (this.FocusedComponent.Bounds.ContainsPoint(position) && _event.Button == MouseButton.Left)
+                if (focused.Bounds.ContainsPoint(position) && _event.Button == MouseButton.Left)
                 {
-                    this.FocusedComponent.OnClicked();
+                    focused.OnClicked();
                 }
 
-                MouseButtonEventArgs innerEvent = new MouseButtonEventArgs(_event.Button, position - this.FocusedComponent.Bounds.TopLeft);
-                this.FocusedComponent.OnMouseUpEvent(innerEvent);
+                MouseButtonEventArgs innerEvent = new MouseButtonEventArgs(_event.Button, position - focused.Bounds.TopLeft, _event.Modifiers);
+                focused.OnMouseUpEvent(innerEvent);
             }
         }
-
+        
         protected internal override bool OnKeyDownEvent(KeyEventArgs _event)
         {
-            base.OnKeyDownEvent(_event);  
-            var focusedComp = this.FocusedComponent;
-            if (focusedComp != null && this.FocusedComponent.Visible)
+            base.OnKeyDownEvent(_event);
+            var focused = this.focusManager.FocusedControl;
+            if (focused != null && focused.Visible)
             {
-                var consumed = focusedComp.OnKeyDownEvent(_event);
+                var consumed = focused.OnKeyDownEvent(_event);
                 if (consumed)
                     return true;
-                else 
-                {
-                    return HandleFocusing(_event.Key, _event.Modifiers);
-                }
             }
-            
-            return false;
+
+            return HandleFocusing(_event.Key, _event.Modifiers);
         }
 
         protected internal override void OnKeyUpEvent(KeyEventArgs _event)
         {
-            base.OnKeyUpEvent(_event);  
-            var focusedComp = this.FocusedComponent;
-            if (focusedComp != null && this.FocusedComponent.Visible)
+            base.OnKeyUpEvent(_event);
+            var focused = this.focusManager.FocusedControl;
+            if (focused != null && focused.Visible)
             {
-               focusedComp.OnKeyUpEvent(_event);
+                focused.OnKeyUpEvent(_event);
             }
         }
 
         protected internal override void OnCharEvent(CharEventArgs _event)
         {
-            base.OnCharEvent(_event);  
-            var focusedComp = this.FocusedComponent;
-            if (focusedComp != null && this.FocusedComponent.Visible)
+            base.OnCharEvent(_event);
+            var focused = this.focusManager.FocusedControl;
+            if (focused != null && focused.Visible)
             {
-                focusedComp.OnCharEvent(_event);
+                focused.OnCharEvent(_event);
             }
         }
 
         protected internal override void OnMouseWheelChanged(MouseWheelEventArgs _event)
         {
-            base.OnMouseWheelChanged(_event);  
-            var focusedComp = this.FocusedComponent;
-            if (focusedComp != null && this.FocusedComponent.Visible)
+            base.OnMouseWheelChanged(_event);
+            var focused = this.focusManager.FocusedControl;
+            if (focused != null && focused.Visible)
             {
-                focusedComp.OnMouseWheelChanged(_event);
+                focused.OnMouseWheelChanged(_event);
             }
         }
 
@@ -264,13 +228,13 @@ namespace Monocle.EntityGUI
         protected override void OnFocusGained(EventArgs eventArgs)
         {
             base.OnFocusGained(eventArgs);
-            this.SetFocus(0);
+            this.focusManager.ContainerFocusGained();
         }
 
         protected override void OnFocusLost(EventArgs eventArgs)
         {
             base.OnFocusLost(eventArgs);
-            this.RemoveFocus();
+            this.focusManager.ContainerFocusLost();
         }
 
         private bool HandleFocusing(Key key, ModifierKeys modifiers)
@@ -278,46 +242,19 @@ namespace Monocle.EntityGUI
             switch (key)
             {
                 case OpenTK.Input.Key.Tab:
-                    Console.WriteLine(modifiers);
-
                     if ((modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
-                        return FocusPrev();
+                        return this.focusManager.FocusPrev();
                     else
-                        return FocusNext();
+                        return this.focusManager.FocusNext();
 
                 case OpenTK.Input.Key.Left:
                 case OpenTK.Input.Key.Down:
-                    return FocusPrev();
-
+                    return this.focusManager.FocusPrev();
                 case OpenTK.Input.Key.Right:
                 case OpenTK.Input.Key.Up:
-                    return FocusNext();
+                    return this.focusManager.FocusNext();
             }
 
-            return false;
-        }
-
-        private bool FocusPrev()
-        {
-            if (this.focusIndex > 0)
-            {
-                this.SetFocus(focusIndex - 1);
-                return true;
-            }
-
-            this.Focused = false;
-            return false;
-        }
-
-        private bool FocusNext()
-        {
-            if (this.focusIndex + 1 < this.controls.Count)
-            {
-                this.SetFocus(focusIndex + 1);
-                return true;
-            }
-
-            this.Focused = false;
             return false;
         }
 

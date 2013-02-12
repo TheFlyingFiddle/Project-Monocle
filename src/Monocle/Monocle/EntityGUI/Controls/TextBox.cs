@@ -89,8 +89,10 @@ namespace Monocle.EntityGUI
         {
             var idle = new IdleTextBoxState();
             idle.AddTransition(GUIEventID.FocusGained, 1);
+
             var focused = new FocusedTextBoxState();
             focused.AddTransition(GUIEventID.FocusLost, 0);
+            
 
             return new GUIFSM<TextBox>(this, new GUIState<TextBox>[] { idle, focused });
         }
@@ -114,6 +116,32 @@ namespace Monocle.EntityGUI
             }
         }
 
+        private bool selecting = false;
+        protected internal override void OnMouseDownEvent(MouseButtonEventArgs _event)
+        {
+            base.OnMouseDownEvent(_event);
+            int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
+            this.editText.MarkerIndex = index;
+            this.editText.SelectionIndex = index;
+
+            this.selecting = true;
+        }
+
+        protected internal override void OnMouseMoveEvent(MouseMoveEventArgs _event)
+        {
+            base.OnMouseMoveEvent(_event);
+            if (this.selecting)
+            {
+                int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
+                this.editText.MarkerIndex = index;
+            }
+        }
+
+        protected internal override void OnMouseUpEvent(MouseButtonEventArgs _event)
+        {
+            base.OnMouseUpEvent(_event);
+            this.selecting = false;
+        }
 
         #region States
 
@@ -143,7 +171,7 @@ namespace Monocle.EntityGUI
             protected internal override void OnFocusGained()
             {
                 base.OnFocusGained();
-                Control.editText.SelectAll();
+                // Control.editText.SelectAll();
             }
         }
 

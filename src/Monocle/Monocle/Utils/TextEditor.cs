@@ -27,7 +27,7 @@ namespace Monocle.Utils
                 if (value < 0)
                     this.markerIndex = 0;
                 else if (value > this.Length)
-                    this.MaxSize = this.Length;
+                    this.markerIndex = this.Length;
                 else
                     this.markerIndex = value;
             }
@@ -36,6 +36,15 @@ namespace Monocle.Utils
         public int SelectionIndex
         {
             get { return this.selectionIndex; }
+            set
+            {
+                if (value < 0)
+                    this.selectionIndex = 0;
+                else if (value > this.Length)
+                    this.selectionIndex = this.Length;
+                else
+                    this.selectionIndex = value;
+            }
         }
 
         public int MaxSize
@@ -263,6 +272,8 @@ namespace Monocle.Utils
         {
             get
             {
+                if (!this.Selected) return string.Empty;
+
                 int min = Math.Min(this.selectionIndex, this.markerIndex);
                 int max = Math.Max(this.selectionIndex, this.markerIndex);
                 return this.builder.ToString().Substring(min, max - min);

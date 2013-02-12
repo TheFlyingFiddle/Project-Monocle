@@ -10,7 +10,6 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Monocle.Content.Serialization;
 using System.IO;
-
 namespace Monocle
 {
     abstract class OpenTKWindow
@@ -45,13 +44,14 @@ namespace Monocle
         private readonly int fps;
         private readonly string resourceFolder;
         private Time Time;
-
+                
         public OpenTKWindow(int width, int height, int fps, string title, string resourceFolder)
         {
-            window = new GameWindow(width, height, new OpenTK.Graphics.GraphicsMode(),
-                                    title, 0, DisplayDevice.Default, 3, 3, 
+            window = new GameWindow(width, height, OpenTK.Graphics.GraphicsMode.Default,
+                                    title, GameWindowFlags.Default, DisplayDevice.Default, 3, 3, 
                                     OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible 
                                     | OpenTK.Graphics.GraphicsContextFlags.Debug);
+           
             this.fps = fps;
             this.resourceFolder = resourceFolder;
 
@@ -79,10 +79,22 @@ namespace Monocle
             this.window.SwapBuffers();
         }
 
+        private TimeSpan elapsed;
+        private int count;
+
+
         void window_UpdateFrame(object sender, FrameEventArgs e)
         {
             TimeSpan elapsed = TimeSpan.FromSeconds(e.Time);
             this.Time = new Time(this.Time.Total + elapsed, elapsed);
+            this.elapsed += elapsed;
+            if(this.elapsed > TimeSpan.FromSeconds(1)) {
+                this.elapsed -= TimeSpan.FromSeconds(1);
+                window.Title = "" + count;
+                this.count = 0;
+            }
+            this.count++;
+
 
             this.panel.Update(this.Time);
             this.Update(this.Time);
@@ -106,7 +118,7 @@ namespace Monocle
             this.guiRenderer = new GUIRenderer(new SpriteBuffer(this.GraphicsContext, effect), new Frame(pixel.Bounds, pixel));
 
 
-            window.VSync = VSyncMode.Adaptive;
+            window.VSync = VSyncMode.Off;
             window.Keyboard.KeyRepeat = true;
                   
             // Other state
@@ -116,6 +128,8 @@ namespace Monocle
 
             var factory = CreateGUIFactory();
             this.Load(factory);
+
+            GC.Collect();
         }
 
         private GUIFactory CreateGUIFactory()
@@ -146,7 +160,7 @@ namespace Monocle
         {
             using (window)
             {
-                window.Run(this.fps);
+                window.Run(200);
             }
         }
 

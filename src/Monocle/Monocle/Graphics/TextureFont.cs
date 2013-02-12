@@ -125,7 +125,7 @@ namespace Monocle.Graphics
             if (cursorX > size.X)
                 size.X = cursorX;
 
-            size.Y += this.LineHeight;
+            size.Y += this.Size;
 
             return size;
         }
@@ -135,16 +135,23 @@ namespace Monocle.Graphics
             return MessureSubstring(toMessure, 0, toMessure.Length);
         }
 
-        public unsafe string BestFit(string tofit, float maxWidth)
+        public int BestFit(string tofit, float maxWidth)
+        {
+            return this.BestSubstringFit(tofit, 0, tofit.Length, maxWidth);
+        }
+
+        public unsafe int BestSubstringFit(string tofit, int startIndex, int length, float maxWidth)
         {
             float pos = 0;
             fixed (char* ptr = tofit)
             {
-                for (int i = 0; i < tofit.Length; i++)
+                for (int i = startIndex; i < startIndex + length; i++)
                 {
                     char c = ptr[i];
                     if (c == '\n' || c == '\r')
-                        continue;
+                    {
+                        return i;
+                    }
                     else if (c == '\t')
                     {
                         CharInfo ci = this[' '];
@@ -161,15 +168,15 @@ namespace Monocle.Graphics
                     pos += info.Advance;
                     if (pos > maxWidth)
                     {
-                        return tofit.Substring(0, i);
+                        return i;
                     }
                 }
             }
 
-            return tofit;
+            return tofit.Length;
         }
 
-        public unsafe string BestFitBackWards(string tofit, int from, float maxWidth)
+        public unsafe int BestFitBackWards(string tofit, int from, float maxWidth)
         {
             float pos = 0;
             fixed (char* ptr = tofit)
@@ -178,7 +185,7 @@ namespace Monocle.Graphics
                 {
                     char c = ptr[i];
                     if (c == '\n' || c == '\r')
-                        continue;
+                        return Math.Max(from - (i + 1), 0);
                     else if (c == '\t')
                     {
                         CharInfo ci = this[' '];
@@ -195,15 +202,13 @@ namespace Monocle.Graphics
                     pos += info.Advance;
                     if (pos > maxWidth)
                     {
-                        return tofit.Substring(i + 1, from - i - 1);
+                        return from - (i + 1);
                     }
                 }
             }
 
-            return tofit;
+            return tofit.Length;
         }
-
-
 
         public object Clone()
         {

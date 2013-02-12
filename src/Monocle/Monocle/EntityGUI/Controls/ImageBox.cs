@@ -30,6 +30,9 @@ namespace Monocle.EntityGUI
         {
             Color c = this.focused ? this.BackgroundColor : Color.AddContrast(this.BackgroundColor, 0.2f);
 
+            drawableArea.W = this.Width;
+            drawableArea.H = this.Height;
+
             renderer.DrawRect(ref drawableArea, c);
             if (Image != null)
                 renderer.DrawFrame(Image, ref drawableArea, ImageColor);

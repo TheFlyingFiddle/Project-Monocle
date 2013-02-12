@@ -35,7 +35,7 @@ namespace Monocle.EntityGUI
         void mouse_WheelChanged(object sender, OpenTK.Input.MouseWheelEventArgs e)
         {
             Vector2 position = new Vector2(e.X, e.Y);
-            root.OnMouseWheelChanged(new MouseWheelEventArgs(e.DeltaPrecise));
+            root.OnMouseWheelChanged(new MouseWheelEventArgs(e.DeltaPrecise, GetModifierKeys()));
         }
 
         void mouse_ButtonUp(object sender, OpenTK.Input.MouseButtonEventArgs e)
@@ -43,7 +43,7 @@ namespace Monocle.EntityGUI
             MouseButton button = (MouseButton)e.Button;
             Vector2 position = new Vector2(e.X, e.Y); 
 
-            root.OnMouseUpEvent(new MouseButtonEventArgs(button, position));
+            root.OnMouseUpEvent(new MouseButtonEventArgs(button, position, GetModifierKeys()));
         }
 
         void mouse_ButtonDown(object sender, OpenTK.Input.MouseButtonEventArgs e)
@@ -52,7 +52,7 @@ namespace Monocle.EntityGUI
             Vector2 position = new Vector2(e.X, e.Y);
             if (root.Bounds.ContainsPoint(position))
             {
-                root.OnMouseDownEvent(new MouseButtonEventArgs(button, position));
+                root.OnMouseDownEvent(new MouseButtonEventArgs(button, position, GetModifierKeys()));
             }
         }
 

@@ -9,19 +9,20 @@ using OpenTK;
 
 namespace Monocle.EntityGUI.Controls
 {
-    class TextArea : FSMControl<TextArea>
+    class TextArea : ScrollableFSMControl<TextArea>
     {
         private const string TEXT_CHANGED_ID = "TEXT_CHANGED";
         protected readonly TextEditor editText;
-
-        private readonly ScrollBar vScrollbar;
-        private readonly ScrollBar hScrollbar;
-
-        
+                
         public string Text
         {
             get { return this.editText.ToString(); }
-            set { this.editText.SetText(value); }
+            set 
+            { 
+                var old = this.editText.ToString();
+                this.editText.SetText(value);
+                this.OnTextChanged(new TextChangedEventArgs(old, this.editText.ToString()));
+            }
         }
 
         public Color TextColor
@@ -42,39 +43,6 @@ namespace Monocle.EntityGUI.Controls
             set;
         }
 
-        public override Vector2 Size
-        {
-            get
-            {
-                return base.Size;
-            }
-            set
-            {
-                this.hScrollbar.Position = new Vector2(0, value.Y - ScrollBar.DEFAULT_SCROLLBAR_SIZE);
-                this.vScrollbar.Position = new Vector2(value.X - ScrollBar.DEFAULT_SCROLLBAR_SIZE, 0);
-
-                this.hScrollbar.Size = new Vector2(value.X, ScrollBar.DEFAULT_SCROLLBAR_SIZE);
-                this.vScrollbar.Size = new Vector2(ScrollBar.DEFAULT_SCROLLBAR_SIZE, value.Y);
-
-                base.Size = value;
-            }
-        }
-
-        public override bool Focused
-        {
-            get
-            {
-                return base.Focused;
-            }
-            internal set
-            {
-                this.hScrollbar.Focused = true;
-                this.vScrollbar.Focused = true;
-
-                base.Focused = value;
-            }
-        }
-
         public TextArea(Font font, string text = "", int maxLenght = -1)
         {
             this.Font = font;
@@ -82,14 +50,7 @@ namespace Monocle.EntityGUI.Controls
             this.TextColor = Color.Black;
             this.SelectedColor = Color.Blue;
             this.padding = new Rect(4, 4, 4, 4);
-
-            this.hScrollbar = new ScrollBar(Orientation.Horizontal, 0, 0, 0);
-            this.hScrollbar.ButtonColor = Color.Green;
-            this.hScrollbar.BackgroundColor = Color.DarkGray;
-
-            this.vScrollbar = new ScrollBar(Orientation.Vertical, 0, 0, 0);
-            this.vScrollbar.ButtonColor = Color.Green;
-            this.vScrollbar.BackgroundColor = Color.DarkGray;
+            this.ScrollStep = Font.Size;
          }
 
         protected override GUIFSM<TextArea> CreateFSM()
@@ -110,23 +71,8 @@ namespace Monocle.EntityGUI.Controls
 
             Vector2 contentSize = this.Font.MessureString(this.editText.ToString());
 
-            if (contentSize.X > this.Width - this.padding.W - this.padding.X)
-            {
-                this.hScrollbar.MaxValue = contentSize.X - this.Width + this.padding.W + this.padding.X + this.vScrollbar.Size.X;
-            }
-            else
-            {
-                this.hScrollbar.MaxValue = 0;
-            }
 
-            if (contentSize.Y > this.Height - this.padding.H - this.padding.Y)
-            {
-                this.vScrollbar.MaxValue = contentSize.Y - this.Height + this.padding.H + this.padding.Y + this.hScrollbar.Size.Y;
-            }
-            else
-            {
-                this.vScrollbar.MaxValue = 0;
-            }
+            this.ContentArea = new Rect(0, 0, contentSize.X, contentSize.Y);            
         }
 
         public event EventHandler<TextChangedEventArgs> TextChanged
@@ -141,67 +87,87 @@ namespace Monocle.EntityGUI.Controls
             }
         }
 
+        private bool selecting = false;
         protected internal override void OnMouseDownEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseDownEvent(_event);
-            if (vScrollbar.Bounds.ContainsPoint(_event.Position))
+            this.selecting = true;
+
+            int lineIndex = (int)((_event.Y - this.padding.Y + this.ScrollOffset.Y) / this.Font.LineHeight);
+            if (lineIndex == 0)
             {
-                MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new Vector2(_event.X - vScrollbar.X, _event.Y - vScrollbar.Y));
-                this.vScrollbar.OnMouseDownEvent(_internalEvent);
+                int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
+                this.editText.MarkerIndex = index;
+                this.editText.SelectionIndex = index;
+                return;
             }
-            
-            if (hScrollbar.Bounds.ContainsPoint(_event.Position))
+
+            int indexOfLine = LineIndex(lineIndex);
+
+            if (indexOfLine == this.editText.Length - 1)
             {
-                MouseButtonEventArgs _internalEvent = new MouseButtonEventArgs(_event.Button, new Vector2(_event.X - hScrollbar.X, _event.Y - hScrollbar.Y));
-                this.hScrollbar.OnMouseDownEvent(_internalEvent);
+                this.editText.MarkerIndex = this.editText.Length;
+                this.editText.SelectionIndex = this.editText.Length;
+            }
+            else
+            {
+                int index = this.Font.BestSubstringFit(this.editText.ToString(), indexOfLine, 
+                            this.editText.Length - indexOfLine, _event.Position.X + this.ScrollOffset.X);
+                this.editText.MarkerIndex = index;
+                this.editText.SelectionIndex = index;
             }
         }
+
 
         protected internal override void OnMouseUpEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseUpEvent(_event);
-            MouseButtonEventArgs _internalEvent0 = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - vScrollbar.X, _event.Y - vScrollbar.Y));
-            this.vScrollbar.OnMouseUpEvent(_internalEvent0);
-
-
-            MouseButtonEventArgs _internalEvent1 = new MouseButtonEventArgs(_event.Button, new OpenTK.Vector2(_event.X - hScrollbar.X, _event.Y - hScrollbar.Y));
-            this.hScrollbar.OnMouseUpEvent(_internalEvent1);
+            this.selecting = false;
         }
 
         protected internal override void OnMouseMoveEvent(MouseMoveEventArgs _event)
         {
             base.OnMouseMoveEvent(_event);
+            if (this.selecting)
+            {
+                int lineIndex = (int)((_event.Y + this.ScrollOffset.Y - this.padding.Y) / this.Font.LineHeight);
+                if (lineIndex == 0)
+                {
+                    int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
+                    this.editText.MarkerIndex = index;
+                    return;
+                }
 
-            MouseMoveEventArgs _internalEvent0 = new MouseMoveEventArgs(new Vector2(_event.X - vScrollbar.X, _event.Y - vScrollbar.Y), _event.Delta);
-            this.vScrollbar.OnMouseMoveEvent(_internalEvent0);
+                int indexOfLine = LineIndex(lineIndex);
 
-
-            MouseMoveEventArgs _internalEvent1 = new MouseMoveEventArgs(new Vector2(_event.X - hScrollbar.X, _event.Y - hScrollbar.Y), _event.Delta);
-            this.hScrollbar.OnMouseMoveEvent(_internalEvent1);
+                if (indexOfLine == this.editText.Length - 1)
+                {
+                    this.editText.MarkerIndex = this.editText.Length;
+                }
+                else
+                {
+                    int index = this.Font.BestSubstringFit(this.editText.ToString(), indexOfLine, 
+                                this.editText.Length - indexOfLine, _event.Position.X + this.ScrollOffset.X);
+                    this.editText.MarkerIndex = index;
+                }
+            }
         }
 
-
-
-        private void DrawScrollbars(ref Rect area, IGUIRenderer renderer)
+        private int LineIndex(int lineIndex)
         {
-            if (this.vScrollbar.MaxValue + this.Width > this.Width)
+            var txt = this.editText.ToString();
+            int x = 0;
+            for (int i = 0; i < txt.Length; i++)
             {
-                Rect scrollArea = new Rect(area.X + this.vScrollbar.X, area.Y, this.vScrollbar.Width, area.H);
-                if (renderer.SetSubRectDrawableArea(ref area, ref scrollArea, out scrollArea))
+                if (txt[i] == '\n') 
                 {
-                    this.vScrollbar.Draw(ref scrollArea, renderer);
+                    x++; if (lineIndex == x) return Math.Min(i + 1, this.editText.Length);
                 }
             }
 
-            if (this.hScrollbar.MaxValue + this.Height > this.Height)
-            {
-                Rect scrollArea = new Rect(area.X, area.Y + this.hScrollbar.Y, area.W, this.hScrollbar.Height);
-                if (renderer.SetSubRectDrawableArea(ref area, ref scrollArea, out scrollArea))
-                {
-                    this.hScrollbar.Draw(ref scrollArea, renderer);
-                }
-            }
+            return txt.Length - 1;
         }
+
 
         class Idle : GUIState<TextArea>
         {
@@ -217,12 +183,10 @@ namespace Monocle.EntityGUI.Controls
                 {
                     if (Control.editText.Length > 0)
                     {
-                        Vector2 offset = new Vector2(Control.hScrollbar.Value, Control.vScrollbar.Value);
+                        Vector2 offset = new Vector2(Control.HScrollBar.Value, Control.VScrollBar.Value);
                         renderer.DrawMultiLineString(Control.Font, Control.Text, ref _contentRect, Control.TextColor, ref offset);
                     }
                 }
-
-                Control.DrawScrollbars(ref area, renderer);
             }
         }
 
@@ -231,20 +195,17 @@ namespace Monocle.EntityGUI.Controls
             protected internal override void Draw(ref Rect area, IGUIRenderer renderer)
             {
                 renderer.DrawRect(ref area, Control.BackgroundColor);
-                Rect _contentRect = new Rect(area.X + Control.padding.X, area.Y + Control.padding.Y,
-                                area.W - Control.padding.X - Control.padding.W,
-                                area.H - Control.padding.H - Control.padding.Y);
 
+                Rect _contentRect = Control.ContentArea;
+                _contentRect.Displace(area.TopLeft);
                 if (renderer.SetSubRectDrawableArea(ref area, ref _contentRect, out _contentRect))
                 {
 
-                    Vector2 offset = new Vector2(Control.hScrollbar.Value, Control.vScrollbar.Value);
+                    Vector2 offset = new Vector2(Control.HScrollBar.Value, Control.VScrollBar.Value);
                     renderer.DrawMarkedMultiLineString(Control.Font, Control.editText,
                                            ref _contentRect, ref offset, Control.TextColor, 
                                            Control.SelectedColor);
                 }
-
-                Control.DrawScrollbars(ref area, renderer);
             }
 
             protected internal override void OnCharEvent(CharEventArgs _event)
@@ -275,12 +236,6 @@ namespace Monocle.EntityGUI.Controls
                 }
 
                 return base.OnKeyDownEvent(_event);
-            }
-
-            protected internal override void OnMouseWheelChanged(MouseWheelEventArgs _event)
-            {
-                base.OnMouseWheelChanged(_event);
-                Control.vScrollbar.Value -= _event.Delta * Control.Font.Size;
             }
         }
     }

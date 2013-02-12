@@ -46,7 +46,8 @@ namespace Monocle.Content.Serialization.Processors
         private Texture2D LoadTexture(string fileName, IResourceContext context)
         {
             string path = Path.Combine(Path.GetDirectoryName(this.ResourcePath), fileName);
-            return context.LoadAsset<Texture2D>(path, processor: new TextureProcessor(System.Drawing.Imaging.PixelFormat.Format32bppPArgb));
+            return context.LoadAsset<Texture2D>(path, processor: new TextureProcessor(System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
+                                                                  OpenTK.Graphics.OpenGL.PixelInternalFormat.CompressedRedRgtc1));
         }
     }
 }

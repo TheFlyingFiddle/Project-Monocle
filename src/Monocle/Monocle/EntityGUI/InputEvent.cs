@@ -53,10 +53,12 @@ namespace Monocle.EntityGUI
     class MouseWheelEventArgs : EventArgs
     {
         public readonly float Delta;
+        public readonly ModifierKeys Modifiers;
 
-        public MouseWheelEventArgs(float delta)
+        public MouseWheelEventArgs(float delta, ModifierKeys modifiers)
         {
             this.Delta = delta;
+            this.Modifiers = modifiers;
         }
     }
 
@@ -95,8 +97,9 @@ namespace Monocle.EntityGUI
 
     class MouseButtonEventArgs : EventArgs
     {
-        public readonly MouseButton Button;
         public readonly Vector2 Position;
+        public readonly MouseButton Button;
+        public readonly ModifierKeys Modifiers;
 
         public float X
         {
@@ -108,12 +111,12 @@ namespace Monocle.EntityGUI
             get { return this.Position.Y; }
         }
 
-        public MouseButtonEventArgs(MouseButton button, Vector2 position)
+        public MouseButtonEventArgs(MouseButton button, Vector2 position, ModifierKeys modifiers)
         {
             this.Button = button;
             this.Position = position;
+            this.Modifiers = modifiers;
         }
-
     }
 
     class KeyEventArgs : EventArgs

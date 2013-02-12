@@ -9,7 +9,7 @@ namespace Monocle.EntityGUI
     class ScrollBar : ScrollBase
     {
         public const int MIN_SCROLLBAR_BUTTON_SIZE = 15;
-        public const int DEFAULT_SCROLLBAR_SIZE = 8;
+        public const int DEFAULT_SCROLLBAR_SIZE = 9;
 
         public ScrollBar(Orientation orientation, int min, int max, int value)
             : base(orientation, min, max, value) { }
@@ -17,17 +17,8 @@ namespace Monocle.EntityGUI
         protected internal override void Draw(ref Rect area, IGUIRenderer renderer)
         {
             base.Draw(ref area, renderer);
-            if (Focused)
-            {
-                Color bgc = Color.AddContrast(this.BackgroundColor, 0.1f);
-                Color bc = Color.AddContrast(this.ButtonColor, 0.1f);
-                this.Draw(ref area, renderer, bgc, bc);
-
-            }
-            else
-            {
-                this.Draw(ref area, renderer, this.BackgroundColor, this.ButtonColor);
-            }
+            
+            this.Draw(ref area, renderer, this.BackgroundColor, this.ButtonColor);
         }
 
         private void Draw(ref Rect area, IGUIRenderer renderer, Color bgc, Color bc)

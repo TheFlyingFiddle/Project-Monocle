@@ -82,5 +82,14 @@ namespace Monocle.Graphics
 
         int GetUniformLocation(int programID, string name);
         void Clear(Color4 color, ClearBufferMask mask);
+
+        void GenRenderBuffers(int n, out int handle);
+        void GenFrameBuffers(int n, out int handle);
+
+        void BindFrameBuffer(FramebufferTarget framebufferTarget, int handle);
+
+        void FrameBufferTexture2D(FramebufferTarget framebufferTarget, FramebufferAttachment framebufferAttachment, TextureTarget textureTarget, int textureHandle, int p);
+        void DeleteFrameBuffers(int handle);
+        void DeleterRenderBuffers(int handle);
     }
 }

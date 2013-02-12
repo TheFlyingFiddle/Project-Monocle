@@ -35,37 +35,34 @@ namespace Monocle.EntityGUI
 
         public void DrawString(Font textureFont, string text, ref Rect rect, Color color, TextAlignment textAlignment)
         {
-            string canDraw = textureFont.BestFit(text, rect.W);
-            Vector2 align = GetAlignment(textureFont, canDraw, ref rect, textAlignment);
-            this.batch.BufferString(textureFont, canDraw, new Vector2(rect.X, rect.Y), color, align);
+            int length = textureFont.BestFit(text, rect.W);
+            Vector2 align = GetAlignment(textureFont, text, 0, length, ref rect, textAlignment);
+            this.batch.BufferSubString(textureFont, text,0,length, new Vector2(rect.X, rect.Y), color, align, Vector2.One);
         }
 
         public void DrawMarkedString(Font textureFont, TextEditor text, ref Rect rect, Color color, Color selectionColor, TextAlignment textAlignment)
         {
-            string canDraw = textureFont.BestFitBackWards(text.ToString(), text.MarkerIndex, rect.W);
+            int length = textureFont.BestFitBackWards(text.ToString(), text.MarkerIndex, rect.W);
             float markerPos;
-            if (canDraw.Length < text.Length)
+            if (length < text.Length)
                 markerPos = rect.W - 1;
             else
             {
-                markerPos = textureFont.MessureSubstring(canDraw, 0, text.MarkerIndex - (text.Length - canDraw.Length)).X;
+                markerPos = textureFont.MessureSubstring(text.ToString(), Math.Max(0,(text.MarkerIndex - length)), text.MarkerIndex - (text.Length - length)).X;
                 markerPos = MathHelper.Clamp(0, rect.W - 1, markerPos);
             }
 
-            Vector2 align = GetAlignment(textureFont, canDraw, ref rect, textAlignment);
+            Vector2 align = GetAlignment(textureFont, text.ToString(), text.MarkerIndex - length, length, ref rect, textAlignment);
 
             if (text.Selected)
             {
-                float selectionStart = textureFont.MessureSubstring(canDraw, 0, text.SelectionIndex - (text.Length - canDraw.Length)).X;
+                float selectionStart = textureFont.MessureSubstring(text.ToString(), 0, text.SelectionIndex - (text.Length - length)).X;
+                                
                 this.batch.BufferFrame(this.pixel, new Rect(rect.X + selectionStart, rect.Y, markerPos - selectionStart, rect.H), selectionColor * 0.6f);
-                this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerPos, rect.Y, 1, rect.H), color);
-                this.batch.BufferString(textureFont, canDraw, new Vector2(rect.X, rect.Y), color, align);
             }
-            else
-            {
-                this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerPos, rect.Y, 1, rect.H), color);
-                this.batch.BufferString(textureFont, canDraw, new Vector2(rect.X, rect.Y), color, align);   
-            }
+
+            this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerPos, rect.Y, 1, rect.H), color);
+            this.batch.BufferSubString(textureFont, text.ToString(), Math.Max(0, text.MarkerIndex - length), length, new Vector2(rect.X, rect.Y), color, align, Vector2.One);
         }
 
         public void DrawMultiLineString(Font font, string text, ref Rect rect, Color color, ref Vector2 offset)
@@ -76,12 +73,65 @@ namespace Monocle.EntityGUI
         public void DrawMarkedMultiLineString(Font font, TextEditor textEditor, ref Rect rect,ref Vector2 offset, Color color, Color selectionColor)
         {
             int realIndex;
-            int lineIndex = FindLineIndex(textEditor.ToString(), textEditor.MarkerIndex, out realIndex);
-
-            float markerIndex = font.MessureSubstring(textEditor.ToString(), realIndex, textEditor.MarkerIndex - realIndex).X;
+            int line = FindLineIndex(textEditor.ToString(), textEditor.MarkerIndex, out realIndex);
+            float markerX = font.MessureSubstring(textEditor.ToString(), realIndex, textEditor.MarkerIndex - realIndex).X;
 
             this.batch.BufferString(font, textEditor.ToString(), new Vector2(rect.X, rect.Y), color, offset);
-            this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerIndex - offset.X, rect.Y - offset.Y + lineIndex * font.LineHeight, 1, font.Size), color);
+            this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerX - offset.X, rect.Y - offset.Y + line * font.LineHeight, 1, font.LineHeight), color);
+
+            if (textEditor.Selected)
+            {
+                DrawSelection(font, textEditor, ref rect, ref offset, ref selectionColor, markerX);
+            }
+        }
+
+        private void DrawSelection(Font font, TextEditor textEditor, ref Rect rect, ref Vector2 offset, ref Color selectionColor, float markerX)
+        {
+            int min = Math.Min(textEditor.SelectionIndex, textEditor.MarkerIndex);
+            int max = Math.Max(textEditor.SelectionIndex, textEditor.MarkerIndex);
+
+            string txt = textEditor.ToString();
+            int lastLine = min;
+            int real;
+            int line = FindLineIndex(textEditor.ToString(), min, out real);
+            bool first = true;
+
+            float selectionLineWidth;
+
+            for (int i = min; i < max; i++)
+            {
+                if (txt[i] == '\n')
+                {
+                    selectionLineWidth = font.MessureSubstring(textEditor.ToString(), lastLine, i - lastLine).X;
+                    if (first) //Anoying special case. First line found.
+                    {
+                        float selectionX = font.MessureSubstring(textEditor.ToString(), real, min - real).X;
+                        this.batch.BufferFrame(this.pixel, new Rect(rect.X - offset.X + selectionX, rect.Y - offset.Y + 
+                                               line * font.LineHeight, selectionLineWidth, font.LineHeight), selectionColor * 0.6f);
+                        first = false;
+                    }
+                    else
+                        this.batch.BufferFrame(this.pixel, new Rect(rect.X - offset.X, rect.Y - offset.Y + 
+                                               line * font.LineHeight, selectionLineWidth, font.LineHeight), selectionColor * 0.6f);
+
+                    lastLine = i;
+                    line++;
+                }
+            }
+
+            selectionLineWidth = font.MessureSubstring(textEditor.ToString(), lastLine, max - lastLine).X;
+            if (textEditor.MarkerIndex < textEditor.SelectionIndex)
+            {
+                FindLineIndex(textEditor.ToString(), max, out real);
+                float mi2 = font.MessureSubstring(textEditor.ToString(), real, min - real).X;
+                this.batch.BufferFrame(this.pixel, new Rect(rect.X + mi2 - offset.X, rect.Y - offset.Y +
+                                       line * font.LineHeight, selectionLineWidth, font.LineHeight), selectionColor * 0.6f);
+            } 
+            else
+            {
+                this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerX - selectionLineWidth - offset.X, rect.Y - offset.Y +
+                                       line * font.LineHeight, selectionLineWidth, font.LineHeight), selectionColor * 0.6f);
+            }
         }
 
         private unsafe int FindLineIndex(string p, int p_2, out int realIndex)
@@ -106,9 +156,9 @@ namespace Monocle.EntityGUI
 
 
 
-        private Vector2 GetAlignment(Font textureFont, string text, ref Rect bounds, TextAlignment textAlignment)
+        private Vector2 GetAlignment(Font textureFont, string text, int startIndex, int length, ref Rect bounds, TextAlignment textAlignment)
         {
-            Vector2 textSize = textureFont.MessureString(text);
+            Vector2 textSize = textureFont.MessureSubstring(text, startIndex, length);
             Vector2 offset = Vector2.Zero;
         
             switch (textAlignment)

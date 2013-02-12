@@ -81,6 +81,10 @@ namespace Monocle.Graphics
             : this(color.R * a, color.G * a, color.B * a, a)
         {  }
 
+        public Color(float r, float g, float b)
+            : this(r,g,b,1.0f)
+        {  }
+
         public static Color AddContrast(Color c, float contrast)
         {
             return new Color(c.R + contrast, c.G + contrast, c.B + contrast, c.A); 

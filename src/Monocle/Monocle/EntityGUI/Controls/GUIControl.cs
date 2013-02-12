@@ -88,6 +88,18 @@ namespace Monocle.EntityGUI
             set;
         }
 
+        public int FocusIndex
+        {
+            get;
+            set;
+        }
+
+        public bool Focusable
+        {
+            get;
+            set;
+        }
+
         public Color BackgroundColor
         {
             get;
@@ -156,6 +168,7 @@ namespace Monocle.EntityGUI
         {
             this.BackgroundColor = Color.White;
             this.Visible = true;
+            this.Focusable = true;
             this._eventMap = new Dictionary<string, object>();
         }
 

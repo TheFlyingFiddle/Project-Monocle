@@ -14,12 +14,14 @@ namespace Monocle.Content.Serialization
     class TextureProcessor : Processor<Bitmap, Texture2D>
     {
         public TextureProcessor()
-            : this(System.Drawing.Imaging.PixelFormat.Format32bppPArgb)
+            : this(System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
+                   PixelInternalFormat.Rgba)
         { }
 
-        public TextureProcessor(System.Drawing.Imaging.PixelFormat format)
+        public TextureProcessor(System.Drawing.Imaging.PixelFormat format, PixelInternalFormat internalFormat)
         {
             this.Format = format;
+            this.InternalFormat = internalFormat;
         }
 
         public override Texture2D Process(Bitmap bitmap, IResourceContext context)
@@ -38,17 +40,26 @@ namespace Monocle.Content.Serialization
 
             //gc.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-
+            gc.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
+            gc.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 0);
             gc.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             gc.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
 
             bitmap.Dispose();
 
+            Console.WriteLine(GC.GetTotalMemory(true));
+
             return new Texture2D(gc, id, data.Width, data.Height);
         }
 
         public System.Drawing.Imaging.PixelFormat Format
+        {
+            get;
+            set;
+        }
+
+        public PixelInternalFormat InternalFormat
         {
             get;
             set;

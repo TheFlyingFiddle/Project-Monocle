@@ -61,10 +61,9 @@ namespace Monocle.Graphics
         [StructLayout(LayoutKind.Sequential)]
         public struct Vertex : IVertex
         {
-            public Vector2 Position;
+            public Vector4 Position;
             public Vector2 TexCoords;
             public int Tint;
-            public Vector2 Offset;
             public float Rotation;
             
             public int SizeInBytes { get { return 32; } }
@@ -129,14 +128,12 @@ namespace Monocle.Graphics
         {
             this.GraphicsContext.UseShaderProgram(program);
             program.SetUniform("tex", 0);
-            activeEffect.SetUniform("projection_matrix", ref transformation);
+            program.SetUniform("projection_matrix", ref transformation);
 
-
-            int posIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_position");
-            int texIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_coords");
-            int coloIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_tint");
-            int offsetIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_offset");
-            int rotationIndex = this.GraphicsContext.GetAttribLocation(program.Handle, "in_rotation");
+            int posIndex = program.GetAttributeLocation("in_position");
+            int texIndex = program.GetAttributeLocation("in_coords");
+            int coloIndex = program.GetAttributeLocation("in_tint");
+            int rotationIndex = program.GetAttributeLocation("in_rotation");
 
             GL.BindVertexArray(this.vertexArrayHandle);
 
@@ -144,15 +141,12 @@ namespace Monocle.Graphics
             this.GraphicsContext.EnableVertexAttribArray(posIndex);
             this.GraphicsContext.EnableVertexAttribArray(texIndex);
             this.GraphicsContext.EnableVertexAttribArray(coloIndex);
-            this.GraphicsContext.EnableVertexAttribArray(offsetIndex);
             this.GraphicsContext.EnableVertexAttribArray(rotationIndex);
 
-            this.GraphicsContext.VertexAttribPointer(posIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, 0);
-            this.GraphicsContext.VertexAttribPointer(texIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes);
-            this.GraphicsContext.VertexAttribPointer(coloIndex, 4, VertexAttribPointerType.UnsignedByte, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2);
-            this.GraphicsContext.VertexAttribPointer(offsetIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 2 + sizeof(int));
-            this.GraphicsContext.VertexAttribPointer(rotationIndex, 1, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector2.SizeInBytes * 3 + sizeof(int));
-
+            this.GraphicsContext.VertexAttribPointer(posIndex, 4, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, 0);
+            this.GraphicsContext.VertexAttribPointer(texIndex, 2, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector4.SizeInBytes);
+            this.GraphicsContext.VertexAttribPointer(coloIndex, 4, VertexAttribPointerType.UnsignedByte, true, this.vertices[0].SizeInBytes, Vector4.SizeInBytes + Vector2.SizeInBytes);
+            this.GraphicsContext.VertexAttribPointer(rotationIndex, 1, VertexAttribPointerType.Float, true, this.vertices[0].SizeInBytes, Vector4.SizeInBytes + Vector2.SizeInBytes  + sizeof(int));
         }
 
         public Monocle.Graphics.IGraphicsContext GraphicsContext
@@ -203,6 +197,10 @@ namespace Monocle.Graphics
             this.BufferString(font, toDraw.ToString(), position, color, origin, scale, angle, mirror, renderLayer);
         }
 
+        public void BufferSubString(Font font, string toDraw, int startIndex, int length, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        {
+            this.BufferString(font,toDraw,startIndex,length,position,color,origin,scale,angle,mirror, renderLayer);
+        }
 
         /// <summary>
         /// Adds a string to be drawn in the next batch draw call.
@@ -218,22 +216,31 @@ namespace Monocle.Graphics
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
         public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
+            this.BufferString(fontUsed, toDraw, 0, toDraw.Length, position, color, origin, scale, angle, mirror, renderLayer);          
+        }
+
+        private void BufferString(Font fontUsed, string toDraw, int startIndex, int length, Vector2 position, 
+                                  Color4 color, Vector2 origin, Vector2 scale, float angle = 0, 
+                                  bool mirror = false, float renderLayer = 0.0f)
+        {
             if (fontUsed == null || toDraw == null)
                 throw new ArgumentNullException();
+            else if (toDraw.Length < startIndex + length)
+                throw new IndexOutOfRangeException();
 
             Vector2 cursor = new Vector2(-origin.X * scale.X, -origin.Y * scale.Y);
             int tint = color.ToArgb();
             unsafe
             {
-                if (this.elementCount + toDraw.Length >= this.textures.Length)
+                if (this.elementCount + length * 4 >= this.textures.Length)
                     this.Resize();
 
-
+                //Using pointer to avoid unessasary bounds checking.
                 fixed (char* ptr = toDraw)
                 {
                     if (!mirror)
                     {
-                        for (int i = 0; i < toDraw.Length; i++)
+                        for (int i = startIndex; i < startIndex + length; i++)
                         {
                             char c = ptr[i];
                             BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, false, tint, angle, renderLayer, c);
@@ -241,7 +248,7 @@ namespace Monocle.Graphics
                     }
                     else
                     {
-                        for (int i = toDraw.Length - 1; i >= 0; i--)
+                        for (int i = startIndex + length - 1; i >= startIndex; i--)
                         {
                             char c = ptr[i];
                             BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, true, tint, angle, renderLayer, c);
@@ -327,8 +334,8 @@ namespace Monocle.Graphics
 
                 ptr->Position.X = pos.X;
                 ptr->Position.Y = pos.Y;
-                ptr->Offset.X = dest.X;
-                ptr->Offset.Y = dest.Y;
+                ptr->Position.Z = dest.X;
+                ptr->Position.W = dest.Y;
                 ptr->TexCoords.X = src.X;
                 ptr->TexCoords.Y = src.Y;
                 ptr->Rotation = angle;
@@ -338,8 +345,8 @@ namespace Monocle.Graphics
 
                 ptr->Position.X = pos.X;
                 ptr->Position.Y = pos.Y;
-                ptr->Offset.X = dest.Z;
-                ptr->Offset.Y = dest.Y;
+                ptr->Position.Z = dest.Z;
+                ptr->Position.W = dest.Y;
                 ptr->TexCoords.X = src.Z;
                 ptr->TexCoords.Y = src.Y;
                 ptr->Rotation = angle;
@@ -349,8 +356,8 @@ namespace Monocle.Graphics
 
                 ptr->Position.X = pos.X;
                 ptr->Position.Y = pos.Y;
-                ptr->Offset.X = dest.Z;
-                ptr->Offset.Y = dest.W;
+                ptr->Position.Z = dest.Z;
+                ptr->Position.W = dest.W;
                 ptr->TexCoords.X = src.Z;
                 ptr->TexCoords.Y = src.W;
                 ptr->Rotation = angle;
@@ -360,8 +367,8 @@ namespace Monocle.Graphics
 
                 ptr->Position.X = pos.X;
                 ptr->Position.Y = pos.Y;
-                ptr->Offset.X = dest.X;
-                ptr->Offset.Y = dest.W;
+                ptr->Position.Z = dest.X;
+                ptr->Position.W = dest.W;
                 ptr->TexCoords.X = src.X;
                 ptr->TexCoords.Y = src.W;
                 ptr->Rotation = angle;
@@ -517,50 +524,56 @@ namespace Monocle.Graphics
         {
             this.GraphicsContext.BindIndexBuffer(indexBuffer);
             this.GraphicsContext.BindVertexBuffer(this.vertexBuffer);
+
             
             int toDraw = 0;
             var toUse = textures[this.sortedIndexes[0]];
             for (int i = 0; i < this.elementCount; i++)
             {
-                var index = this.sortedIndexes[i];
+                var texture = textures[this.sortedIndexes[i]];
 
-                if (toUse != textures[index])
+                if (toUse != texture)
                 {
                     this.GraphicsContext[0] = toUse;
                     this.GraphicsContext.DrawElements(BeginMode.Triangles, toDraw * Elements_Per_Square, DrawElementsType.UnsignedInt, (i - toDraw) * Elements_Per_Square * sizeof(uint));
                     toDraw = 0;
 
-                    toUse = textures[index];
+                    toUse = texture;
                 }
                 toDraw++;
             }
 
             this.GraphicsContext[0] = toUse;
-            this.GraphicsContext.DrawElements(BeginMode.Triangles, toDraw * Elements_Per_Square, DrawElementsType.UnsignedInt, (elementCount - toDraw) * Elements_Per_Square * sizeof(uint));
+            this.GraphicsContext.DrawElements(BeginMode.Triangles, toDraw * Elements_Per_Square, DrawElementsType.UnsignedInt, (elementCount - toDraw) * Elements_Per_Square * sizeof(uint));       
         }
 
         private void RenderUnsorted()
         {
+            GL.BindVertexArray(this.vertexArrayHandle);
             this.GraphicsContext.BindIndexBuffer(indexBuffer);
             this.GraphicsContext.BindVertexBuffer(this.vertexBuffer);
-            
+
+
             int toDraw = 0;
             var toUse = textures[0];
             for (int i = 0; i < this.elementCount; i++)
             {
-                if (toUse != textures[i])
+                var texture = textures[i]; 
+                if (toUse != texture)
                 {
                     this.GraphicsContext[0] = toUse;
                     this.GraphicsContext.DrawElements(BeginMode.Triangles, toDraw * Elements_Per_Square, DrawElementsType.UnsignedInt, (i - toDraw) * Elements_Per_Square * sizeof(uint));
                     toDraw = 0;
 
-                    toUse = textures[i];
+                    toUse = texture;
                 }
                 toDraw++;
             }
 
             this.GraphicsContext[0] = toUse;
             this.GraphicsContext.DrawElements(BeginMode.Triangles, toDraw * Elements_Per_Square, DrawElementsType.UnsignedInt, (elementCount - toDraw) * Elements_Per_Square * sizeof(uint));
+
+            GL.BindVertexArray(0);
         }
 
         private class RenderOrderSorter : IComparer<int>
