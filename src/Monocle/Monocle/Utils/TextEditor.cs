@@ -13,8 +13,9 @@ namespace Monocle.Utils
         public const char Delete = '\u007F';
         public const char Enter = '\n';
 
-        private Func<char, bool> filter;
+        private bool hasChanged;
 
+        private Func<char, bool> filter;
         private StringBuilder builder;
         private string _last;
         private int markerIndex, selectionIndex;
@@ -81,6 +82,8 @@ namespace Monocle.Utils
             this.markerIndex = 0;
             this.selectionIndex = -1;
             this.Multiline = multiline;
+
+            this.hasChanged = false;
         }
 
         public void MoveLeft()
@@ -250,7 +253,7 @@ namespace Monocle.Utils
             int min = Math.Min(this.selectionIndex, this.markerIndex);
             int max = Math.Max(this.selectionIndex, this.markerIndex);
             this.builder.Remove(min, max - min);
-            this._last = this.builder.ToString();
+            this.hasChanged = true;
             this.markerIndex = min;
             this.Selected = false;
         }
@@ -297,7 +300,7 @@ namespace Monocle.Utils
                 return false;
 
             this.builder.Remove(this.markerIndex, 1);
-            this._last = this.builder.ToString();
+            this.hasChanged = true;
             return true;
         }
 
@@ -310,13 +313,22 @@ namespace Monocle.Utils
                 return false;
 
             this.builder.Insert(this.markerIndex, c);
-            this._last = this.builder.ToString();
+            this.hasChanged = true;
             this.markerIndex++;
             return true;
         }
 
         public override string ToString()
         {
+            if (this.hasChanged)
+            {
+                this._last = this.builder.ToString();
+                Console.WriteLine("Size of string: " + _last.Length * 2  + " Bytes == " + _last.Length * 2 / 1024 + " KB");
+                Console.WriteLine("Currently using : " + GC.GetTotalMemory(false) + " Bytes of memory:" + GC.GetTotalMemory(false) / 1024 + " == KB");
+                
+                this.hasChanged = false;
+            }
+
             return this._last;
         }
 
@@ -358,13 +370,13 @@ namespace Monocle.Utils
                 this.builder.Append(p.Substring(0, this.MaxSize));
             }
 
-            this._last = this.builder.ToString();
+            this.hasChanged = true;
         }
 
         public void Clear()
         {
             this.builder.Clear();
-            this._last = this.builder.ToString();
+            this.hasChanged = true;
             this.markerIndex = 0;
             this.selectionIndex = -1;
         }

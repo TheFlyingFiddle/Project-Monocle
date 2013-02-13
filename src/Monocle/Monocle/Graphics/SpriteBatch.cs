@@ -232,7 +232,7 @@ namespace Monocle.Graphics
             int tint = color.ToArgb();
             unsafe
             {
-                if (this.elementCount + length * 4 >= this.textures.Length)
+                while(this.elementCount + length * 4 >= this.textures.Length)
                     this.Resize();
 
                 //Using pointer to avoid unessasary bounds checking.

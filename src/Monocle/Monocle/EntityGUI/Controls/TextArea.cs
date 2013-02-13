@@ -96,7 +96,7 @@ namespace Monocle.EntityGUI.Controls
             int lineIndex = (int)((_event.Y - this.padding.Y + this.ScrollOffset.Y) / this.Font.LineHeight);
             if (lineIndex == 0)
             {
-                int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
+                int index = this.Font.BestWidthFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
                 this.editText.MarkerIndex = index;
                 this.editText.SelectionIndex = index;
                 return;
@@ -111,7 +111,7 @@ namespace Monocle.EntityGUI.Controls
             }
             else
             {
-                int index = this.Font.BestSubstringFit(this.editText.ToString(), indexOfLine, 
+                int index = this.Font.BestSubstringWidthFit(this.editText.ToString(), indexOfLine, 
                             this.editText.Length - indexOfLine, _event.Position.X + this.ScrollOffset.X);
                 this.editText.MarkerIndex = index;
                 this.editText.SelectionIndex = index;
@@ -133,7 +133,7 @@ namespace Monocle.EntityGUI.Controls
                 int lineIndex = (int)((_event.Y + this.ScrollOffset.Y - this.padding.Y) / this.Font.LineHeight);
                 if (lineIndex == 0)
                 {
-                    int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
+                    int index = this.Font.BestWidthFit(this.editText.ToString(), _event.Position.X + this.ScrollOffset.X);
                     this.editText.MarkerIndex = index;
                     return;
                 }
@@ -146,7 +146,7 @@ namespace Monocle.EntityGUI.Controls
                 }
                 else
                 {
-                    int index = this.Font.BestSubstringFit(this.editText.ToString(), indexOfLine, 
+                    int index = this.Font.BestSubstringWidthFit(this.editText.ToString(), indexOfLine, 
                                 this.editText.Length - indexOfLine, _event.Position.X + this.ScrollOffset.X);
                     this.editText.MarkerIndex = index;
                 }

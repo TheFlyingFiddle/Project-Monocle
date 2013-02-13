@@ -71,9 +71,20 @@ namespace Monocle.Examples
 
             TextArea area = new TextArea(font);
             area.Position = new OpenTK.Vector2(textBox3.Bounds.Right + 20, 50);
-            area.Size = new OpenTK.Vector2(400, 200);
+            area.Size = new OpenTK.Vector2(400, 300);
             area.Text = "This is a text area! This is not fully implemented! Yes true it is.";
             this.Panel.AddControl(area);
+
+            ListBox<int> numbers = new ListBox<int>(font);
+            numbers.Position = new OpenTK.Vector2(area.Bounds.Right + 20, 50);
+            numbers.Size = new OpenTK.Vector2(400, 300);
+
+            for (int i = 0; i < 20; i++)
+            {
+                numbers.AddItem(i);
+            }
+
+            this.Panel.AddControl(numbers);
         }
     }
 }

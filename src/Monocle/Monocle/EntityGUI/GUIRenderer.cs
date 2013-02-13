@@ -35,14 +35,14 @@ namespace Monocle.EntityGUI
 
         public void DrawString(Font textureFont, string text, ref Rect rect, Color color, TextAlignment textAlignment)
         {
-            int length = textureFont.BestFit(text, rect.W);
+            int length = textureFont.BestWidthFit(text, rect.W);
             Vector2 align = GetAlignment(textureFont, text, 0, length, ref rect, textAlignment);
             this.batch.BufferSubString(textureFont, text,0,length, new Vector2(rect.X, rect.Y), color, align, Vector2.One);
         }
 
         public void DrawMarkedString(Font textureFont, TextEditor text, ref Rect rect, Color color, Color selectionColor, TextAlignment textAlignment)
         {
-            int length = textureFont.BestFitBackWards(text.ToString(), text.MarkerIndex, rect.W);
+            int length = textureFont.BestWidthFitBackWards(text.ToString(), text.MarkerIndex, rect.W);
             float markerPos;
             if (length < text.Length)
                 markerPos = rect.W - 1;
@@ -76,7 +76,10 @@ namespace Monocle.EntityGUI
             int line = FindLineIndex(textEditor.ToString(), textEditor.MarkerIndex, out realIndex);
             float markerX = font.MessureSubstring(textEditor.ToString(), realIndex, textEditor.MarkerIndex - realIndex).X;
 
-            this.batch.BufferString(font, textEditor.ToString(), new Vector2(rect.X, rect.Y), color, offset);
+            int indexOfFirst = font.BestHeightFit(textEditor.ToString(), offset.Y);
+            int indexOfLast = font.BestHeightFit(textEditor.ToString(), offset.Y + rect.Bottom + font.Size);
+
+            this.batch.BufferSubString(font, textEditor.ToString(), indexOfFirst, indexOfLast - indexOfFirst, new Vector2(rect.X, rect.Y), color, new Vector2(offset.X, (offset.Y > 0) ? font.Size + 8: 0), Vector2.One);
             this.batch.BufferFrame(this.pixel, new Rect(rect.X + markerX - offset.X, rect.Y - offset.Y + line * font.LineHeight, 1, font.LineHeight), color);
 
             if (textEditor.Selected)

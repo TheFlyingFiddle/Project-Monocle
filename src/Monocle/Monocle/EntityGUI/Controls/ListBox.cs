@@ -121,8 +121,8 @@ namespace Monocle.EntityGUI
 
             this.scrollbar = new ScrollBar(Orientation.Vertical, 0, 100, 0);
             this.scrollbar.Step = this.Font.Size;
-            this.scrollbar.ButtonColor = Color.Green;
-            this.scrollbar.BackgroundColor = Color.DarkGray;
+            this.scrollbar.ButtonColor = Color.Gray;
+            this.scrollbar.BackgroundColor = Color.Transparent;
         }
 
 

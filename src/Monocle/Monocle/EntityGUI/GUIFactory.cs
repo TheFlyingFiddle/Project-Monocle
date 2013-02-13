@@ -26,7 +26,6 @@ namespace Monocle.EntityGUI
             return (T)clone;
         }
 
-
         public void RegisterStandardObject<T>(T obj) where T : GUIControl
         {
             this.standardObjects.Add(typeof(T), obj);

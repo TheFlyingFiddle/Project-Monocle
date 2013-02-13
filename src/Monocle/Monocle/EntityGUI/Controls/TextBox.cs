@@ -120,7 +120,7 @@ namespace Monocle.EntityGUI
         protected internal override void OnMouseDownEvent(MouseButtonEventArgs _event)
         {
             base.OnMouseDownEvent(_event);
-            int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
+            int index = this.Font.BestWidthFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
             this.editText.MarkerIndex = index;
             this.editText.SelectionIndex = index;
 
@@ -132,7 +132,7 @@ namespace Monocle.EntityGUI
             base.OnMouseMoveEvent(_event);
             if (this.selecting)
             {
-                int index = this.Font.BestFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
+                int index = this.Font.BestWidthFit(this.editText.ToString(), _event.Position.X - this.padding.X) + 1;
                 this.editText.MarkerIndex = index;
             }
         }

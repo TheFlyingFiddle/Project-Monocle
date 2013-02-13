@@ -92,6 +92,8 @@ namespace Monocle
                 this.elapsed -= TimeSpan.FromSeconds(1);
                 window.Title = "" + count;
                 this.count = 0;
+
+                Console.WriteLine("Currently using : " + GC.GetTotalMemory(false) + " Bytes of memory:" + GC.GetTotalMemory(false) / 1024 + " == KB");
             }
             this.count++;
 
@@ -118,7 +120,7 @@ namespace Monocle
             this.guiRenderer = new GUIRenderer(new SpriteBuffer(this.GraphicsContext, effect), new Frame(pixel.Bounds, pixel));
 
 
-            window.VSync = VSyncMode.Off;
+            window.VSync = VSyncMode.On;
             window.Keyboard.KeyRepeat = true;
                   
             // Other state

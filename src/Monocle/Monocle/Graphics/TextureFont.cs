@@ -135,12 +135,12 @@ namespace Monocle.Graphics
             return MessureSubstring(toMessure, 0, toMessure.Length);
         }
 
-        public int BestFit(string tofit, float maxWidth)
+        public int BestWidthFit(string tofit, float maxWidth)
         {
-            return this.BestSubstringFit(tofit, 0, tofit.Length, maxWidth);
+            return this.BestSubstringWidthFit(tofit, 0, tofit.Length, maxWidth);
         }
 
-        public unsafe int BestSubstringFit(string tofit, int startIndex, int length, float maxWidth)
+        public unsafe int BestSubstringWidthFit(string tofit, int startIndex, int length, float maxWidth)
         {
             float pos = 0;
             fixed (char* ptr = tofit)
@@ -176,7 +176,7 @@ namespace Monocle.Graphics
             return tofit.Length;
         }
 
-        public unsafe int BestFitBackWards(string tofit, int from, float maxWidth)
+        public unsafe int BestWidthFitBackWards(string tofit, int from, float maxWidth)
         {
             float pos = 0;
             fixed (char* ptr = tofit)
@@ -213,6 +213,27 @@ namespace Monocle.Graphics
         public object Clone()
         {
             return this;
+        }
+
+        internal unsafe int BestHeightFit(string toFit, float height)
+        {
+            float pos = this.Size;
+            fixed (char* ptr = toFit)
+            {
+                for (int i = 0; i < toFit.Length; i++)
+                {
+                    char c = ptr[i];
+                    if (c == '\n' || c == '\r')
+                    {
+                        pos += this.LineHeight;
+                    }
+
+                    if (pos > height)
+                        return Math.Max(i - 1, 0);
+                }
+            }
+
+            return toFit.Length;
         }
     }
 }
