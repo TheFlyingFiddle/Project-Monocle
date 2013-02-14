@@ -279,7 +279,7 @@ namespace Monocle.Utils
 
                 int min = Math.Min(this.selectionIndex, this.markerIndex);
                 int max = Math.Max(this.selectionIndex, this.markerIndex);
-                return this.builder.ToString().Substring(min, max - min);
+                return this.ToString().Substring(min, max - min);
             }
         }
 
@@ -324,7 +324,6 @@ namespace Monocle.Utils
             {
                 this._last = this.builder.ToString();
                 Console.WriteLine("Size of string: " + _last.Length * 2  + " Bytes == " + _last.Length * 2 / 1024 + " KB");
-                Console.WriteLine("Currently using : " + GC.GetTotalMemory(false) + " Bytes of memory:" + GC.GetTotalMemory(false) / 1024 + " == KB");
                 
                 this.hasChanged = false;
             }

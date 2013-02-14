@@ -63,7 +63,7 @@ namespace Monocle.Graphics
         {
             public Vector4 Position;
             public Vector2 TexCoords;
-            public int Tint;
+            public Color Tint;
             public float Rotation;
             
             public int SizeInBytes { get { return 32; } }
@@ -162,7 +162,7 @@ namespace Monocle.Graphics
         /// <param name="toDraw">The string to be drawn.</param>
         /// <param name="position">The upper left corner position of the string.</param>
         /// <param name="color">The color to draw with.</param>
-        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color color)
         {
             this.BufferString(fontUsed, toDraw, position, color, Vector2.Zero, Vector2.One, 0, false);
         }
@@ -175,7 +175,7 @@ namespace Monocle.Graphics
         /// <param name="position">The upper left corner position of the string.</param>
         /// <param name="color">The color to draw with.</param>
         /// <param name="origin">The origin point used.</param>
-        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color color, Vector2 origin)
         {
             this.BufferString(fontUsed, toDraw, position, color, origin, Vector2.One, 0, false);
         }
@@ -192,12 +192,12 @@ namespace Monocle.Graphics
         /// <param name="angle">The angle the text should be totated.</param>
         /// <param name="mirror">A fralg indicating if the text should be mirrored or not.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void BufferString(Font font, StringBuilder toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        public void BufferString(Font font, StringBuilder toDraw, Vector2 position, Color color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
             this.BufferString(font, toDraw.ToString(), position, color, origin, scale, angle, mirror, renderLayer);
         }
 
-        public void BufferSubString(Font font, string toDraw, int startIndex, int length, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        public void BufferSubString(Font font, string toDraw, int startIndex, int length, Vector2 position, Color color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
             this.BufferString(font,toDraw,startIndex,length,position,color,origin,scale,angle,mirror, renderLayer);
         }
@@ -214,13 +214,13 @@ namespace Monocle.Graphics
         /// <param name="angle">The angle the text should be totated.</param>
         /// <param name="mirror">A fralg indicating if the text should be mirrored or not.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
+        public void BufferString(Font fontUsed, string toDraw, Vector2 position, Color color, Vector2 origin, Vector2 scale, float angle = 0, bool mirror = false, float renderLayer = 0.0f)
         {
             this.BufferString(fontUsed, toDraw, 0, toDraw.Length, position, color, origin, scale, angle, mirror, renderLayer);          
         }
 
         private void BufferString(Font fontUsed, string toDraw, int startIndex, int length, Vector2 position, 
-                                  Color4 color, Vector2 origin, Vector2 scale, float angle = 0, 
+                                  Color color, Vector2 origin, Vector2 scale, float angle = 0, 
                                   bool mirror = false, float renderLayer = 0.0f)
         {
             if (fontUsed == null || toDraw == null)
@@ -229,7 +229,6 @@ namespace Monocle.Graphics
                 throw new IndexOutOfRangeException();
 
             Vector2 cursor = new Vector2(-origin.X * scale.X, -origin.Y * scale.Y);
-            int tint = color.ToArgb();
             unsafe
             {
                 while(this.elementCount + length * 4 >= this.textures.Length)
@@ -243,7 +242,7 @@ namespace Monocle.Graphics
                         for (int i = startIndex; i < startIndex + length; i++)
                         {
                             char c = ptr[i];
-                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, false, tint, angle, renderLayer, c);
+                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, false, color, angle, renderLayer, c);
                         }
                     }
                     else
@@ -251,7 +250,7 @@ namespace Monocle.Graphics
                         for (int i = startIndex + length - 1; i >= startIndex; i--)
                         {
                             char c = ptr[i];
-                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, true, tint, angle, renderLayer, c);
+                            BufferChar(fontUsed, ref position, ref origin, ref scale, ref cursor, true, color, angle, renderLayer, c);
                         }
                     }
                 }
@@ -271,7 +270,7 @@ namespace Monocle.Graphics
             this.SetupIndices(this.textures.Length);
         }
 
-        private void BufferChar(Font fontUsed, ref Vector2 position, ref Vector2 origin, ref Vector2 scale, ref Vector2 cursor, bool mirror, int tint, float angle, float renderLayer, char c)
+        private void BufferChar(Font fontUsed, ref Vector2 position, ref Vector2 origin, ref Vector2 scale, ref Vector2 cursor, bool mirror, Color tint, float angle, float renderLayer, char c)
         {
             if (c == '\r') 
                 return;
@@ -326,7 +325,7 @@ namespace Monocle.Graphics
             return;
         }
 
-        protected unsafe void CreateRect(ref Vector4 dest, ref Vector4 src, ref Vector2 pos, int tint, float angle)
+        protected unsafe void CreateRect(ref Vector4 dest, ref Vector4 src, ref Vector2 pos, Color tint, float angle)
         {
             fixed (Vertex* fixedPtr = &this.vertices[this.elementCount * 4])
             {
@@ -388,7 +387,7 @@ namespace Monocle.Graphics
         /// <param name="rotation">The rotation of the frame.</param>
         /// <param name="mirror">A fralg indicating if the frame should be mirrored.</param>
         /// <param name="renderLayer">The layer in with to render the text. (used together with SortMode.RenderOrder to render objects in specific layers)</param>
-        public void BufferFrame(Frame frame, Vector2 position, Color4 color, Vector2 origin, Vector2 scale, float rotation = 0.0f, bool mirror = false, float renderLayer = 0)
+        public void BufferFrame(Frame frame, Vector2 position, Color color, Vector2 origin, Vector2 scale, float rotation = 0.0f, bool mirror = false, float renderLayer = 0)
         {
             if (this.elementCount >= this.textures.Length)
                 this.Resize();
@@ -418,7 +417,7 @@ namespace Monocle.Graphics
 
 
 
-            this.CreateRect(ref dest, ref src, ref position, color.ToArgb(), rotation);
+            this.CreateRect(ref dest, ref src, ref position, color, rotation);
 
             this.textures[this.elementCount] = frame.Texture2D;
             this.renderOrder[this.elementCount++] = renderLayer;
@@ -433,7 +432,7 @@ namespace Monocle.Graphics
         /// <param name="color">The color of the frame.</param>
         /// <param name="rotation">The rotation of the frame.</param>
         /// <param name="mirror"> </param>
-        public void BufferFrame(Frame frame, Rect position, Color4 color, float rotation = 0, bool mirror = false)
+        public void BufferFrame(Frame frame, Rect position, Color color, float rotation = 0, bool mirror = false)
         {
             this.BufferFrame(frame, new Vector2(position.X, position.Y), color, Vector2.Zero, new Vector2((position.W / frame.SrcRect.W), position.H / frame.SrcRect.H), rotation, mirror);
         }
@@ -445,7 +444,7 @@ namespace Monocle.Graphics
         /// <param name="frame">The frame to draw.</param>
         /// <param name="position">The top left corner position of the frame.</param>
         /// <param name="color">The color of the frame.</param>
-        public void BufferFrame(Frame frame, Vector2 position, Color4 color)
+        public void BufferFrame(Frame frame, Vector2 position, Color color)
         {
             this.BufferFrame(frame, position, color, Vector2.Zero, Vector2.One, 0f, false);
         }

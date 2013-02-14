@@ -85,6 +85,7 @@
     <Compile Include="EntityGUI\Controls\AnimationBox.cs" />
     <Compile Include="EntityGUI\Controls\Button.cs" />
     <Compile Include="EntityGUI\Controls\CheckBox.cs" />
+    <Compile Include="EntityGUI\Controls\ComboBox.cs" />
     <Compile Include="EntityGUI\Controls\FocusManager.cs" />
     <Compile Include="EntityGUI\Controls\ImageBox.cs" />
     <Compile Include="EntityGUI\Controls\ScrollableControl.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Examples\ButtonExample.cs" />
     <Compile Include="Examples\LabelExample.cs" />
     <Compile Include="Examples\AnimationExample.cs" />
+    <Compile Include="Examples\Particles.cs" />
     <Compile Include="Examples\TextExamples.cs" />
     <Compile Include="Graphics\Animation.cs" />
     <Compile Include="Graphics\Color.cs" />

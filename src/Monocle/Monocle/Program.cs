@@ -32,8 +32,11 @@ namespace Monocle
 
 
 
-            TextExample example = new TextExample(resourceFolder);
-            example.Run(); 
+           // TextExample example = new TextExample(resourceFolder);
+           // example.Run(); 
+
+            Particles example = new Particles(resourceFolder);
+            example.Run();
         }
 
     }

@@ -37,7 +37,9 @@ namespace Monocle
 
         protected IGraphicsContext GraphicsContext;
         protected ResourceContext Resourses;
+        protected Frame pixel;
         private IGUIRenderer guiRenderer;
+        protected SpriteBuffer spriteBuffer;
       
         private readonly GUIEventSystem eventSystem;
         private readonly Panel panel;
@@ -82,18 +84,18 @@ namespace Monocle
         private TimeSpan elapsed;
         private int count;
 
+        private Clock clock;
 
         void window_UpdateFrame(object sender, FrameEventArgs e)
         {
-            TimeSpan elapsed = TimeSpan.FromSeconds(e.Time);
-            this.Time = new Time(this.Time.Total + elapsed, elapsed);
-            this.elapsed += elapsed;
+            clock.Step();
+            this.Time = new Time(this.Time.Total + elapsed, clock.Elapsed);
+
+            this.elapsed += clock.Elapsed;
             if(this.elapsed > TimeSpan.FromSeconds(1)) {
                 this.elapsed -= TimeSpan.FromSeconds(1);
                 window.Title = "" + count;
                 this.count = 0;
-
-                Console.WriteLine("Currently using : " + GC.GetTotalMemory(false) + " Bytes of memory:" + GC.GetTotalMemory(false) / 1024 + " == KB");
             }
             this.count++;
 
@@ -115,9 +117,10 @@ namespace Monocle
                                                         Path.Combine(this.resourceFolder, "Assets"), this.resourceFolder);
             this.Resourses.ShouldSaveAllLoadedAssets = false;
 
-            var pixel = this.Resourses.LoadAsset<Texture2D>("pixel.png");
+            pixel = this.Resourses.LoadAsset<TextureAtlas>("Fonts\\Metro_W_Pixel.atlas")["pixel"];
             var effect = this.Resourses.LoadAsset<ShaderProgram>("Basic.effect");
-            this.guiRenderer = new GUIRenderer(new SpriteBuffer(this.GraphicsContext, effect), new Frame(pixel.Bounds, pixel));
+            this.spriteBuffer = new SpriteBuffer(this.GraphicsContext, effect);
+            this.guiRenderer = new GUIRenderer(this.spriteBuffer, pixel);
 
 
             window.VSync = VSyncMode.On;
@@ -131,7 +134,8 @@ namespace Monocle
             var factory = CreateGUIFactory();
             this.Load(factory);
 
-            GC.Collect();
+            clock = new Clock();
+
         }
 
         private GUIFactory CreateGUIFactory()
