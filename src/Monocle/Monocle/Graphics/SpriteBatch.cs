@@ -396,11 +396,7 @@ namespace Monocle.Graphics
                 throw new ArgumentNullException();
 
 
-            Vector4 src = frame.SrcRect.ToVector4();
-            src.X /= frame.Texture2D.Width;
-            src.Z /= frame.Texture2D.Width;
-            src.Y /= frame.Texture2D.Height;
-            src.W /= frame.Texture2D.Height;
+            Vector4 src = frame.TextureCoordinates;
 
             if (mirror)
             {

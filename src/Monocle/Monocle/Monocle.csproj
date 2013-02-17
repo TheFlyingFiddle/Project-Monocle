@@ -125,6 +125,8 @@
     <Compile Include="Graphics\IGraphicsContext.cs" />
     <Compile Include="Graphics\ISpriteBuffer.cs" />
     <Compile Include="EntityGUI\Controls\Panel.cs" />
+    <Compile Include="Graphics\ParticleBatch.cs" />
+    <Compile Include="Graphics\PointBatch.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\IndexBuffer.cs" />
     <Compile Include="Graphics\IVertex.cs" />
