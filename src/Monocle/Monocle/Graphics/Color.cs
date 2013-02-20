@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Graphics;
+using OpenTK;
 
 namespace Monocle.Graphics
 {
@@ -78,7 +79,7 @@ namespace Monocle.Graphics
         }
 
         public Color(Color color, float a)
-            : this(color.R * a, color.G * a, color.B * a, a)
+            : this(color.R, color.G, color.B, a)
         {  }
 
         public Color(float r, float g, float b)
@@ -90,6 +91,10 @@ namespace Monocle.Graphics
             return new Color(c.R + contrast, c.G + contrast, c.B + contrast, c.A); 
         }
 
+        public Vector4 ToVector4()
+        {
+            return new Vector4(R, G, B, A);
+        }
 
         private static int Clamp(int value)
         {
@@ -1260,6 +1265,5 @@ namespace Monocle.Graphics
                 return new Color(4281519514u);
             }
         }
-
     }
 }

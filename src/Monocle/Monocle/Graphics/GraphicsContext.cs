@@ -393,7 +393,11 @@ namespace Monocle.Graphics
         {
             ErrorCode code = GL.GetError();
             if (code != ErrorCode.NoError)
-                throw new GraphicsException("Error in graphics! ErrorCode : " + code);
+            {
+                var e = new GraphicsException("Error in graphics! ErrorCode : " + code);
+                Console.WriteLine(e.StackTrace);
+                throw e;
+            }
         }
 
         public void AttachShader(int programID, int shaderID)

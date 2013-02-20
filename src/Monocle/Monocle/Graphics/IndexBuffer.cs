@@ -34,6 +34,11 @@ namespace Monocle.Graphics
         {
             context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 2), (IntPtr)(length * 2), data);
         }
+
+        public void Bind()
+        {
+            this.context.BindIndexBuffer(this);
+        }
     }
 
     public class IntIndexBuffer
@@ -62,6 +67,11 @@ namespace Monocle.Graphics
         public void SetSubData(int[] data, int offset, int length)
         {
             context.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr)(offset * 4), (IntPtr)(length * 4), data);
+        }
+
+        public void Bind()
+        {
+            this.context.BindIndexBuffer(this);
         }
 
     }

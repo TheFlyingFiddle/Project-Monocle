@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Monocle.Graphics;
 
 public static class ExtensionMethods
 {
@@ -49,5 +50,11 @@ public static class ExtensionMethods
         return info.DeclaringType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                                  .Where(f => f.Name.Contains(info.Name) && f.Name.Contains("BackingField"))
                                  .Where(f => f.IsDefined(typeof(CompilerGeneratedAttribute), true)).Any();
+    }
+
+
+    public static Color NextColor(this Random random)
+    {
+        return new Color(random.Next(255), random.Next(255), random.Next(255), random.Next(255));
     }
 }

@@ -87,6 +87,37 @@ namespace Monocle.Graphics
             GraphicsContext.Uniform1(location, value);    
         }
 
+        public void SetUniform(string name, ref Vector2 value)
+        {
+            int location;
+            if (!uniformMap.TryGetValue(name, out location))
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+
+            GraphicsContext.Uniform2(location, ref value);    
+        }
+
+
+        public void SetUniform(string name, Color value)
+        {
+            int location;
+            if (!uniformMap.TryGetValue(name, out location))
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+            Vector4 val = value.ToVector4();
+            GraphicsContext.Uniform4(location, ref val);  
+        }
+
         public void SetUniform(string name , ref Matrix4 value)
         {
             int location;

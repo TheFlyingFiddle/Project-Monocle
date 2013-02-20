@@ -53,5 +53,16 @@ namespace Monocle.Graphics
         {
             this.GraphicsContext.BufferSubData<T>(BufferTarget.ArrayBuffer, (IntPtr)(offset * data[0].SizeInBytes), (IntPtr)(count * data[0].SizeInBytes), data);
         }
+
+        public unsafe void SetSubData(IntPtr data, int bufferOffset, int count, int size)
+        {
+            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)(bufferOffset * size), (IntPtr)(count * size), data);
+        }
+
+
+        public void Bind()
+        {
+            this.GraphicsContext.BindVertexBuffer(this);
+        }
     }
 }
