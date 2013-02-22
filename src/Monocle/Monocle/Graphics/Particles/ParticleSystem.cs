@@ -23,8 +23,12 @@ namespace Monocle.Graphics.Particles
         private const string START_SIZE = "start_size";
         private const string END_SIZE = "end_size";
 
+        private const string SIZE_VARIANCE = "size_variance";
+
         private const string LIFE_TIME = "life_time";
         private const string CURRENT_TIME = "current";
+
+        private const string COLOR_VARIANCE = "color_variance";
 
         public const string START_ANGULAR_VELOCITY = "start_angular_velocity";
         public const string END_ANGULAR_VELOCITY = "end_angular_velocity";
@@ -129,6 +133,8 @@ namespace Monocle.Graphics.Particles
             program.SetUniform(END_SIZE, settings.EndSize);
             program.SetUniform(START_ANGULAR_VELOCITY, settings.StartAngularVelocity);
             program.SetUniform(END_ANGULAR_VELOCITY, settings.EndAngularVelocity);
+            program.SetUniform(COLOR_VARIANCE, settings.ColorVariance);
+            program.SetUniform(SIZE_VARIANCE, settings.SizeVariance);
 
             program.SetUniform(LIFE_TIME, settings.LifeTime);
             program.SetUniform(CURRENT_TIME, this.currentTime);
@@ -307,9 +313,7 @@ namespace Monocle.Graphics.Particles
 
             firstNewParticle = firstFreeParticle;
         }
-
-        Random random = new Random();
-
+        
         public void AddParticle(Vector2 position, Vector2 velocity, Vector2 size, Vector4 coords)
         {
             int nextFreeParticle = (firstFreeParticle + 1) % this.MaxParticles;
@@ -328,8 +332,9 @@ namespace Monocle.Graphics.Particles
             queue[firstFreeParticle * 4 + 2].Offset = size / 2;
             queue[firstFreeParticle * 4 + 3].Offset = new Vector2(-size.X / 2, size.Y / 2); ;
 
-            Vector2 rand = new Vector2((float)random.NextDouble() * 100 - 50, (float)random.NextDouble() * 100 - 50);
+            Random random = Examples.Particles.Random;
 
+            Vector2 rand = new Vector2(-1 + (float)random.NextDouble() * 2, -1f + (float)random.NextDouble() * 2f);
             for (int i = 0; i < 4; i++)
             {
                 queue[firstFreeParticle * 4 + i].Position = new Vector2(position.X, position.Y);

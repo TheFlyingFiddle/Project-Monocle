@@ -40,6 +40,7 @@ namespace Monocle.Graphics.Particles
         Random random = new Random();
         private void EmitParticle()
         {
+            Random random = Examples.Particles.Random;
             double angle = random.NextDouble() * Math.PI * 2;
 
             Vector2 position = this.Position;

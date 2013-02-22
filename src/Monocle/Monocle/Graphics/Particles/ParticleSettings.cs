@@ -12,6 +12,8 @@ namespace Monocle.Graphics.Particles
 
         public Color StartColor;
         public Color EndColor;
+        public Color ColorVariance;
+
 
         public float StartSize;
         public float EndSize;
@@ -20,9 +22,14 @@ namespace Monocle.Graphics.Particles
         public float EndAngularVelocity;
 
         public float LifeTime;
+        public float SizeVariance;
 
-        public ParticleSettings(Vector2 forces, Color startC, Color endC, float startS, float endS, float startAngularVelocity, float endAngluarVelocity, float lifeTime)
+
+
+        public ParticleSettings(Vector2 forces, Color startC, Color endC, Color colorVariance, float startS, float endS, float sizeVariance, float startAngularVelocity, float endAngluarVelocity, float lifeTime)
         {
+            this.SizeVariance = sizeVariance;
+            this.ColorVariance = colorVariance;
             this.Forces = forces;
             this.StartColor = startC;
             this.EndColor = endC;
