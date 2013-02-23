@@ -33,5 +33,10 @@ namespace Monocle.Graphics
         {
             return this.GetEnumerator();
         }
+
+        public Frame[] ToArray()
+        {
+            return this.dict.Values.ToArray();
+        }
     }
 }

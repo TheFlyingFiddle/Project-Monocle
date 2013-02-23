@@ -15,10 +15,10 @@ namespace Monocle.Graphics.Particles
         private TimeSpan particleInterval;
         private TimeSpan elapsed;
 
-        private Frame ParticleFrame;
+        private Frame[] ParticleFrame;
 
 
-        public ParticleEmiter(Vector2 initialPosition, TimeSpan particleInterval, ParticleSystem system, Frame particleFrame)
+        public ParticleEmiter(Vector2 initialPosition, TimeSpan particleInterval, ParticleSystem system, Frame[] particleFrame)
         {
             this.Position = initialPosition;
             this.particleInterval = particleInterval;
@@ -44,11 +44,12 @@ namespace Monocle.Graphics.Particles
             double angle = random.NextDouble() * Math.PI * 2;
 
             Vector2 position = this.Position;
-            Vector2 velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle))
-                                * (float)(random.NextDouble() * 150 + 1);
+            Vector2 velocity = new Vector2(200,-100 + random.Next(0,200));
             Vector2 size = new Vector2(4,4);
 
-            this.system.AddParticle(position, velocity, size, ParticleFrame.TextureCoordinates);
+            var frame = ParticleFrame[random.Next(ParticleFrame.Length)];
+
+            this.system.AddParticle(position, velocity, size, frame.TextureCoordinates);
         }        
     }
 }

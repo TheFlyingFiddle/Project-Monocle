@@ -17,41 +17,25 @@ namespace Monocle.Examples
             : base(1280, 720, 60, "Particles", p)
         { }
 
-        int w, h;
-
-        private struct Particle
-        {
-            internal Color color;
-            internal Vector2 position;
-            internal Vector2 direction;
-        }
-
-        private PointBatch batch;
         private ShaderProgram particleProgram;
-        private Frame particleTexture;
-        private Particle[] particles = new Particle[4096 * 64];
-
+        private TextureAtlas particleAtlas;        
 
         private ParticleSystem[] systems;
-        private ParticleEmiter[] emiters;
-        private ParticleSettings particleSettings;
+        private Emiter2D[] emiters;
 
-        Random random;
         protected override void Load(EntityGUI.GUIFactory factory)
         {
             this.particleProgram = this.Resourses.LoadAsset<ShaderProgram>("Sin.effect");
             this.Panel.BackgroundColor = Color.Gray;
 
-            random = new Random();
-          //  this.Panel.MouseMove += new EventHandler<EntityGUI.MouseMoveEventArgs>(Panel_MouseMove);
             this.Panel.MouseDown += new EventHandler<EntityGUI.MouseButtonEventArgs>(Panel_MouseDown);
+            this.Panel.MouseMove +=new EventHandler<EntityGUI.MouseMoveEventArgs>(Panel_MouseMove);
 
-            var tex = this.Resourses.LoadAsset<Texture2D>("particle.png");
-            this.particleTexture = new Frame(tex.Bounds, tex);
+            particleAtlas = this.Resourses.LoadAsset<TextureAtlas>("Atlases\\Particles.atlas");
 
 
             this.systems = new ParticleSystem[10];
-            this.emiters = new ParticleEmiter[10];
+            this.emiters = new Emiter2D[10];
             this.Panel_MouseDown(null, null);
         }
 
@@ -61,16 +45,49 @@ namespace Monocle.Examples
             {
                 for (int j = 0; j < 2; j++)
                 {
-                    Color c = random.NextColor();
-                    Color c2 = random.NextColor();
+                    Color c = Random.NextColor();
+                    Color c2 = Random.NextColor();
 
-                    ParticleSettings settings = new ParticleSettings(new Vector2(random.Next(-200, 100), random.Next(-500, 500)), c * 0.2f, c2 * 0.7f,
+                    ParticleSettings settings = new ParticleSettings(new Vector2(Random.Next(-30, 30), Random.Next(-30, 30)), c * 0.7f, c2,
                                                                      Color.Black * 0.5f,
-                                                                     random.Next(2, 8), random.Next(16, 32), 3f, 5, 10, random.Next(3, 4));
+                                                                     Random.Next(2, 8), Random.Next(16, 64), 3f, 0, 2, Random.Next(1, 5));
 
 
-                    this.systems[i * 2 + j] = new ParticleSystem(this.GraphicsContext, 1024, settings);
-                    this.emiters[i * 2 + j] = new ParticleEmiter(new Vector2(this.Width / 5 * i + 150, this.Height / 2* j + 250), TimeSpan.FromSeconds(1 / 150d), systems[i * 2 + j], this.particleTexture);
+                    this.systems[i * 2 + j] = new ParticleSystem(this.GraphicsContext, 256 * 2, settings);
+
+                    double r = Random.NextDouble();
+                    if (r > 0.66f)
+                    {
+
+                        SprayEmiter2D emiter = new SprayEmiter2D(100f, 200f, 0, (float)(Random.NextDouble() * Math.PI * 2), new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
+                        new Frame[] { particleAtlas["Cloud002"], particleAtlas["Flame"], particleAtlas["Cloud004"] }, systems[i * 2 + j]);
+                        emiter.EmitInterval = TimeSpan.FromSeconds(1d / 64);
+                        emiter.EmitCount = 2;
+
+
+                        this.emiters[i * 2 + j] = emiter;
+                    }
+                    else if (r > 0.33d)
+                    {
+                        BeeEmiter2D emiter = new BeeEmiter2D(new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
+                        new Frame[] { particleAtlas["Cloud002"], particleAtlas["Flame"], particleAtlas["Cloud004"] }, systems[i * 2 + j]);
+                        emiter.EmitInterval = TimeSpan.FromSeconds(1d / 64);
+                        emiter.EmitCount = 4;
+
+                        this.emiters[i * 2 + j] = emiter;
+                    }
+                    else
+                    {
+                        HoleEmiter emiter = new HoleEmiter(50, 75, new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
+                        new Frame[] { particleAtlas["LensFlare"], particleAtlas["Water002"], particleAtlas["SoftSmokey"], particleAtlas["Water001"] }, systems[i * 2 + j]);
+                        emiter.EmitInterval = TimeSpan.FromSeconds(1d / 32);
+                        emiter.EmitCount = 8;
+
+
+                        this.emiters[i * 2 + j] = emiter;
+
+                    }
+                        
                 }
             }
         }
@@ -79,7 +96,7 @@ namespace Monocle.Examples
 
         void Panel_MouseMove(object sender, EntityGUI.MouseMoveEventArgs e)
         {
-            emiters[random.Next(emiters.Length)].Position = e.Position;
+            emiters[0].Position = e.Position;
         }
                
 
@@ -107,7 +124,7 @@ namespace Monocle.Examples
 
             foreach (var item in systems)
             {
-                item.Render(ref proj, this.particleProgram, this.particleTexture.Texture2D);
+                item.Render(ref proj, this.particleProgram, this.particleAtlas.Texture);
             }
         }
     }

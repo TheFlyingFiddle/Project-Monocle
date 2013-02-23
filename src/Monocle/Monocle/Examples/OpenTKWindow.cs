@@ -123,7 +123,7 @@ namespace Monocle
             this.guiRenderer = new GUIRenderer(this.spriteBuffer, pixel);
 
 
-            window.VSync = VSyncMode.On;
+            window.VSync = VSyncMode.Off;
             window.Keyboard.KeyRepeat = true;
                   
             // Other state

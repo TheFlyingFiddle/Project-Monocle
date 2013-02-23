@@ -126,6 +126,7 @@
     <Compile Include="Graphics\ISpriteBuffer.cs" />
     <Compile Include="EntityGUI\Controls\Panel.cs" />
     <Compile Include="Graphics\ParticleBatch.cs" />
+    <Compile Include="Graphics\Particles\Emiter.cs" />
     <Compile Include="Graphics\Particles\ParticleEmiter.cs" />
     <Compile Include="Graphics\Particles\ParticleSettings.cs" />
     <Compile Include="Graphics\Particles\ParticleSystem.cs" />

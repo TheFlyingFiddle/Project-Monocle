@@ -20,6 +20,10 @@ namespace Monocle.Graphics.Particles
         private const string START_COLOR = "start_color";
         private const string END_COLOR = "end_color";
 
+
+        private const string START_ALPHA = "start_alpha";
+        private const string END_ALPHA = "end_alpha";
+
         private const string START_SIZE = "start_size";
         private const string END_SIZE = "end_size";
 
@@ -136,9 +140,17 @@ namespace Monocle.Graphics.Particles
             program.SetUniform(COLOR_VARIANCE, settings.ColorVariance);
             program.SetUniform(SIZE_VARIANCE, settings.SizeVariance);
 
+            Vector3 g = new Vector3(500,500, -300);
+            program.SetUniform("gravity_well_1", ref g);
+            g = new Vector3(1550, 500, 200);
+            program.SetUniform("gravity_well_2", ref g);
+
+
+            program.SetUniform(START_ALPHA, 1f);
+            program.SetUniform(END_ALPHA, 0f);
+
             program.SetUniform(LIFE_TIME, settings.LifeTime);
             program.SetUniform(CURRENT_TIME, this.currentTime);
-
 
             program.SetUniform(TEXTURE, 0);
             

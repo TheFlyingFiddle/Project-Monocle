@@ -103,6 +103,22 @@ namespace Monocle.Graphics
         }
 
 
+        public void SetUniform(string name, ref Vector3 value)
+        {
+            int location;
+            if (!uniformMap.TryGetValue(name, out location))
+            {
+                location = GraphicsContext.GetUniformLocation(this.Handle, name);
+                if (location == -1)
+                    throw new ArgumentException();
+                else
+                    uniformMap.Add(name, location);
+            }
+
+            GraphicsContext.Uniform3(location, ref value);
+        }
+
+
         public void SetUniform(string name, Color value)
         {
             int location;
