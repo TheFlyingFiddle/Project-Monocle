@@ -140,13 +140,13 @@ namespace Monocle.Graphics.Particles
             program.SetUniform(COLOR_VARIANCE, settings.ColorVariance);
             program.SetUniform(SIZE_VARIANCE, settings.SizeVariance);
 
-            Vector3 g = new Vector3(500,500, -300);
+            Vector3 g = new Vector3(500,500, -0);
             program.SetUniform("gravity_well_1", ref g);
-            g = new Vector3(1550, 500, 200);
+            g = new Vector3(1550, 500, 0);
             program.SetUniform("gravity_well_2", ref g);
 
 
-            program.SetUniform(START_ALPHA, 1f);
+            program.SetUniform(START_ALPHA, 1.5f);
             program.SetUniform(END_ALPHA, 0f);
 
             program.SetUniform(LIFE_TIME, settings.LifeTime);

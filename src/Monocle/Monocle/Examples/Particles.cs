@@ -45,12 +45,12 @@ namespace Monocle.Examples
             {
                 for (int j = 0; j < 2; j++)
                 {
-                    Color c = Random.NextColor();
+                    Color c = Random.NextColor() * 0.5f;
                     Color c2 = Random.NextColor();
 
                     ParticleSettings settings = new ParticleSettings(new Vector2(Random.Next(-30, 30), Random.Next(-30, 30)), c * 0.7f, c2,
                                                                      Color.Black * 0.5f,
-                                                                     Random.Next(2, 8), Random.Next(16, 64), 3f, 0, 2, Random.Next(1, 5));
+                                                                     0, Random.Next(30, 40), 3f, 0, 2, Random.Next(1, 2));
 
 
                     this.systems[i * 2 + j] = new ParticleSystem(this.GraphicsContext, 256 * 2, settings);
@@ -59,8 +59,8 @@ namespace Monocle.Examples
                     if (r > 0.66f)
                     {
 
-                        SprayEmiter2D emiter = new SprayEmiter2D(100f, 200f, 0, (float)(Random.NextDouble() * Math.PI * 2), new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
-                        new Frame[] { particleAtlas["Cloud002"], particleAtlas["Flame"], particleAtlas["Cloud004"] }, systems[i * 2 + j]);
+                        SprayEmiter2D emiter = new SprayEmiter2D(100f, 200f, 0, (float)(Random.NextDouble() * Math.PI), new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
+                        this.particleAtlas.ToArray(), systems[i * 2 + j]);
                         emiter.EmitInterval = TimeSpan.FromSeconds(1d / 64);
                         emiter.EmitCount = 2;
 
@@ -78,8 +78,8 @@ namespace Monocle.Examples
                     }
                     else
                     {
-                        HoleEmiter emiter = new HoleEmiter(50, 75, new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
-                        new Frame[] { particleAtlas["LensFlare"], particleAtlas["Water002"], particleAtlas["SoftSmokey"], particleAtlas["Water001"] }, systems[i * 2 + j]);
+                        CircleEmiter2D emiter = new CircleEmiter2D(50, 75, new Vector2(this.Width / 5 * i + 150, this.Height / 2 * j + 150),
+                          this.particleAtlas.ToArray(), systems[i * 2 + j]);
                         emiter.EmitInterval = TimeSpan.FromSeconds(1d / 32);
                         emiter.EmitCount = 8;
 
